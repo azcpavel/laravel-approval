@@ -15,7 +15,8 @@ class ApprovalRequestApproverForm extends Model
     protected $fillable = [
         'approval_request_approver_id',
         'approvable_id',
-        'approvable_type'
+        'approvable_type',
+        'title'
     ];
     public $timestamps = false;
 

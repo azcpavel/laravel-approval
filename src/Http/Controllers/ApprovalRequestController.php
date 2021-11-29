@@ -147,7 +147,7 @@ class ApprovalRequestController extends Controller
 	 */
 	public function submit(Request $request, ApprovalRequest $approvalRequest)
 	{
-		$currentLavel = $approvalRequest->currentLevel(true);
+		$currentLevel = $approvalRequest->currentLevel(true);
 		if($request->has('approval_option')){            
 			try{
 				\DB::beginTransaction();
@@ -180,57 +180,59 @@ class ApprovalRequestController extends Controller
 
 				if($request->approval_option == 1){                    
 
-					$approvalRequest->approvers()->create([
-						'approval_id' => $currentLavel->approval_id,
+					$approvalRequestApprover = $approvalRequest->approvers()->create([
+						'approval_id' => $currentLevel->approval_id,
 						'user_id' => auth()->id(),
-						'title' => $currentLavel->title,
-						'is_flexible' => $currentLavel->is_flexible,
-						'is_form_required' => $currentLavel->is_form_required,
-						'level' => $currentLavel->level,
-						'action_type' => $currentLavel->action_type,
-						'action_data' => $currentLavel->action_data,
-						'status_fields' => $currentLavel->status_fields,
-						'is_data_mapped' => $currentLavel->is_data_mapped,
+						'title' => $currentLevel->title,
+						'is_flexible' => $currentLevel->is_flexible,
+						'is_form_required' => $currentLevel->is_form_required,
+						'level' => $currentLevel->level,
+						'action_type' => $currentLevel->action_type,
+						'action_data' => $currentLevel->action_data,
+						'status_fields' => $currentLevel->status_fields,
+						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 1,
 						'is_rejected' => 0,                        
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
 					]);
+					$message['msg_data'] = 'Your approval has been submitted';
 				}else if($request->approval_option == 0){                    
 
-					$approvalRequest->approvers()->create([
-						'approval_id' => $currentLavel->approval_id,
+					$approvalRequestApprover = $approvalRequest->approvers()->create([
+						'approval_id' => $currentLevel->approval_id,
 						'user_id' => auth()->id(),
-						'title' => $currentLavel->title,
-						'is_flexible' => $currentLavel->is_flexible,
-						'is_form_required' => $currentLavel->is_form_required,
-						'level' => $currentLavel->level,
-						'action_type' => $currentLavel->action_type,
-						'action_data' => $currentLavel->action_data,
-						'status_fields' => $currentLavel->status_fields,
-						'is_data_mapped' => $currentLavel->is_data_mapped,
+						'title' => $currentLevel->title,
+						'is_flexible' => $currentLevel->is_flexible,
+						'is_form_required' => $currentLevel->is_form_required,
+						'level' => $currentLevel->level,
+						'action_type' => $currentLevel->action_type,
+						'action_data' => $currentLevel->action_data,
+						'status_fields' => $currentLevel->status_fields,
+						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 0,
 						'is_rejected' => 1,                        
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
 					]);
+					$message['msg_data'] = 'Your rejection has been submitted';
 				}
 
 				$finalLevel = $approvalRequest->approval->levels->sortByDesc('level')->first();
 				
 				$complete = true;                    
-				foreach($currentLavel->users as $keyAU => $valueAU){
-					$isSubmitted = $approvalRequest->approvers->where('level',$currentLavel->level)->where('user_id',$valueAU->id)->where('status',0)->first();
+				foreach($currentLevel->users as $keyAU => $valueAU){
+					$isSubmitted = $approvalRequest->approvers->where('level',$currentLevel->level)->where('user_id',$valueAU->id)->where('status',0)->first();
 					if(!$isSubmitted){
 						$complete = false;
 						break;
 					}
 				}
 
-				if($complete){
+				if($complete){					
 					$approveCount = 0;
 					$rejectCount = 0;
-					foreach($approvalRequest->approvers->where('level',$currentLavel->level)->where('status',0)->all() as $keyASD => $valueASD){
+					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
 						$valueASD->update([
 							'status' => 1
 						]);
@@ -241,47 +243,125 @@ class ApprovalRequestController extends Controller
 							$rejectCount++;
 					}
 
-					if($currentLavel->is_flexible == 0){
+					if($currentLevel->is_flexible == 0){
 						if($rejectCount == 0){
-							foreach($currentLavel->status_fields->approve as $keyA => $valueA){
+							foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
 							$approvalItem->save();
-							$message['msg_data'] = 'Your approval has been submitted';
-							if($finalLevel->id == $currentLavel->id && $complete){
+							
+							if($finalLevel->id == $currentLevel->id && $complete){
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
+
+								if($finalLevel->is_form_required){
+									foreach($finalLevel->forms as $keyAFR => $valueAFR){									
+										if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
+											
+											$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
+												'approvable_id' => $approvalItem->id,
+										        'approvable_type' => $valueAFR->approvable_type,
+										        'title' => $valueAFR->title
+											]);
+											
+											foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
+												$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
+												if($request->has($fieldItem)){													
+													$approvalRequestApproverForm->form_data()->create([
+														'mapped_field_name' => $valueAFRF->mapped_field_name,
+														'mapped_field_label' => $valueAFRF->mapped_field_label,
+														'mapped_field_type' => $valueAFRF->mapped_field_type,
+														'mapped_field_value' => $request->$fieldItem,
+													]);
+
+													$approvalItem->update([
+														$valueAFRF->mapped_field_name => $request->$fieldItem
+													]);
+												}
+											}
+										}
+									}
+								}
 							}
 						}else{
-							foreach($currentLavel->status_fields->reject as $keyA => $valueA){
+							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
-							$approvalItem->save();
-							$message['msg_data'] = 'Your rejection has been submitted';
+							$approvalItem->save();							
 						}
 					}else{
-						if($approveCount >= $currentLavel->is_flexible){
-							foreach($currentLavel->status_fields->approve as $keyA => $valueA){
+						if($approveCount >= $currentLevel->is_flexible){
+							foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
-							$approvalItem->save();
-							$message['msg_data'] = 'Your approval has been submitted';
-							if($finalLevel->id == $currentLavel->id && $complete){
+							$approvalItem->save();							
+							if($finalLevel->id == $currentLevel->id && $complete){
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
+
+								if($finalLevel->id == $currentLevel->id && $complete){
+									$approvalRequest->completed = 1;
+									$approvalRequest->save();
+
+									if($finalLevel->is_form_required){
+										foreach($finalLevel->forms as $keyAFR => $valueAFR){									
+											if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
+												
+												$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
+													'approvable_id' => $approvalItem->id,
+											        'approvable_type' => $valueAFR->approvable_type,
+											        'title' => $valueAFR->title
+												]);
+												
+												foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
+													$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
+													if($request->has($fieldItem)){													
+														$approvalRequestApproverForm->form_data()->create([
+															'mapped_field_name' => $valueAFRF->mapped_field_name,
+															'mapped_field_label' => $valueAFRF->mapped_field_label,
+															'mapped_field_type' => $valueAFRF->mapped_field_type,
+															'mapped_field_value' => $request->$fieldItem,
+														]);
+
+														$approvalItem->update([
+															$valueAFRF->mapped_field_name => $request->$fieldItem
+														]);
+													}
+												}
+											}
+										}
+									}
+								}
 							}
 						}else{
-							foreach($currentLavel->status_fields->reject as $keyA => $valueA){
+							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
 							$approvalItem->save();
-							$message['msg_data'] = 'Your rejection has been submitted';
 						}
-					}
-				
-				}				
+					}				
+				}
 				
 				\DB::commit();
+
+				if($currentLevel->action_type == 2){
+					if($request->approval_option == 1){
+						$routeParams = [];
+						foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
+							$routeParams[$keyRP] = $approvalItem->$valueRP;
+						}
+						$routeParams['approver_id'] = $approvalRequestApprover->id;
+						return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
+					}else{
+						$routeParams = [];
+						foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
+							$routeParams[$keyRP] = $approvalItem->$valueRP;
+						}
+						$routeParams['approver_id'] = $approvalRequestApprover->id;
+						return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
+					}
+				}								
+				
 			}catch(\Exception $e){
 				if(env('APP_DEBUG'))
 					dd($e);

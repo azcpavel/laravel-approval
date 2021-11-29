@@ -125,7 +125,21 @@
 			        <select name="approval_option" class="form-control mb-3" id="approval-option">
 			        	<option value="1">Approve</option>
 			        	<option value="0">Reject</option>
-			        </select>
+			        </select>			        
+			        @if($currentLevel->forms)
+			        @foreach($currentLevel->forms as $keyAF => $valueAF)
+			        <label class="approval-form">{{$valueAF->title}}</label>
+			        @foreach($valueAF->form_data as $keyAFS => $valueAFS)
+			        @if($valueAFS->mapped_field_type == 'text')
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        @elseif($valueAFS->mapped_field_type == 'email')
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        @elseif($valueAFS->mapped_field_type == 'file')
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        @endif
+			        @endforeach
+			        @endforeach
+			        @endif
 			        <button type="submit" class="btn btn-primary">Save changes</button>
 		        </form>
 		      </div>
@@ -156,6 +170,17 @@
 	<script type="text/javascript">
 		$(document).on("click","#submit-approval",function(){
 			$('#approval-modal .modal-title').html("Approval For: "+currentLevel.title);
+		});
+
+		$(document).on("change","#approval-option",function(){
+			var $item = $(this);
+			if($item.val() == 1){
+				$('.approval-form').show();
+				$(':input.approval-form').removeAttr('required').attr('required','required');
+			}else{
+				$('input.approval-form').removeAttr('required');
+				$('.approval-form').hide();
+			}
 		});		
 	</script>
 @endpush
