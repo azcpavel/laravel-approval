@@ -26,7 +26,7 @@ This package is very easy to set up. There are only couple of steps.
 
 Pull this package in through Composer
 ```
-composer require exception-soluitions/laravel-approval
+composer require exceptio/laravel-approval
 ```
 
 ### Service Provider
