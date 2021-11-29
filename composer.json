@@ -1,0 +1,24 @@
+{
+    "name": "exception-soluitions/laravel-approval",
+    "description": "Dynamic Approval Package For Laravel Framework",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Exception Solutions",
+            "email": "azc.pavel@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Exceptio\\ApprovalPermission\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Exceptio\\ApprovalPermission\\ApprovalPermissionServiceProvider"
+            ]
+        }
+    }
+}
