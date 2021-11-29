@@ -52,14 +52,13 @@
 									$currentLevel = $approvalRequest->currentLevel(true);
 									?>
 									Level: {{$approvalRequest->currentLevel()}}<br>
-									Users: {{($currentLevel != null) ? $currentLevel->users->pluck('name')->join(',') : ''}}<br>
-									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}
-									
-									@if($currentLevel && in_array(auth()->id(), $currentLevel->users->pluck('id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
+									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
+									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}									
+									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
 									<script type="text/javascript">
 										var currentLevel = {!!json_encode($currentLevel)!!};
 									</script>
-									<br><button data-toggle="modal" data-target="#approval-modal" data-whatever="@mdo" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
+									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
 									@endif
 								</div>
 							</div>							

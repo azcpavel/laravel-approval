@@ -29,7 +29,7 @@ class CreateApprovalRequestApproversTable extends Migration
             $table->tinyInteger('is_approved')->default(1);            
             $table->tinyInteger('is_rejected')->default(0);
             $table->text('reason')->nullable();
-            $table->string('reason_file')->nullable();
+            $table->string('reason_file',1000)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
             $table->foreign('approval_id')->on('ex_approvals')->references('id');

@@ -7,6 +7,7 @@ use Exceptio\ApprovalPermission\Models\{
 	ApprovalRequest,    
 };
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class ApprovalRequestController extends Controller
 {
@@ -229,6 +230,13 @@ class ApprovalRequestController extends Controller
 					}
 				}
 
+				if($currentLevel->group_notification){
+					$notifiableClass = $currentLevel->notifiable_class;
+					$userModel = config('approval-config.user-model');
+					$users = new $userModel();
+					Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$currentLevel->notifiable_params->channels));
+				}
+
 				if($complete){					
 					$approveCount = 0;
 					$rejectCount = 0;
@@ -254,34 +262,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								if($finalLevel->is_form_required){
-									foreach($finalLevel->forms as $keyAFR => $valueAFR){									
-										if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
-											
-											$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
-												'approvable_id' => $approvalItem->id,
-										        'approvable_type' => $valueAFR->approvable_type,
-										        'title' => $valueAFR->title
-											]);
-											
-											foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
-												$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
-												if($request->has($fieldItem)){													
-													$approvalRequestApproverForm->form_data()->create([
-														'mapped_field_name' => $valueAFRF->mapped_field_name,
-														'mapped_field_label' => $valueAFRF->mapped_field_label,
-														'mapped_field_type' => $valueAFRF->mapped_field_type,
-														'mapped_field_value' => $request->$fieldItem,
-													]);
-
-													$approvalItem->update([
-														$valueAFRF->mapped_field_name => $request->$fieldItem
-													]);
-												}
-											}
-										}
-									}
-								}
+								$this->doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -299,39 +280,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								if($finalLevel->id == $currentLevel->id && $complete){
-									$approvalRequest->completed = 1;
-									$approvalRequest->save();
-
-									if($finalLevel->is_form_required){
-										foreach($finalLevel->forms as $keyAFR => $valueAFR){									
-											if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
-												
-												$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
-													'approvable_id' => $approvalItem->id,
-											        'approvable_type' => $valueAFR->approvable_type,
-											        'title' => $valueAFR->title
-												]);
-												
-												foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
-													$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
-													if($request->has($fieldItem)){													
-														$approvalRequestApproverForm->form_data()->create([
-															'mapped_field_name' => $valueAFRF->mapped_field_name,
-															'mapped_field_label' => $valueAFRF->mapped_field_label,
-															'mapped_field_type' => $valueAFRF->mapped_field_type,
-															'mapped_field_value' => $request->$fieldItem,
-														]);
-
-														$approvalItem->update([
-															$valueAFRF->mapped_field_name => $request->$fieldItem
-														]);
-													}
-												}
-											}
-										}
-									}
-								}
+								$this->doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -339,6 +288,16 @@ class ApprovalRequestController extends Controller
 							}
 							$approvalItem->save();
 						}
+					}
+					
+					if($currentLevel->next_level_notification && $approveCount > $rejectCount){
+						$nextLevel = $approvalRequest->approval->levels->where('level','>',$currentLevel->level)->where('status',1)->first();						
+						if($nextLevel){
+							$notifiableClass = $nextLevel->notifiable_class;
+							$userModel = config('approval-config.user-model');
+							$users = new $userModel();
+							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
+						}						
 					}				
 				}
 				
@@ -373,6 +332,37 @@ class ApprovalRequestController extends Controller
 		}else{
 			$message['msg_type'] = 'danger';
 			return redirect()->back()->with($message);
+		}
+	}
+
+	private function doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem){
+		if($finalLevel->is_form_required){
+			foreach($finalLevel->forms as $keyAFR => $valueAFR){									
+				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
+					
+					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
+						'approvable_id' => $approvalItem->id,
+				        'approvable_type' => $valueAFR->approvable_type,
+				        'title' => $valueAFR->title
+					]);
+					
+					foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
+						$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
+						if($request->has($fieldItem)){													
+							$approvalRequestApproverForm->form_data()->create([
+								'mapped_field_name' => $valueAFRF->mapped_field_name,
+								'mapped_field_label' => $valueAFRF->mapped_field_label,
+								'mapped_field_type' => $valueAFRF->mapped_field_type,
+								'mapped_field_value' => $request->$fieldItem,
+							]);
+
+							$approvalItem->update([
+								$valueAFRF->mapped_field_name => $request->$fieldItem
+							]);
+						}
+					}
+				}
+			}
 		}
 	}
 }

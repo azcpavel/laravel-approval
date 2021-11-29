@@ -14,7 +14,8 @@ class ApprovalRequestMappingFieldData extends Model
 	protected $fillable=[
 		'approval_request_mapping_field_id',
 		'field_name',
-		'field_text',
+		'field_label',
+		'field_type',
 		'field_data'
 	];
 	public $timestamps = false;
