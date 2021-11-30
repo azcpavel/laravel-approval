@@ -73,6 +73,15 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
+		<label for="approval_action_frequency">Action Frequency</label>
+		<select class="form-control" name="approval_action_frequency[]">												
+			<option value="0">None</option>
+			<option value="1">Every Time</option>
+			<option value="2">Final</option>
+		</select>
+		<span class="d-none invalid-feedback"></span>
+	</div>
+	<div class="form-group">
 		<label for="approval_status_fields">Status Fields<span class="text-danger position-relative">*</span></label>
 		<input class="form-control" type="text" name="approval_status_fields[]" placeholder="Status Fields" required>
 		<span class="d-none invalid-feedback"></span>

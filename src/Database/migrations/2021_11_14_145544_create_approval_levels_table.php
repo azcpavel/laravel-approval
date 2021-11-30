@@ -22,6 +22,7 @@ class CreateApprovalLevelsTable extends Migration
             $table->integer('level');
             $table->integer('action_type');
             $table->text('action_data')->nullable();
+            $table->integer('action_frequency')->nullable();
             $table->text('status_fields');
             $table->tinyInteger('is_data_mapped')->default(0);
             $table->string('notifiable_class')->nullable();

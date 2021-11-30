@@ -152,6 +152,7 @@ class ApprovalController extends Controller
 					'level' => $request->approval_level[$keyL],
 					'action_type' => $request->approval_action_type[$keyL],
 					'action_data' => json_decode($request->approval_action_data[$keyL]),
+					'action_frequency' => $request->approval_action_frequency[$keyL],
 					'status_fields' => json_decode($request->approval_status_fields[$keyL]),
 					'is_data_mapped' => $request->approval_data_mapped[$keyL],
 					'notifiable_class' => $request->approval_notifiable_namespace[$keyL],

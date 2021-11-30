@@ -17,7 +17,7 @@ class CreateApprovalRequestMappingFieldsTable extends Migration
             $table->id();
             $table->foreignId('approval_request_id');
             $table->string('title');
-            $table->foreignId('approvable_id');
+            $table->foreignId('approvable_id')->nullable();
             $table->string('approvable_type');
             $table->timestamps();
             $table->foreign('approval_request_id')->on('ex_approval_requests')->references('id');

@@ -21,6 +21,7 @@ class ApprovalLevel extends Model
 		'level',
 		'action_type',
 		'action_data',
+		'action_frequency',
 		'status_fields',
 		'is_data_mapped',
 		'notifiable_class',

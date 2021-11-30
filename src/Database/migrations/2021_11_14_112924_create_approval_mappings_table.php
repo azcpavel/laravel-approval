@@ -18,6 +18,7 @@ class CreateApprovalMappingsTable extends Migration
             $table->foreignId('approval_id');
             $table->string('title',150);
             $table->string('approvable_type',150);
+            $table->string('relation',150)->nullable();
             $table->foreign('approval_id')->on('ex_approvals')->references('id');
         });
     }

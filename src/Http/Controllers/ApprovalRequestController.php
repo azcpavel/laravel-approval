@@ -190,6 +190,7 @@ class ApprovalRequestController extends Controller
 						'level' => $currentLevel->level,
 						'action_type' => $currentLevel->action_type,
 						'action_data' => $currentLevel->action_data,
+						'action_frequency' => $currentLevel->action_frequency,
 						'status_fields' => $currentLevel->status_fields,
 						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 1,
@@ -209,6 +210,7 @@ class ApprovalRequestController extends Controller
 						'level' => $currentLevel->level,
 						'action_type' => $currentLevel->action_type,
 						'action_data' => $currentLevel->action_data,
+						'action_frequency' => $currentLevel->action_frequency,
 						'status_fields' => $currentLevel->status_fields,
 						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 0,
@@ -298,42 +300,14 @@ class ApprovalRequestController extends Controller
 							$users = new $userModel();
 							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
 						}						
-					}				
-				}
+					}
+					if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 2)
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, true);				
+				}				
+				if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 1)
+					return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
 				
 				\DB::commit();
-
-				if($currentLevel->action_type == 1){
-					if($request->approval_option == 1 && $currentLevel->action_data->approve){
-						$actionClassPath = $currentLevel->action_data->approve->class;
-						$actionClassMethod = $currentLevel->action_data->approve->method;
-						$actionClass = new $actionClassPath();
-						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
-					}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
-						$actionClassPath = $currentLevel->action_data->reject->class;
-						$actionClassMethod = $currentLevel->action_data->reject->method;
-						$actionClass = new $actionClassPath();
-						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
-					}
-				}
-				elseif($currentLevel->action_type == 2){
-					if($request->approval_option == 1 && $currentLevel->action_data->approve){
-						$routeParams = [];
-						foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
-							$routeParams[$keyRP] = $approvalItem->$valueRP;
-						}
-						$routeParams['approver_id'] = $approvalRequestApprover->id;
-						return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
-					}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
-						$routeParams = [];
-						foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
-							$routeParams[$keyRP] = $approvalItem->$valueRP;
-						}
-						$routeParams['approver_id'] = $approvalRequestApprover->id;
-						return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
-					}
-				}								
-				
 			}catch(\Exception $e){
 				if(env('APP_DEBUG'))
 					dd($e);
@@ -348,7 +322,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){
+	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
 		if($finalLevel->is_form_required){
 			foreach($finalLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
@@ -377,5 +351,40 @@ class ApprovalRequestController extends Controller
 				}
 			}
 		}
+	}
+
+	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request){		
+		\DB::commit();
+		
+		if($currentLevel->action_type == 1){
+			if($request->approval_option == 1 && $currentLevel->action_data->approve){
+				$actionClassPath = $currentLevel->action_data->approve->class;
+				$actionClassMethod = $currentLevel->action_data->approve->method;
+				$actionClass = new $actionClassPath();
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+			}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
+				$actionClassPath = $currentLevel->action_data->reject->class;
+				$actionClassMethod = $currentLevel->action_data->reject->method;
+				$actionClass = new $actionClassPath();
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+			}
+		}
+		elseif($currentLevel->action_type == 2){
+			if($request->approval_option == 1 && $currentLevel->action_data->approve){
+				$routeParams = [];
+				foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
+					$routeParams[$keyRP] = $approvalItem->$valueRP;
+				}
+				$routeParams['approver_id'] = $approvalRequestApprover->id;
+				return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
+			}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
+				$routeParams = [];
+				foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
+					$routeParams[$keyRP] = $approvalItem->$valueRP;
+				}
+				$routeParams['approver_id'] = $approvalRequestApprover->id;
+				return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
+			}
+		}		
 	}
 }
