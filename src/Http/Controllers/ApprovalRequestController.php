@@ -262,7 +262,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								$this->doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem);
+								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalItem);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -280,7 +280,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								$this->doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem);
+								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalItem);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -292,7 +292,7 @@ class ApprovalRequestController extends Controller
 					
 					if($currentLevel->next_level_notification && $approveCount > $rejectCount){
 						$nextLevel = $approvalRequest->approval->levels->where('level','>',$currentLevel->level)->where('status',1)->first();						
-						if($nextLevel){
+						if($nextLevel && $nextLevel->notifiable_class != 0){
 							$notifiableClass = $nextLevel->notifiable_class;
 							$userModel = config('approval-config.user-model');
 							$users = new $userModel();
@@ -348,7 +348,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalFinal($finalLevel, $approvalRequestApproverForm, $approvalItem){
+	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalItem){
 		if($finalLevel->is_form_required){
 			foreach($finalLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
