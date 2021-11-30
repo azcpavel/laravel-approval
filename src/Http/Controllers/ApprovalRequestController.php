@@ -263,9 +263,7 @@ class ApprovalRequestController extends Controller
 							
 							if($finalLevel->id == $currentLevel->id && $complete){
 								$approvalRequest->completed = 1;
-								$approvalRequest->save();
-
-								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
+								$approvalRequest->save();								
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -282,8 +280,6 @@ class ApprovalRequestController extends Controller
 							if($finalLevel->id == $currentLevel->id && $complete){
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
-
-								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -302,6 +298,9 @@ class ApprovalRequestController extends Controller
 							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
 						}						
 					}
+
+					$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
+
 					if($currentLevel->action_type != 0){						
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 					}
@@ -322,6 +321,9 @@ class ApprovalRequestController extends Controller
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 
 				}
+
+				if($request->approval_option == 1)
+					$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 
 				if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 1)
 					return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
