@@ -149,7 +149,8 @@ class ApprovalRequestController extends Controller
 	public function submit(Request $request, ApprovalRequest $approvalRequest)
 	{
 		$currentLevel = $approvalRequest->currentLevel(true);
-		if($request->has('approval_option')){            
+		$userApprover = in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all());
+		if($request->has('approval_option') && $userApprover !== false){            
 			try{
 				\DB::beginTransaction();
 
@@ -310,7 +311,7 @@ class ApprovalRequestController extends Controller
 							'status' => 1
 						]);						
 					}
-					
+
 					foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 						$approvalItem->$keyA = $valueA;
 					}
@@ -333,7 +334,12 @@ class ApprovalRequestController extends Controller
 				$message['msg_data'] = 'Something went wrong, please try again';
 			}            
 			return redirect()->back()->with($message);
-		}else{
+		}elseif(!$userApprover){
+			$message['msg_type'] = 'danger';
+			$message['msg_data'] = 'User not found for this level!';
+			return redirect()->back()->with($message);
+		}
+		else{
 			$message['msg_type'] = 'danger';
 			return redirect()->back()->with($message);
 		}
