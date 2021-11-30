@@ -337,7 +337,7 @@ class ApprovalRequestController extends Controller
 			return redirect()->back()->with($message);
 		}elseif(!$userApprover){
 			$message['msg_type'] = 'danger';
-			$message['msg_data'] = 'User not found for this level!';
+			$message['msg_data'] = 'Application state is not valid!';
 			return redirect()->back()->with($message);
 		}
 		else{
