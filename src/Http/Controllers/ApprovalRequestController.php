@@ -262,7 +262,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem);
+								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -280,7 +280,7 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->completed = 1;
 								$approvalRequest->save();
 
-								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem);
+								$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 							}
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
@@ -348,7 +348,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem){
+	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){
 		if($finalLevel->is_form_required){
 			foreach($finalLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
