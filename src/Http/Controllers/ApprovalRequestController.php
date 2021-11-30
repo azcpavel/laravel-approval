@@ -318,15 +318,19 @@ class ApprovalRequestController extends Controller
 				}
 				elseif($currentLevel->action_type == 2){
 					if($request->approval_option == 1){
-						$actionClassPath = $currentLevel->action_data->approve->class;
-						$actionClassMethod = $currentLevel->action_data->approve->method;
-						$actionClass = new $actionClassPath();
-						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+						$routeParams = [];
+						foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
+							$routeParams[$keyRP] = $approvalItem->$valueRP;
+						}
+						$routeParams['approver_id'] = $approvalRequestApprover->id;
+						return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
 					}else{
-						$actionClassPath = $currentLevel->action_data->reject->class;
-						$actionClassMethod = $currentLevel->action_data->reject->method;
-						$actionClass = new $actionClassPath();
-						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+						$routeParams = [];
+						foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
+							$routeParams[$keyRP] = $approvalItem->$valueRP;
+						}
+						$routeParams['approver_id'] = $approvalRequestApprover->id;
+						return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
 					}
 				}								
 				
