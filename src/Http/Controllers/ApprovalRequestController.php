@@ -302,8 +302,9 @@ class ApprovalRequestController extends Controller
 							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
 						}						
 					}
-					if($currentLevel->action_type != 0)
-						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
+					if($currentLevel->action_type != 0){						
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
+					}
 
 				}elseif($request->approval_option == 0 && $currentLevel->is_flexible == 0){
 					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
@@ -318,12 +319,12 @@ class ApprovalRequestController extends Controller
 					$approvalItem->save();
 
 					if($currentLevel->action_type != 0)
-						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 
 				}
 
 				if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 1)
-					return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
+					return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 				
 				\DB::commit();
 			}catch(\Exception $e){
@@ -376,7 +377,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request){		
+	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message){		
 		\DB::commit();
 
 		if($currentLevel->action_type == 1){
@@ -391,6 +392,8 @@ class ApprovalRequestController extends Controller
 				$actionClass = new $actionClassPath();
 				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 			}
+
+			return redirect()->back()->with($message);
 		}
 		elseif($currentLevel->action_type == 2){
 			if($request->approval_option == 1 && $currentLevel->action_data->approve){
@@ -408,6 +411,8 @@ class ApprovalRequestController extends Controller
 				$routeParams['approver_id'] = $approvalRequestApprover->id;
 				return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
 			}
+
+			return redirect()->back()->with($message);
 		}		
 	}
 }
