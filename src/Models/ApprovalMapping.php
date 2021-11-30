@@ -16,6 +16,7 @@ class ApprovalMapping extends Model
 		'approval_id',
 		'title',
 		'approvable_type',
+		'relation'
 	];
 	public $timestamps = false;
 

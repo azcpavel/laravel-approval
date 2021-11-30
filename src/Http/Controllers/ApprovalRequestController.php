@@ -301,9 +301,26 @@ class ApprovalRequestController extends Controller
 							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
 						}						
 					}
-					if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 2)
-						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, true);				
-				}				
+					if($currentLevel->action_type != 0)
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
+
+				}elseif($request->approval_option == 0 && $currentLevel->is_flexible == 0){
+					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
+						$valueASD->update([
+							'status' => 1
+						]);						
+					}
+					
+					foreach($currentLevel->status_fields->reject as $keyA => $valueA){
+						$approvalItem->$keyA = $valueA;
+					}
+					$approvalItem->save();
+
+					if($currentLevel->action_type != 0)
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
+
+				}
+
 				if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 1)
 					return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request);
 				
@@ -355,7 +372,7 @@ class ApprovalRequestController extends Controller
 
 	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request){		
 		\DB::commit();
-		
+
 		if($currentLevel->action_type == 1){
 			if($request->approval_option == 1 && $currentLevel->action_data->approve){
 				$actionClassPath = $currentLevel->action_data->approve->class;

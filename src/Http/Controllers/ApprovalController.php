@@ -132,6 +132,7 @@ class ApprovalController extends Controller
 				$approvalMap = $approval->mappings()->create([
 					'title' => $request->model_namespace_relation_title[$keyR],
 					'approvable_type' => $request->model_namespace_relation_path[$keyR],
+					'relation' => $request->model_relation_path[$keyR],
 				]);
 
 				foreach($request->model_namespace_relation_tbody_check[$valueR] as $keyRD => $valueRD){

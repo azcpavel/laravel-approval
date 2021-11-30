@@ -128,7 +128,8 @@
 				'<button type="button" class="btn btn-danger btn-sm float-right" onclick="$(this).closest(\'.model_namespace_relation_div_item\').remove();">Remove</button>'+
 				'<input type="hidden" name="model_namespace_relation_path[]" class="model_namespace_relation_path" value="'+inputVal+'">'+
 				'<input type="hidden" name="model_namespace_relation_key[]" class="model_namespace_relation_key" value="'+inputKey+'">'+
-				'<input type="text" name="model_namespace_relation_title[]" class="float-left my-3 form-control model_namespace_relation_title" placeholder="Relation Title" required>'+
+				'<input type="text" name="model_namespace_relation_title[]" class="float-left form-control model_namespace_relation_title" placeholder="Relation Title" required>'+
+				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation Path">'+
 			'</div>');
 		$.ajax({
 			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
