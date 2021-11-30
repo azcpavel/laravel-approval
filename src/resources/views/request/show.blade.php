@@ -96,9 +96,9 @@
 									        <br><b>{{$valueAFS->title}}</b>
 									        @foreach($valueAFS->form_data as $keyAFSS => $valueAFSS)
 									        @if($valueAFSS->mapped_field_type == 'text')
-									        <br>{{$valueAFSS->mapped_field_value}}
+									        <br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
 									        @elseif($valueAFSS->mapped_field_type == 'email')
-									        <br>{{$valueAFSS->mapped_field_value}}
+									        <br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
 									        @elseif($valueAFSS->mapped_field_type == 'file')
 									        <br><a href="{{asset($valueAFSS->mapped_field_value)}}">{{basename($valueAFSS->mapped_field_value)}}</a>
 									        @endif
