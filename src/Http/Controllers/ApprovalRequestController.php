@@ -304,12 +304,12 @@ class ApprovalRequestController extends Controller
 				\DB::commit();
 
 				if($currentLevel->action_type == 1){
-					if($request->approval_option == 1){
+					if($request->approval_option == 1 && $currentLevel->action_data->approve){
 						$actionClassPath = $currentLevel->action_data->approve->class;
 						$actionClassMethod = $currentLevel->action_data->approve->method;
 						$actionClass = new $actionClassPath();
 						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
-					}else{
+					}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
 						$actionClassPath = $currentLevel->action_data->reject->class;
 						$actionClassMethod = $currentLevel->action_data->reject->method;
 						$actionClass = new $actionClassPath();
@@ -317,14 +317,14 @@ class ApprovalRequestController extends Controller
 					}
 				}
 				elseif($currentLevel->action_type == 2){
-					if($request->approval_option == 1){
+					if($request->approval_option == 1 && $currentLevel->action_data->approve){
 						$routeParams = [];
 						foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
 							$routeParams[$keyRP] = $approvalItem->$valueRP;
 						}
 						$routeParams['approver_id'] = $approvalRequestApprover->id;
 						return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
-					}else{
+					}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
 						$routeParams = [];
 						foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
 							$routeParams[$keyRP] = $approvalItem->$valueRP;
