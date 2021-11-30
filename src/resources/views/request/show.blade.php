@@ -50,8 +50,10 @@
 								<div class="card-body">
 									<?php
 									$currentLevel = $approvalRequest->currentLevel(true);
+									$currentLevelStatus = $approvalRequest->currentLevel();
 									?>
-									Level: {{$approvalRequest->currentLevel()}}<br>
+									Level: {{$currentLevelStatus}}<br>
+									@if($currentLevel)
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}									
 									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
@@ -59,6 +61,7 @@
 										var currentLevel = {!!json_encode($currentLevel)!!};
 									</script>
 									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
+									@endif
 									@endif
 								</div>
 							</div>							
@@ -89,6 +92,19 @@
 											@foreach($valueALS->reason_file as $keyAF => $valueAF)
 											<br><a href="{{asset($valueAF)}}">{{basename($valueAF)}}</a>
 											@endforeach
+											@foreach($valueALS->forms as $keyAFS => $valueAFS)
+									        <br><b>{{$valueAFS->title}}</b>
+									        @foreach($valueAFS->form_data as $keyAFSS => $valueAFSS)
+									        @if($valueAFSS->mapped_field_type == 'text')
+									        <br>{{$valueAFSS->mapped_field_value}}
+									        @elseif($valueAFSS->mapped_field_type == 'email')
+									        <br>{{$valueAFSS->mapped_field_value}}
+									        @elseif($valueAFSS->mapped_field_type == 'file')
+									        <br><a href="{{asset($valueAFSS->mapped_field_value)}}">{{basename($valueAFSS->mapped_field_value)}}</a>
+									        @endif
+									        @endforeach
+									        <br>
+									        @endforeach
 											@endif
 										</td>
 									</tr>
@@ -106,6 +122,23 @@
 				min-height: 140px !important;
 			}
 		</style>
+		<div class="modal" tabindex="-1" id="approval-data-modal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title">Approval Data</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                <span aria-hidden="true">&times;</span>
+	            </button>
+		      </div>
+		      <div class="modal-body">
+		      </div>
+		      <div class="modal-footer justify-content-between">
+	              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
+	          </div>
+		    </div>
+		  </div>
+		</div>
 		@if($currentLevel)
 		<div class="modal" tabindex="-1" id="approval-modal">
 		  <div class="modal-dialog">
@@ -129,12 +162,15 @@
 			        @foreach($currentLevel->forms as $keyAF => $valueAF)
 			        <label class="approval-form">{{$valueAF->title}}</label>
 			        @foreach($valueAF->form_data as $keyAFS => $valueAFS)
+			        <?php
+			        $fieldName = $valueAFS->mapped_field_name;
+			    	?>
 			        @if($valueAFS->mapped_field_type == 'text')
-			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 			        @elseif($valueAFS->mapped_field_type == 'email')
-			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 			        @elseif($valueAFS->mapped_field_type == 'file')
-			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$valueAFS->mapped_field_name}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 			        @endif
 			        @endforeach
 			        @endforeach

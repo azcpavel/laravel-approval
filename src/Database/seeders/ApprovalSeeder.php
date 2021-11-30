@@ -19,8 +19,8 @@ class ApprovalSeeder extends Seeder
             'title' => 'Membership Approval',
             'approvable_type' => 'App\Models\Member',
             'view_route_name' => 'members.show',
-            'view_route_param' => '{"member":"id"}',
-            'list_data_fields' => '["company_name","serial_number"]',
+            'view_route_param' => ["member"=>"id"],
+            'list_data_fields' => ["company_name","serial_number"],
             'on_create' => 1,
             'on_update' => 0,
             'on_delete' => 0
@@ -29,13 +29,13 @@ class ApprovalSeeder extends Seeder
         $user = \DB::table(config('approval-config.user-table'))->first();
 
         $firstLevel = $approval->levels()->create([
-                    'title' => 'Lavel 1',
+                    'title' => 'Level 1',
                     'is_flexible' => 0,
                     'is_form_required' => 0,
                     'level' => 1,
                     'action_type' => 1,
-                    'action_data' => '{"approve":{"class":"App\Http\Controllers\MemberController","method":"handelApproval"},"reject":{"class":"App\Http\Controllers\MemberController","method":"handelApproval"}}',
-                    'status_fields' => '{"approve":{"status":2,"completion":0},"reject":{"completion":2},"pending":{"status":1,"completion":0}}',
+                    'action_data' => ["approve" => ["class" => "App\Http\Controllers\MemberController","method" => "handelApproval"],"reject" => ["class" => "App\Http\Controllers\MemberController","method" => "handelApproval"]],
+                    'status_fields' => ["approve" => ["status" => 2,"completion" => 0],"reject" => ["completion" => 2],"pending" => ["status" => 1,"completion" => 0]],
                     'is_data_mapped' => 0,
                     'notifiable_class' => 0,
                     'notifiable_params' => null,
@@ -50,13 +50,13 @@ class ApprovalSeeder extends Seeder
                     ]);
 
         $finalLevel = $approval->levels()->create([
-                    'title' => 'Lavel 2',
+                    'title' => 'Level 2',
                     'is_flexible' => 0,
                     'is_form_required' => 0,
                     'level' => 2,
                     'action_type' => 1,
-                    'action_data' => '{"approve":{"class":"App\Http\Controllers\MemberController","method":"handelApproval"},"reject":{"class":"App\Http\Controllers\MemberController","method":"handelApproval"}}',
-                    'status_fields' => '{"approve":{"status":3,"completion":1},"reject":{"completion":2},"pending":{"status":2,"completion":0}}',
+                    'action_data' => ["approve" => ["class" => "App\Http\Controllers\MemberController","method" => "handelApproval"],"reject" => ["class" => "App\Http\Controllers\MemberController","method" => "handelApproval"]],
+                    'status_fields' => ["approve" => ["status" => 3,"completion" => 1],"reject" => ["completion" => 2],"pending" => ["status" => 2,"completion" => 0]],
                     'is_data_mapped' => 0,
                     'notifiable_class' => 0,
                     'notifiable_params' => null,
