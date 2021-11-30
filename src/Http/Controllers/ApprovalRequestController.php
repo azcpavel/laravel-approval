@@ -149,7 +149,7 @@ class ApprovalRequestController extends Controller
 	public function submit(Request $request, ApprovalRequest $approvalRequest)
 	{
 		$currentLevel = $approvalRequest->currentLevel(true);
-		$userApprover = in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all());
+		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
 		if($request->has('approval_option') && $userApprover !== false){            
 			try{
 				\DB::beginTransaction();
