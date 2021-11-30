@@ -20,6 +20,7 @@ use Exceptio\ApprovalPermission\Models\{
 
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Artisan;
 
 class ApprovalController extends Controller
 {
@@ -185,7 +186,7 @@ class ApprovalController extends Controller
 					}
 				}
 			}
-			
+			Artisan::call('view:clear');
 			DB::commit();			
 		}catch(\Exception $e){
 			DB::rollBack();
@@ -277,5 +278,6 @@ class ApprovalController extends Controller
 	public function changeStatus(Request $request, Approval $approval){
 		$approval->status = !$approval->status;
 		$approval->update();
+		Artisan::call('view:clear');
 	}
 }

@@ -303,21 +303,30 @@ class ApprovalRequestController extends Controller
 				
 				\DB::commit();
 
-				if($currentLevel->action_type == 2){
+				if($currentLevel->action_type == 1){
 					if($request->approval_option == 1){
-						$routeParams = [];
-						foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
-							$routeParams[$keyRP] = $approvalItem->$valueRP;
-						}
-						$routeParams['approver_id'] = $approvalRequestApprover->id;
-						return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
+						$actionClassPath = $currentLevel->action_data->approve->class;
+						$actionClassMethod = $currentLevel->action_data->approve->method;
+						$actionClass = new $actionClassPath();
+						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 					}else{
-						$routeParams = [];
-						foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
-							$routeParams[$keyRP] = $approvalItem->$valueRP;
-						}
-						$routeParams['approver_id'] = $approvalRequestApprover->id;
-						return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
+						$actionClassPath = $currentLevel->action_data->reject->class;
+						$actionClassMethod = $currentLevel->action_data->reject->method;
+						$actionClass = new $actionClassPath();
+						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+					}
+				}
+				elseif($currentLevel->action_type == 2){
+					if($request->approval_option == 1){
+						$actionClassPath = $currentLevel->action_data->approve->class;
+						$actionClassMethod = $currentLevel->action_data->approve->method;
+						$actionClass = new $actionClassPath();
+						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+					}else{
+						$actionClassPath = $currentLevel->action_data->reject->class;
+						$actionClassMethod = $currentLevel->action_data->reject->method;
+						$actionClass = new $actionClassPath();
+						return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 					}
 				}								
 				
