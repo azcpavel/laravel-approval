@@ -40,17 +40,10 @@ class ApprovalRequest extends Model
 
 	public function currentLevel($returnItem = false){
 		$levels = $this->approval->levels;
-		$approvable = $this->approvable;
-		
-		$current = $levels->filter(function($item) use($approvable){
-			$matched = true;			
-			foreach($item->status_fields->pending as $key => $value){			
-				if($approvable->$key != $value){
-					$matched = false;
-					break;
-				}
-			}
-			return $matched;
+		$approvalRequest = $this;
+
+		$current = $levels->filter(function($item) use($approvalRequest){
+			return $item->level == $approvalRequest->approval_state;
 		})->values();
 
 		if($returnItem){
@@ -59,9 +52,9 @@ class ApprovalRequest extends Model
 			return null;
 		}
 
-		if($this->completed)
+		if($this->completed == 1)
 			return 'Completed';
-		else if(count($current) > 0)
+		else if($this->completed == 0 && count($current) > 0)
 			return $current[0]->title;
 		else
 			return 'Pending';

@@ -52,18 +52,10 @@
 					})
 					return htmlData;
 				}},
-				{'title': 'Level', name: 'level', data: "approvable",render : function(data, type, row){
-					var htmlData = row.completed ? 'Completed' : 'Pending';
-					$.each(approval.levels,function(infAL, valAL){
-						var status_fields = valAL.status_fields;
-						var matched = true;
-						for(ind in status_fields.pending){
-							if(data[ind] != status_fields.pending[ind]){
-								matched = false;
-								break;
-							}
-						}
-						if(matched){
+				{'title': 'Level', name: 'level', data: "approval_state",render : function(data, type, row){
+					var htmlData = row.completed == 1 ? 'Completed' : 'Pending';
+					$.each(approval.levels,function(infAL, valAL){						
+						if(row.completed == 0 && valAL.level == data){
 							htmlData = valAL.title;
 							return false;
 						}

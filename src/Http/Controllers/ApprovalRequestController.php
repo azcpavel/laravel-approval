@@ -53,11 +53,7 @@ class ApprovalRequestController extends Controller
 			
 			$where[] = ['approval_id',$approval->id];
 			$fields = $approval->list_data_fields;
-			if($approval->levels->count() > 0){
-				foreach($approval->levels[0]->status_fields->pending as $keyF => $valueF){
-					$fields[] = $keyF;
-				}
-			}
+			
 			$with[] = 'approvable:id,'.implode(',', $fields);
 			$approvalRequest = $approvalRequest->getDataForDataTable($limit, $offset, $search, $where, $with, $join, $orderBy, $request->all(), null, $approval->list_data_fields);
 
@@ -150,7 +146,7 @@ class ApprovalRequestController extends Controller
 	{
 		$currentLevel = $approvalRequest->currentLevel(true);
 		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
-		if($request->has('approval_option') && $userApprover !== false){            
+		if($approvalRequest->completed == 0 && $userApprover !== false && $request->has('approval_option')){
 			try{
 				\DB::beginTransaction();
 
@@ -223,6 +219,8 @@ class ApprovalRequestController extends Controller
 				}
 
 				$finalLevel = $approvalRequest->approval->levels->sortByDesc('level')->first();
+				$prevLevel = $approvalRequest->approval->levels->where('level',$currentLevel->level-1)->where('status',1)->first();
+				$nextLevel = $approvalRequest->approval->levels->where('level',$currentLevel->level+1)->where('status',1)->first();
 				
 				$complete = true;                    
 				foreach($currentLevel->users as $keyAU => $valueAU){
@@ -238,7 +236,7 @@ class ApprovalRequestController extends Controller
 					$userModel = config('approval-config.user-model');
 					$users = new $userModel();
 					Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$currentLevel->notifiable_params->channels));
-				}
+				}				
 
 				if($complete){					
 					$approveCount = 0;
@@ -261,15 +259,20 @@ class ApprovalRequestController extends Controller
 							}
 							$approvalItem->save();
 							
-							if($finalLevel->id == $currentLevel->id && $complete){
+							if($finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
-								$approvalRequest->save();								
+							}elseif($nextLevel){
+								$approvalRequest->approval_state = $nextLevel->level;
 							}
+							$approvalRequest->save();
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
-							$approvalItem->save();							
+							$approvalItem->save();
+
+							$approvalRequest->completed = 2;
+							$approvalRequest->save();
 						}
 					}else{
 						if($approveCount >= $currentLevel->is_flexible){
@@ -277,20 +280,24 @@ class ApprovalRequestController extends Controller
 								$approvalItem->$keyA = $valueA;
 							}
 							$approvalItem->save();							
-							if($finalLevel->id == $currentLevel->id && $complete){
+							if($finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
-								$approvalRequest->save();
+							}elseif($nextLevel){
+								$approvalRequest->approval_state = $nextLevel->level;
 							}
+							$approvalRequest->save();
 						}else{
 							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 								$approvalItem->$keyA = $valueA;
 							}
 							$approvalItem->save();
+
+							$approvalRequest->completed = 2;
+							$approvalRequest->save();
 						}
-					}
+					}					
 					
 					if($currentLevel->next_level_notification && $approveCount > $rejectCount){
-						$nextLevel = $approvalRequest->approval->levels->where('level','>',$currentLevel->level)->where('status',1)->first();						
 						if($nextLevel && $nextLevel->notifiable_class != 0){
 							$notifiableClass = $nextLevel->notifiable_class;
 							$userModel = config('approval-config.user-model');
@@ -299,7 +306,7 @@ class ApprovalRequestController extends Controller
 						}						
 					}
 
-					$this->doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
+					$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 
 					if($currentLevel->action_type != 0){						
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
@@ -316,6 +323,9 @@ class ApprovalRequestController extends Controller
 						$approvalItem->$keyA = $valueA;
 					}
 					$approvalItem->save();
+
+					$approvalRequest->completed = 2;
+					$approvalRequest->save();
 
 					if($currentLevel->action_type != 0)
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);

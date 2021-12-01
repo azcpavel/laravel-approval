@@ -19,7 +19,7 @@ class CreateApprovalRequestsTable extends Migration
             $table->string('approvable_type',150);
             $table->foreignId('approvable_id');
             $table->foreignId('user_id');
-            $table->tinyInteger('approval_state')->default(0);
+            $table->tinyInteger('approval_state')->default(1);
             $table->tinyInteger('completed')->default(0);
             $table->timestamps();
             $table->foreign('approval_id')->on('ex_approvals')->references('id');            
