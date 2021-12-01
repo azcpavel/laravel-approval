@@ -6,6 +6,8 @@ A Dynamic package for handling model based approval process in Laravel.
     - [Composer](#composer)
     - [Service Provider](#service-provider)
     - [Config File](#config-file)
+    - [View File](#view-file)
+    - [Migration File](#migration-file)
     - [Approvable Trait](#approvable-trait)
     - [Migrations and Seeds](#migrations-and-seeds)
 - [Usage](#usage)
@@ -57,6 +59,12 @@ Publish the package config file to your application. Run these commands inside y
     you may set `approvalpermission-enable` to `false` to disable the feature.
     you may set `do-migration` to `false` in config file to disable the migration.
     Note: database must have all the necessary tables and columns if you disable migration.
+
+### View Files
+
+Publish the view file to your application. Run these commands inside your terminal.
+
+    php artisan vendor:publish --provider="Exceptio\ApprovalPermission\ApprovalPermissionServiceProvider" --tag="views"
 
 ### Migration File
 

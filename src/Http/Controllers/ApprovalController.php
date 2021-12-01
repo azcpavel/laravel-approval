@@ -58,7 +58,6 @@ class ApprovalController extends Controller
 
 			if($request->input('search') && $request->input('search')['value'] != ""){
 				$search['title'] = $request->input('search')['value'];
-				$search['slug'] = $request->input('search')['value'];
 			}
 
 			if($request->input('where')){
@@ -120,8 +119,8 @@ class ApprovalController extends Controller
 				'title' => $request->title,
 				'approvable_type' => $request->model_namespace,
 				'view_route_name' => $request->view_route_name,
-				'view_route_param' => json_decode($request->view_route_param),
-				'list_data_fields' => json_decode($request->list_data_fields),
+				'view_route_param' => array_combine($request->view_route_param_key,$request->view_route_param_value),
+				'list_data_fields' => $request->list_data_fields,
 				'on_create' => $request->approval_type == 1 ? 1 : 0,
 				'on_update' => $request->approval_type == 2 ? 1 : 0,
 				'on_delete' => $request->approval_type == 3 ? 1 : 0,
@@ -139,6 +138,7 @@ class ApprovalController extends Controller
 					$approvalMap->fields()->create([
 						'field_name' => $request->model_namespace_relation_tbody_name[$valueR][$valueRD],
 				        'field_label' => $request->model_namespace_relation_tbody_label[$valueR][$valueRD],
+				        'field_relation' => $request->model_namespace_relation_tbody_relation[$valueR][$valueRD],
 				        'field_type' => $request->model_namespace_relation_tbody_type[$valueR][$valueRD]
 				    ]);
 				}
@@ -188,6 +188,7 @@ class ApprovalController extends Controller
 					}
 				}
 			}
+			
 			Artisan::call('view:clear');
 			DB::commit();			
 		}catch(\Exception $e){

@@ -18,6 +18,7 @@ class ApprovalRequest extends Model
 		'approvable_type',
 		'approvable_id',
 		'user_id',
+		'approval_state',
 		'completed'
 	];
 

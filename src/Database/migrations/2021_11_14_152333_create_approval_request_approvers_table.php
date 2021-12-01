@@ -24,7 +24,7 @@ class CreateApprovalRequestApproversTable extends Migration
             $table->integer('level');
             $table->integer('action_type');
             $table->text('action_data')->nullable();
-            $table->text('status_fields');
+            $table->text('status_fields')->nullable();
             $table->tinyInteger('is_data_mapped')->default(0);            
             $table->tinyInteger('is_approved')->default(1);            
             $table->tinyInteger('is_rejected')->default(0);

@@ -15,6 +15,7 @@ class ApprovalRequestMappingFieldData extends Model
 		'approval_request_mapping_field_id',
 		'field_name',
 		'field_label',
+		'field_relation',
 		'field_type',
 		'field_data'
 	];

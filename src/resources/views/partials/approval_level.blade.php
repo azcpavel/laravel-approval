@@ -82,8 +82,8 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_status_fields">Status Fields<span class="text-danger position-relative">*</span></label>
-		<input class="form-control" type="text" name="approval_status_fields[]" placeholder="Status Fields" required>
+		<label for="approval_status_fields">Status Fields</label>
+		<input class="form-control" type="text" name="approval_status_fields[]" placeholder="Status Fields">
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">

@@ -30,9 +30,23 @@
 									</select>
 									<span class="d-none invalid-feedback"></span>
 								</div>
-								<div class="form-group">
-									<label for="list_data_fields">List Data Fields<span class="text-danger position-relative">*</span></label>
-									<input class="form-control" type="text" name="list_data_fields" placeholder="List Data Fields" id="list_data_fields" required>
+								<div class="form-group row">
+									<div class="col-8">
+										<label for="list_data_fields">List Data Fields<span class="text-danger position-relative">*</span></label>	
+									</div>
+									<div class="col-4 text-right">
+										<button type="button" id="list_data_fields_btn_add" class="btn btn-success">Add</button>
+									</div>
+									<div class="col-12" id="list_data_fields_div">
+										<div class="row mt-2 list_data_fields_div_item">
+											<div class="col-8">
+												<input class="form-control" type="text" name="list_data_fields[]" placeholder="List Data Fields" required>	
+											</div>
+											<div class="col-4 text-right">
+												<button type="button" class="btn btn-danger list_data_fields_btn_remove">Remove</button>
+											</div>
+										</div>										
+									</div>
 									<span class="d-none invalid-feedback"></span>
 								</div>
 								<div class="row" id="model_namespace_relation_div" style="display:none;">
@@ -63,9 +77,24 @@
 									<input class="form-control" type="text" name="view_route_name" placeholder="Route name" id="view_route" required>
 									<span class="d-none invalid-feedback"></span>
 								</div>
-								<div class="form-group">
-									<label for="view_route_param">View Route Param<span class="text-danger position-relative">*</span></label>
-									<input class="form-control" type="text" name="view_route_param" placeholder="Route param" id="view_route" required>
+								<div class="form-group row">
+									<div class="col-8">
+										<label for="view_route_param">View Route Param<span class="text-danger position-relative">*</span></label>	
+									</div>
+									<div class="col-4 text-right">
+										<button type="button" id="view_route_param_btn_add" class="btn btn-success">Add</button>
+									</div>
+									<div class="col-12" id="view_route_param_div">
+										<div class="row mt-2 view_route_param_div_item">
+											<div class="col-8 input-group">
+												<input class="form-control" type="text" name="view_route_param_key[]" placeholder="Param Name" required>	
+												<input class="form-control" type="text" name="view_route_param_value[]" placeholder="Column Name" required>	
+											</div>
+											<div class="col-4 text-right">
+												<button type="button" class="btn btn-danger view_route_param_btn_remove">Remove</button>
+											</div>
+										</div>										
+									</div>
 									<span class="d-none invalid-feedback"></span>
 								</div>
 								<div class="row">
@@ -118,6 +147,49 @@
 		}
 	});
 
+	$(document).on("click",".list_data_fields_btn_remove",function(){
+		var $input = $(this);
+		if($('#list_data_fields_div').children().length > 1){
+			$input.parent().parent().remove();
+		}
+	});
+
+	$(document).on("click","#list_data_fields_btn_add",function(){
+		var $input = $(this);
+		$('#list_data_fields_div').append(
+			'<div class="row mt-2 list_data_fields_div_item">'+
+				'<div class="col-8">'+
+					'<input class="form-control" type="text" name="list_data_fields[]" placeholder="List Data Fields" id="list_data_fields" required>	'+
+				'</div>'+
+				'<div class="col-4 text-right">'+
+					'<button type="button" class="btn btn-danger list_data_fields_btn_remove">Remove</button>'+
+				'</div>'+
+			'</div>'
+		);
+	});
+
+	$(document).on("click",".view_route_param_btn_remove",function(){
+		var $input = $(this);
+		if($('#view_route_param_div').children().length > 1){
+			$input.parent().parent().remove();
+		}
+	});
+
+	$(document).on("click","#view_route_param_btn_add",function(){
+		var $input = $(this);
+		$('#view_route_param_div').append(
+			'<div class="row mt-2 view_route_param_div_item">'+
+				'<div class="col-8 input-group">'+
+					'<input class="form-control" type="text" name="view_route_param_key[]" placeholder="Param Name" required>	'+
+					'<input class="form-control" type="text" name="view_route_param_value[]" placeholder="Column Name" required>	'+
+				'</div>'+
+				'<div class="col-4 text-right">'+
+					'<button type="button" class="btn btn-danger view_route_param_btn_remove">Remove</button>'+
+				'</div>'+
+			'</div>'
+		);
+	});
+
 	$(document).on("click","#model_namespace_relation_add",function(){
 		var $input = $(this);
 		var inputKey = $('#model_namespace_relation option:selected').text();
@@ -129,7 +201,7 @@
 				'<input type="hidden" name="model_namespace_relation_path[]" class="model_namespace_relation_path" value="'+inputVal+'">'+
 				'<input type="hidden" name="model_namespace_relation_key[]" class="model_namespace_relation_key" value="'+inputKey+'">'+
 				'<input type="text" name="model_namespace_relation_title[]" class="float-left form-control model_namespace_relation_title" placeholder="Relation Title" required>'+
-				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation Path">'+
+				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation Path" required>'+
 			'</div>');
 		$.ajax({
 			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
@@ -150,8 +222,9 @@
 				$htmlWrap.find('#model_namespace_relation_tbody').append(
 					'<tr>'+
 						'<td>'+val.Field+'</td>'+
-						'<td><input type="text" name="model_namespace_relation_tbody_label['+inputKey+'][]" class="form-control model_namespace_relation_tbody_label">'+
+						'<td><input type="text" name="model_namespace_relation_tbody_label['+inputKey+'][]" class="form-control model_namespace_relation_tbody_label" placeholder="Label">'+
 						'<input type="hidden" name="model_namespace_relation_tbody_name['+inputKey+'][]" class="form-control model_namespace_relation_tbody_name" value="'+val.Field+'" required>'+
+						'<input type="text" name="model_namespace_relation_tbody_relation['+inputKey+'][]" class="form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation">'+
 						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option></select></td>'+
 						'<td><input type="checkbox" name="model_namespace_relation_tbody_check['+inputKey+'][]" class="model_namespace_relation_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'

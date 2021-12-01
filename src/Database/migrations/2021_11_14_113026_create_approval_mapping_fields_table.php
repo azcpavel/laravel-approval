@@ -18,6 +18,7 @@ class CreateApprovalMappingFieldsTable extends Migration
             $table->foreignId('approval_mapping_id');
             $table->string('field_name',150);
             $table->string('field_label',150);
+            $table->string('field_relation',150);
             $table->string('field_type',150);
             $table->foreign('approval_mapping_id')->on('ex_approval_mappings')->references('id');
         });

@@ -15,6 +15,7 @@ class ApprovalMappingField extends Model
 		'approval_mapping_id',
 		'field_name',
 		'field_label',
+		'field_relation',
 		'field_type',
 	];
 	public $timestamps = false;

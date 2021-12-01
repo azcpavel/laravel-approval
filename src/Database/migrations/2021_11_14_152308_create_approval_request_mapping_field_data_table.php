@@ -19,6 +19,7 @@ class CreateApprovalRequestMappingFieldDataTable extends Migration
             $table->string('field_name',150);
             $table->string('field_label',150);
             $table->string('field_type',150);
+            $table->string('field_relation',150);
             $table->longText('field_data');
             $table->foreign('approval_request_mapping_field_id','approval_request_mapping_data')->on('ex_approval_request_mapping_fields')->references('id');
         });
