@@ -62,7 +62,7 @@
 									</script>
 									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
 									@endif
-									@else
+									@elseif($currentLevelStatus == 'Completed')
 									Time: {{approvalDate($approvalRequest->updated_at)}}
 									@endif
 								</div>

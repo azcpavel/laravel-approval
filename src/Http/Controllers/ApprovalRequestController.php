@@ -348,9 +348,9 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalFinal($finalLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
-		if($finalLevel->is_form_required){
-			foreach($finalLevel->forms as $keyAFR => $valueAFR){									
+	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
+		if($currentLevel->is_form_required){
+			foreach($currentLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
 					
 					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
