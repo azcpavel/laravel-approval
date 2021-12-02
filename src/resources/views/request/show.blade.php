@@ -162,11 +162,12 @@
 			        </select>			        
 			        @if($currentLevel->forms)
 			        @foreach($currentLevel->forms as $keyAF => $valueAF)
-			        <label class="approval-form">{{$valueAF->title}}</label>
+			        <label class="approval-form">{{$valueAF->title}}</label><br>
 			        @foreach($valueAF->form_data as $keyAFS => $valueAFS)
 			        <?php
 			        $fieldName = $valueAFS->mapped_field_name;
 			    	?>
+			    	<label class="approval-form">{{$valueAFS->mapped_field_label}}</label>
 			        @if($valueAFS->mapped_field_type == 'text')
 			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 			        @elseif($valueAFS->mapped_field_type == 'email')
