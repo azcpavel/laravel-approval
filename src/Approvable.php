@@ -17,6 +17,8 @@ use Exceptio\ApprovalPermission\Models\{
 	ApprovalRequestMappingFieldData
 };
 
+use Illuminate\Support\Facades\Notification;
+
 trait Approvable 
 {
     public function notifyApprovalCreate($approvalItem){
