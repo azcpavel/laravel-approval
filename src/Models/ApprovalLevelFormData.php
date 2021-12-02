@@ -14,6 +14,7 @@ class ApprovalLevelFormData extends Model
         'approval_level_form_id',
         'mapped_field_name',
         'mapped_field_label',
+        'mapped_field_relation',
         'mapped_field_type',
     ];
     public $timestamps = false;

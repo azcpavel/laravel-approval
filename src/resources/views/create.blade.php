@@ -200,8 +200,8 @@
 				'<button type="button" class="btn btn-danger btn-sm float-right" onclick="$(this).closest(\'.model_namespace_relation_div_item\').remove();">Remove</button>'+
 				'<input type="hidden" name="model_namespace_relation_path[]" class="model_namespace_relation_path" value="'+inputVal+'">'+
 				'<input type="hidden" name="model_namespace_relation_key[]" class="model_namespace_relation_key" value="'+inputKey+'">'+
-				'<input type="text" name="model_namespace_relation_title[]" class="float-left form-control model_namespace_relation_title" placeholder="Relation Title" required>'+
-				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation Path" required>'+
+				'<input type="text" name="model_namespace_relation_title[]" class="float-left form-control model_namespace_relation_title" placeholder="Title" required>'+
+				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation" required>'+
 			'</div>');
 		$.ajax({
 			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
@@ -224,7 +224,7 @@
 						'<td>'+val.Field+'</td>'+
 						'<td><input type="text" name="model_namespace_relation_tbody_label['+inputKey+'][]" class="form-control model_namespace_relation_tbody_label" placeholder="Label">'+
 						'<input type="hidden" name="model_namespace_relation_tbody_name['+inputKey+'][]" class="form-control model_namespace_relation_tbody_name" value="'+val.Field+'" required>'+
-						'<input type="text" name="model_namespace_relation_tbody_relation['+inputKey+'][]" class="form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation">'+
+						'<input type="text" name="model_namespace_relation_tbody_relation['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation">'+
 						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
 						'<td><input type="checkbox" name="model_namespace_relation_tbody_check['+inputKey+'][]" class="model_namespace_relation_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'
@@ -266,7 +266,8 @@
 				'<button type="button" class="btn btn-danger btn-sm float-right approval_form_div_item_div_item_remove" >Remove</button>'+
 				'<input type="hidden" name="approval_form_path['+approvalLevel+'][]" class="approval_form_path" value="'+inputVal+'">'+
 				'<input type="hidden" name="approval_form_key['+approvalLevel+'][]" class="approval_form_key" value="'+inputKey+'">'+
-				'<input type="text" name="approval_form_title['+approvalLevel+'][]" class="float-left my-3 form-control approval_form_title" placeholder="Relation Title" required>'+
+				'<input type="text" name="approval_form_title['+approvalLevel+'][]" class="float-left mt-3 form-control approval_form_title" placeholder="Title" required>'+
+				'<input type="text" name="approval_form_relation['+approvalLevel+'][]" class="float-left my-3 form-control approval_form_relation" placeholder="Relation" required>'+
 			'</div>');
 		$.ajax({
 			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
@@ -288,6 +289,7 @@
 					'<tr>'+
 						'<td>'+val.Field+'</td>'+
 						'<td><input type="text" name="approval_form_tbody_label['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_label" placeholder="Label">'+
+						'<input type="text" name="approval_form_tbody_relation['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation" placeholder="Relation">'+
 						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
 						'<input type="hidden" name="approval_form_tbody_name['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_name" value="'+val.Field+'" required></td>'+
 						'<td><input type="checkbox" name="approval_form_tbody_check['+approvalLevel+']['+inputKey+'][]" class="approval_form_tbody_check" value="'+indKey+'"></td>'+
@@ -303,11 +305,8 @@
 		if($input.prop("checked")){
 			$input.closest('tr').find('.approval_form_tbody_label').removeAttr("required");
 			$input.closest('tr').find('.approval_form_tbody_label').attr({"required":true});
-			$input.closest('tr').find('.approval_form_tbody_type').removeAttr("required");
-			$input.closest('tr').find('.approval_form_tbody_type').attr({"required":true});
 		}else{			
 			$input.closest('tr').find('.approval_form_tbody_label').removeAttr("required");
-			$input.closest('tr').find('.approval_form_tbody_type').removeAttr("required");
 		}
 	});
 

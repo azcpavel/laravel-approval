@@ -175,6 +175,7 @@ class ApprovalController extends Controller
 						$approvalLevelForm = $approvalLevel->forms()->create([
 							'title' => $request->approval_form_title[$keyL][$keyF],
 							'approvable_type' => $request->approval_form_path[$keyL][$keyF],
+							'relation' => $request->approval_form_relation[$keyL][$keyF],
 						]);
 
 						$formKey = $request->approval_form_key[$keyL][$keyF];
@@ -182,13 +183,14 @@ class ApprovalController extends Controller
 							$approvalLevelForm->form_data()->create([
 								'mapped_field_name' => $request->approval_form_tbody_name[$keyL][$formKey][$valueFK],
 						        'mapped_field_label' => $request->approval_form_tbody_label[$keyL][$formKey][$valueFK],
+						        'mapped_field_relation' => $request->approval_form_tbody_relation[$keyL][$formKey][$valueFK],
 						        'mapped_field_type' => $request->approval_form_tbody_type[$keyL][$formKey][$valueFK],
 							]);
 						}						
 					}
 				}
 			}
-			
+
 			Artisan::call('view:clear');
 			DB::commit();			
 		}catch(\Exception $e){

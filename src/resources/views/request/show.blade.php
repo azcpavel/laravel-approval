@@ -173,6 +173,23 @@
 			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 			        @elseif($valueAFS->mapped_field_type == 'file')
 			        <input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+			        @elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "")
+			        <?php
+			        $itemModel = $valueAF->approvable_type;
+			        $itemRelation = $valueAFS->mapped_field_relation;
+			        $itemObject = new $itemModel();
+			        $itemRelationObject = $itemObject->$itemRelation();
+			        $itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+			        $itemRelationObjectColumns = \Schema::getColumnListing($itemRelationObject->getRelated()->getTable());
+			        $input_text_column = $itemRelationObjectColumns[1];
+			        $input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
+			        $input_name = $valueAF->id.'_'.$fieldName.($input_multiple ? '[]' : '');
+			    	?>
+			    	<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($input_multiple) ? 'multiple' : '')}}>
+			    	@foreach($itemRelationObject->getRelated()::get() as $keyAFSR => $valueAFSR)
+			    	<option value="{{$valueAFSR->id}}" {{(($valueAFSR->id == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$input_text_column}}</option>
+			    	@endforeach
+			    	</select>
 			        @endif
 			        @endforeach
 			        @endforeach
