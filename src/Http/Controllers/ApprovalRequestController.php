@@ -18,6 +18,8 @@ class ApprovalRequestController extends Controller
 	 */
 	public function index(Request $request, Approval $approval)
 	{
+		if(!$approval->status)
+			abort(404);
 		$approval = Approval::with('levels.forms.form_data','levels.users','mappings.fields')->where('id',$approval->id)->first();
 		if($request->wantsJson()){
 			$approvalRequest = new ApprovalRequest();
@@ -92,6 +94,8 @@ class ApprovalRequestController extends Controller
 	 */
 	public function show(ApprovalRequest $approvalRequest)
 	{
+		if(!$approvalRequest->approval->status)
+			abort(404);
 		$approvalRequest = ApprovalRequest::where('id',$approvalRequest->id)
 					->with('approval.levels.forms.form_data',
 						'approval.levels.users',
@@ -144,6 +148,8 @@ class ApprovalRequestController extends Controller
 	 */
 	public function submit(Request $request, ApprovalRequest $approvalRequest)
 	{
+		if(!$approvalRequest->approval->status)
+			abort(404);
 		$currentLevel = $approvalRequest->currentLevel(true);
 		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
 		if($approvalRequest->completed == 0 && $userApprover !== false && $request->has('approval_option')){
@@ -359,7 +365,7 @@ class ApprovalRequestController extends Controller
 	}
 
 	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
-		if($currentLevel->is_form_required){
+		if($currentLevel->is_form_required && $request->approval_option == 1){
 			foreach($currentLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
 					
