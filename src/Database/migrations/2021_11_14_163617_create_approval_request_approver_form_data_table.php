@@ -20,6 +20,8 @@ class CreateApprovalRequestApproverFormDataTable extends Migration
             $table->string('mapped_field_label',150);
             $table->string('mapped_field_type',150);
             $table->string('mapped_field_relation',150)->nullable();
+            $table->string('mapped_field_relation_pk',150)->nullable();
+            $table->string('mapped_field_relation_show',150)->nullable();
             $table->longText('mapped_field_value');
             $table->foreign('approval_request_approver_form_id','approval_request_approver_form_data')->on('ex_approval_request_approver_forms')->references('id');
         });

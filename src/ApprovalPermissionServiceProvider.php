@@ -30,6 +30,9 @@
 				__DIR__.'/Database/migrations' => database_path('migrations'),
 			], 'migration');
 			$this->publishes([
+				__DIR__.'/Notifications' => app_path(config('approval-config.notification-dir')),
+			], 'notification');
+			$this->publishes([
 				__DIR__.'/Database/seeders' => database_path('seeders'),
 			], 'seeder');
 

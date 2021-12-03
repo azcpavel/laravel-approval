@@ -19,6 +19,7 @@ class CreateApprovalRequestApproverFormsTable extends Migration
             $table->foreignId('approvable_id');
             $table->string('title',150);
             $table->string('approvable_type');
+            $table->string('relation',150)->nullable();
             $table->foreign('approval_request_approver_id','approval_request_approver_form')->on('ex_approval_request_approvers')->references('id');
         });
     }

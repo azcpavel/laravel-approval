@@ -383,6 +383,8 @@ class ApprovalRequestController extends Controller
 								'mapped_field_label' => $valueAFRF->mapped_field_label,
 								'mapped_field_type' => $valueAFRF->mapped_field_type,
 								'mapped_field_relation' => $valueAFRF->mapped_field_relation,
+								'mapped_field_relation_pk' => $valueAFRF->mapped_field_relation_pk,
+								'mapped_field_relation_show' => $valueAFRF->mapped_field_relation_show,
 								'mapped_field_value' => $request->$fieldItem,
 							]);
 

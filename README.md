@@ -8,6 +8,7 @@ A Dynamic package for handling model based approval process in Laravel.
     - [Config File](#config-file)
     - [View File](#view-file)
     - [Migration File](#migration-file)
+    - [Notification File](#notification-file)
     - [Approvable Trait](#approvable-trait)
     - [Migrations and Seeds](#migrations-and-seeds)
 - [Usage](#usage)
@@ -71,6 +72,12 @@ Publish the view file to your application. Run these commands inside your termin
 Publish the package migration file to your application. Run these commands inside your terminal.
 
     php artisan vendor:publish --provider="Exceptio\ApprovalPermission\ApprovalPermissionServiceProvider" --tag="migration"
+
+### Notificaiton File
+
+Publish the package notificaiton file to your application. Run these commands inside your terminal.
+
+    php artisan vendor:publish --provider="Exceptio\ApprovalPermission\ApprovalPermissionServiceProvider" --tag="notificaiton"
 
 ### Approvable Trait
 

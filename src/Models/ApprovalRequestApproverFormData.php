@@ -17,6 +17,8 @@ class ApprovalRequestApproverFormData extends Model
 		'mapped_field_label',
 		'mapped_field_type',
 		'mapped_field_relation',
+		'mapped_field_relation_pk',
+        'mapped_field_relation_show',
 		'mapped_field_value'
 	];
 	public $timestamps = false;

@@ -139,6 +139,8 @@ class ApprovalController extends Controller
 						'field_name' => $request->model_namespace_relation_tbody_name[$valueR][$valueRD],
 				        'field_label' => $request->model_namespace_relation_tbody_label[$valueR][$valueRD],
 				        'field_relation' => $request->model_namespace_relation_tbody_relation[$valueR][$valueRD],
+				        'field_relation_pk' => $request->model_namespace_relation_tbody_relation_pk[$valueR][$valueRD],
+				        'field_relation_show' => $request->model_namespace_relation_tbody_relation_show[$valueR][$valueRD],
 				        'field_type' => $request->model_namespace_relation_tbody_type[$valueR][$valueRD]
 				    ]);
 				}
@@ -184,6 +186,8 @@ class ApprovalController extends Controller
 								'mapped_field_name' => $request->approval_form_tbody_name[$keyL][$formKey][$valueFK],
 						        'mapped_field_label' => $request->approval_form_tbody_label[$keyL][$formKey][$valueFK],
 						        'mapped_field_relation' => $request->approval_form_tbody_relation[$keyL][$formKey][$valueFK],
+						        'mapped_field_relation_pk' => $request->approval_form_tbody_relation_pk[$keyL][$formKey][$valueFK],
+						        'mapped_field_relation_show' => $request->approval_form_tbody_relation_show[$keyL][$formKey][$valueFK],
 						        'mapped_field_type' => $request->approval_form_tbody_type[$keyL][$formKey][$valueFK],
 							]);
 						}						
