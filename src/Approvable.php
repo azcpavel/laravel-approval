@@ -44,7 +44,7 @@ trait Approvable
 			    	]);
 
 			    	$firstLevel = $approval->levels->sortBy('level')->first();
-			    	if($firstLevel->group_notification){
+			    	if($firstLevel->group_notification && $firstLevel->notifiable_class != 0){
 						$notifiableClass = $firstLevel->notifiable_class;
 						$userModel = config('approval-config.user-model');
 						$users = new $userModel();
@@ -108,7 +108,7 @@ trait Approvable
 			    	\DB::commit();
 
 			    	$firstLevel = $approval->levels->sortBy('level')->first();
-			    	if($firstLevel->group_notification){
+			    	if($firstLevel->group_notification && $firstLevel->notifiable_class != 0){
 						$notifiableClass = $firstLevel->notifiable_class;
 						$userModel = config('approval-config.user-model');
 						$users = new $userModel();

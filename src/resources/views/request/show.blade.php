@@ -36,7 +36,7 @@
 								</div>
 								<div class="card-body">									
 									Total Level: {{$approvalRequest->approval->levels->count()}}<br>
-									Total Approvals: {{$approvalRequest->approvers->count()}}<br>
+									Total Submission: {{$approvalRequest->approvers->count()}}<br>
 									No. of Approve: {{$approvalRequest->approvers->count() > 0 ? $approvalRequest->approvers->where('is_approved',1)->count() : 0}}<br>
 									No. of Rejects: {{$approvalRequest->approvers->count() > 0 ? $approvalRequest->approvers->where('is_rejected',1)->count() : 0}}
 								</div>
@@ -134,9 +134,9 @@
 							</div>
 							@endforeach
 						@endif
-						@foreach($approvalRequest->approval->levels as $keyAL => $valueAL)
+						@foreach($approvalRequest->approvers->sortBy('level')->groupBy('level')->all() as $keyAL => $valueAL)
 						<div class="col-12 mt-4">
-							<h5>Approval Submissions for {{$valueAL->title}}</h5>
+							<h5>Approval Submissions for {{$valueAL[0]->title}}</h5>
 							<table class="table table-sm table-bordered table-striped">
 								<thead>
 									<tr>
@@ -148,7 +148,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									@foreach($approvalRequest->approvers->where('level',$valueAL->level)->sortByDesc('id')->values()->all() as $keyALS => $valueALS)
+									@foreach($valueAL->sortByDesc('id')->values()->all() as $keyALS => $valueALS)
 									<tr>
 										<td width="40">{{$keyALS+1}}</td>
 										<td>{{$valueALS->user->name}}</td>
