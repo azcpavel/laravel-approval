@@ -14,9 +14,9 @@ class ApprovalMapping extends Model
 	protected $table="ex_approval_mappings";
 	protected $fillable=[
 		'approval_id',
-		'title',
 		'approvable_type',
-		'relation'
+		'relation',
+		'title'
 	];
 	public $timestamps = false;
 

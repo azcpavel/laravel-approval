@@ -22,7 +22,7 @@ class CreateApprovalRequestMappingFieldDataTable extends Migration
             $table->string('field_relation',150)->nullable();
             $table->string('field_relation_pk',150)->nullable();
             $table->string('field_relation_show',150)->nullable();
-            $table->longText('field_data');
+            $table->longText('field_data')->nullable();
             $table->foreign('approval_request_mapping_field_id','approval_request_mapping_data')->on('ex_approval_request_mapping_fields')->references('id');
         });
     }

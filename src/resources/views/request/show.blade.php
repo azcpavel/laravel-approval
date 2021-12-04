@@ -68,6 +68,72 @@
 								</div>
 							</div>							
 						</div>
+						@if($approvalRequest->approval->on_update)
+							@foreach($approvalRequest->mappings as $keyM => $valueM)
+							<?php
+							$currentItem = $valueM->approvable;
+							?>
+							<div class="col-12">
+								<h5>{{$valueM->title}}</h5>
+							</div>
+							<div class="col-12">
+								<table class="table table-sm table-bordered table-striped">
+									<thead>
+										<tr>
+											<th>#SL</th>
+											<th>Field</th>
+											<th>Current Data</th>
+											<th>New Data</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach($valueM->form_data as $keyMF => $valueMF)
+											<?php
+											$fieldName = $valueMF->field_name;
+											$currentFieldData = '';
+											$newFieldData = '';
+											if($valueMF->field_type == 'text'){
+												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
+												$newFieldData = $valueMF->field_data;
+											}elseif ($valueMF->field_type == 'email') {
+												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
+												$newFieldData = $valueMF->field_data;
+											}elseif ($valueMF->field_type == 'textarea') {
+												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
+												$newFieldData = $valueMF->field_data;
+											}elseif ($valueMF->field_type == 'file') {
+												$currentFieldData = ($currentItem) ? '<a href="'.asset($currentItem->$fieldName).'">'.basename($currentItem->$fieldName).'</a>' : '';
+												$newFieldData = '<a href="'.asset($valueMF->field_data).'">'.basename($valueMF->field_data).'</a>';
+											}elseif ($valueMF->field_type == 'select' && $valueMF->field_relation != '' && $valueMF->field_relation_pk != '' && $valueMF->field_relation_show != '') {
+												$relationName = $valueMF->field_relation;
+												$relationShow = $valueMF->field_relation_show;
+												$currentFieldData = (($currentItem && $currentItem->$relationName) ? $currentItem->$relationName->$relationShow : (($currentItem) ? $currentItem->$fieldName : ''));
+												
+												$itemModel = $currentItem;
+												$itemRelation = $relationName;
+												$itemRelationPK = $valueMF->field_relation_pk;
+												$itemRelationShow = $valueMF->field_relation_show;
+												$itemObject = new $itemModel();
+												$itemRelationObject = $itemObject->$itemRelation()->getRelated();
+												if($itemRelationObject::find($valueMF->field_data))
+													$newFieldData = $itemRelationObject::find($valueMF->field_data)->$relationShow;
+												else
+													$newFieldData = $valueMF->field_data;
+											}
+											$isChanged = ($currentFieldData != $newFieldData);
+											?>
+											<tr>
+												<td>{{$keyMF+1}}</td>
+												<td>{{$valueMF->field_label}}</td>
+												<td>{!!$currentFieldData!!}</td>
+												<td class="{{($isChanged) ? 'data-changed' : ''}}">{!!$newFieldData!!}</td>
+											</tr>
+										@endforeach
+									</tbody>
+								</table>
+							</div>
+							@endforeach
+						@endif
 						@foreach($approvalRequest->approval->levels as $keyAL => $valueAL)
 						<div class="col-12 mt-4">
 							<h5>Approval Submissions for {{$valueAL->title}}</h5>
@@ -134,6 +200,9 @@
 		<style type="text/css">
 			.top-card .card-body{
 				min-height: 140px !important;
+			}
+			.data-changed{
+				border-bottom: 1px solid red !important;
 			}
 		</style>
 		<div class="modal" tabindex="-1" id="approval-data-modal">

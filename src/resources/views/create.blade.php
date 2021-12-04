@@ -51,9 +51,14 @@
 								</div>
 								<div class="row" id="model_namespace_relation_div" style="display:none;">
 									<div class="col-12">
+										<div class="form-group">
+											<label for="title">Update Slug <span class="text-danger position-relative">*</span></label>
+											<input class="form-control" type="text" name="slug" placeholder="Slug" id="slug" required>
+											<span class="d-none invalid-feedback"></span>
+										</div>
 										<div class="row form-group">
 											<div class="col-12">
-											<label for="title">Model Update Fields<span class="text-danger position-relative">*</span></label>											
+											<label for="title">Update Model Fields<span class="text-danger position-relative">*</span></label>											
 											</div>
 											<div class="col-8">
 												<select class="form-control" id="model_namespace_relation">

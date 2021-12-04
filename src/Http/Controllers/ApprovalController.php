@@ -120,6 +120,7 @@ class ApprovalController extends Controller
 				'approvable_type' => $request->model_namespace,
 				'view_route_name' => $request->view_route_name,
 				'view_route_param' => array_combine($request->view_route_param_key,$request->view_route_param_value),
+				'slug' => $request->slug,
 				'list_data_fields' => $request->list_data_fields,
 				'on_create' => $request->approval_type == 1 ? 1 : 0,
 				'on_update' => $request->approval_type == 2 ? 1 : 0,

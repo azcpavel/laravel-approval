@@ -14,8 +14,9 @@ class ApprovalLevelForm extends Model
 	protected $table="ex_approval_level_forms";
 	protected $fillable = [
 		'approval_level_id',
-		'title',
 		'approvable_type',
+		'relation',
+		'title'
 	];
 	public $timestamps = false;
 

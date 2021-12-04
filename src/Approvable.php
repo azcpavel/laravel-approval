@@ -62,27 +62,50 @@ trait Approvable
     	}    	
     }
 
-    public function notifyApprovalUpdate($approvalItem, $approvalMapping){
+    public function notifyApprovalUpdate($approvalItem, $approvalMapping, $slug){
     	$approvalble = get_class($approvalItem);
-    	$approval = Approval::where('approvable_type',$approvalble)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	$approval = Approval::where('approvable_type',$approvalble)->where('status',1)->where('slug',$slug)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
     	
     	try{
     		if($approval){
-    			$old_request = $approval->requests->where('approvable_id',$approvalItem->id)->whereBetween('completed',[0,2])->first();
+    			$old_request = $approval->requests->where('approvable_id',$approvalItem->id)->where('completed',0)->first();
     			if($old_request && $old_request->completed == 0)
     				return -2;
+				else{
+    				\DB::beginTransaction();
 
-    			if($old_request && $old_request->completed == 2){
-    				$old_request->completed = 0;
-    				$old_request->save();
-
-    				return $old_request;
-    			}else{
     				$approvalRequest = $approval->requests()->create([
 			    		'approvable_type' => $approvalble,
 			    		'approvable_id' => $approvalItem->id,
 						'user_id' => auth()->user()->id,
 			    	]);
+
+    				foreach($approvalMapping as $keyRM => $valueRM){
+    					$mapping = $approval->mappings->where('approvable_type',get_class($valueRM))->first();
+    					if($mapping){
+    						$approvalRequestMap = $approvalRequest->mappings()->create([
+    							'title' => $mapping->title,
+								'approvable_id' => $valueRM->id,
+								'approvable_type' => $mapping->approvable_type,
+								'relation' => $mapping->relation,
+				    		]);
+
+				    		foreach($mapping->fields as $keyRMF => $valueRMF){
+				    			$field = $valueRMF->field_name;
+				    			$approvalRequestMap->form_data()->create([
+				    				'field_name' => $valueRMF->field_name,
+									'field_label' => $valueRMF->field_label,
+									'field_relation' => $valueRMF->field_relation,
+									'field_relation_pk' => $valueRMF->field_relation_pk,
+									'field_relation_show' => $valueRMF->field_relation_show,
+									'field_type' => $valueRMF->field_type,
+									'field_data' => $valueRM->$field
+				    			]);
+				    		}
+    					}    					
+    				}	    	
+
+			    	\DB::commit();
 
 			    	$firstLevel = $approval->levels->sortBy('level')->first();
 			    	if($firstLevel->group_notification){

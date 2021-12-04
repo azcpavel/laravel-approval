@@ -18,6 +18,7 @@ class CreateApprovalsTable extends Migration
             $table->string('title',150);
             $table->string('approvable_type',160);
             $table->string('view_route_name',150);
+            $table->string('slug',150)->nullable();
             $table->text('view_route_param');
             $table->text('list_data_fields');
             $table->tinyInteger('on_create')->default(0);

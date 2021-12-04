@@ -14,9 +14,10 @@ class ApprovalRequestMappingField extends Model
 	protected $table="ex_approval_request_mapping_fields";
 	protected $fillable=[
 		'approval_request_id',
-		'title',
 		'approvable_id',
 		'approvable_type',
+		'relation',
+		'title'
 	];
 	public $timestamps = false;
 
@@ -27,4 +28,8 @@ class ApprovalRequestMappingField extends Model
 	public function form_data(){
         return $this->hasMany(ApprovalRequestMappingFieldData::class);
     }
+
+    public function approvable(){
+		return $this->morphTo();
+	}
 }

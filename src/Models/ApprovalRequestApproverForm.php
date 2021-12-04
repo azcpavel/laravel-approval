@@ -16,6 +16,7 @@ class ApprovalRequestApproverForm extends Model
         'approval_request_approver_id',
         'approvable_id',
         'approvable_type',
+        'relation',
         'title'
     ];
     public $timestamps = false;
@@ -26,5 +27,9 @@ class ApprovalRequestApproverForm extends Model
 
     public function form_data(){
         return $this->hasMany(ApprovalRequestApproverFormData::class);
+    }
+
+    public function approvable(){
+        return $this->morphTo();
     }
 }
