@@ -54,13 +54,29 @@
 				}},
 				{'title': 'Level', name: 'level', data: "approval_state",render : function(data, type, row){
 					var htmlData = row.completed == 1 ? 'Completed' : 'Pending';
-					$.each(approval.levels,function(infAL, valAL){						
-						if(row.completed == 0 && valAL.level == data){
-							htmlData = valAL.title;
-							return false;
-						}
-					})
+					if(row.completed == 2){
+						htmlData = 'Rejected';
+					}else{
+						$.each(approval.levels,function(infAL, valAL){						
+							if(row.completed == 0 && valAL.level == data){
+								htmlData = valAL.title;
+								return false;
+							}
+						})
+					}					
 					return htmlData;
+				}},
+				{'title': 'Submitted', name: 'created_at', data: "created_at", render : function(data, type, row){
+					var date = new Date(data);
+					const offset = date.getTimezoneOffset();
+					date = new Date(date.getTime() - (offset*60*1000));
+					return date.toISOString().split('T')[0]+' '+date.toISOString().split('T')[1].split('.')[0];
+				}},
+				{'title': 'Last Updated', name: 'updated_at', data: "updated_at", render : function(data, type, row){
+					var date = new Date(data);
+					const offset = date.getTimezoneOffset();
+					date = new Date(date.getTime() - (offset*60*1000));
+					return date.toISOString().split('T')[0]+' '+date.toISOString().split('T')[1].split('.')[0];
 				}},
 				{
 					'title': 'Option', data: 'id', class: 'text-right width-5-per', render: function (data, type, row, col) {
@@ -88,7 +104,7 @@
 			columnDefs: [{
 				searchable: false,
 				orderable: false,
-				targets: [0,1,2,3]
+				targets: [0,1,2,3,4,5]
 			}],
 			responsive: true,
 			autoWidth: false,
