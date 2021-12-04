@@ -52,8 +52,8 @@
 									$currentLevel = $approvalRequest->currentLevel(true);
 									$currentLevelStatus = $approvalRequest->currentLevel();
 									?>
-									Level: {{$currentLevelStatus}}<br>
-									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed')
+									State: {{$currentLevelStatus}}<br>
+									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected')
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}									
 									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
@@ -63,7 +63,7 @@
 									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
 									@endif
 									@else
-									Time: {{approvalDate($approvalRequest->updated_at)}}
+									Time: {{approvalDate($approvalRequest->updated_at,true)}}
 									@endif
 								</div>
 							</div>							
