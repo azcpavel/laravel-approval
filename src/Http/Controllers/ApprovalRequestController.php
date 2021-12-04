@@ -260,10 +260,12 @@ class ApprovalRequestController extends Controller
 
 					if($currentLevel->is_flexible == 0){
 						if($rejectCount == 0){
-							foreach($currentLevel->status_fields->approve as $keyA => $valueA){
-								$approvalItem->$keyA = $valueA;
-							}
-							$approvalItem->save();
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve')){
+								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
+							}							
 							
 							if($finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
@@ -271,21 +273,26 @@ class ApprovalRequestController extends Controller
 								$approvalRequest->approval_state = $nextLevel->level;
 							}
 							$approvalRequest->save();
-						}else{
-							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
-								$approvalItem->$keyA = $valueA;
+						}else{							
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject')){							
+								foreach($currentLevel->status_fields->reject as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
 							}
-							$approvalItem->save();
 
 							$approvalRequest->completed = 2;
 							$approvalRequest->save();
 						}
 					}else{
 						if($approveCount >= $currentLevel->is_flexible){
-							foreach($currentLevel->status_fields->approve as $keyA => $valueA){
-								$approvalItem->$keyA = $valueA;
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve')){
+								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
 							}
-							$approvalItem->save();							
+
 							if($finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
 							}elseif($nextLevel){
@@ -293,10 +300,12 @@ class ApprovalRequestController extends Controller
 							}
 							$approvalRequest->save();
 						}else{
-							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
-								$approvalItem->$keyA = $valueA;
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject')){
+								foreach($currentLevel->status_fields->reject as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
 							}
-							$approvalItem->save();
 
 							$approvalRequest->completed = 2;
 							$approvalRequest->save();
@@ -396,6 +405,28 @@ class ApprovalRequestController extends Controller
 				}
 			}
 		}
+
+		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_update){
+			if($approvalRequest->mappings){
+				foreach($approvalRequest->mappings as $keyM => $valueM){
+					$currentItem = $valueM->approvable;
+					if(!$currentItem){
+						$itemModelPath = $valueM->approvable_type;
+						$currentItem = new $itemModelPath();
+						if($valueM->approvable_id){
+							$currentItem->id = $valueM->approvable_id;
+						}						
+					}
+
+					foreach($valueM->form_data as $keyMF => $valueMF){
+						$fieldName = $valueMF->field_name;
+						$currentItem->$fieldName = $valueMF->field_data;
+					}
+
+					$currentItem->save();
+				}
+			}
+		}
 	}
 
 	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message){		
@@ -435,5 +466,5 @@ class ApprovalRequestController extends Controller
 
 			return redirect()->back()->with($message);
 		}		
-	}
+	}	
 }
