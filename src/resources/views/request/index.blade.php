@@ -52,7 +52,7 @@
 					})
 					return htmlData;
 				}},
-				{'title': 'Level', name: 'level', data: "approval_state",render : function(data, type, row){
+				{'title': 'State', name: 'state', data: "approval_state",render : function(data, type, row){
 					var htmlData = row.completed == 1 ? 'Completed' : 'Pending';
 					if(row.completed == 2){
 						htmlData = 'Rejected';
