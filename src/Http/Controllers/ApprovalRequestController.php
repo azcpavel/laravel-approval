@@ -260,7 +260,7 @@ class ApprovalRequestController extends Controller
 
 					if($currentLevel->is_flexible == 0){
 						if($rejectCount == 0){
-							if($currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
+							if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
 								$actionClassPath = $currentLevel->action_data->before->class;
 								$actionClassMethod = $currentLevel->action_data->before->method;
 								$actionClass = new $actionClassPath();
@@ -293,13 +293,13 @@ class ApprovalRequestController extends Controller
 						}
 					}else{
 						if($approveCount >= $currentLevel->is_flexible){
-							if($currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
+							if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
 								$actionClassPath = $currentLevel->action_data->before->class;
 								$actionClassMethod = $currentLevel->action_data->before->method;
 								$actionClass = new $actionClassPath();
 								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 							}
-							
+
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve')){
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
