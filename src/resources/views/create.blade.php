@@ -122,6 +122,11 @@
 				</div>
 			</div>
 		</div>
+		<style type="text/css">
+			.action-class, .action-url{				
+				width: 100%;
+			}
+		</style>
 @endsection
 @push('script')
 @if(config('approval-config.load-script'))
@@ -139,6 +144,18 @@
 			$('#model_namespace_relation_div').show();
 		}else{			
 			$('#model_namespace_relation_div').hide();
+		}
+	});
+
+	$(document).on("change",".approval_action_type",function(){
+		var $input = $(this);
+		var $parent = $(this).closest('.approval_level_item');
+
+		$('.action-class, .action-url').hide();
+		if($input.val() == 1){
+			$parent.find('.action-class').show();
+		}else if($input.val() == 2){			
+			$parent.find('.action-url').show();
 		}
 	});
 
@@ -252,6 +269,7 @@
 			var $htmlData = $(response.replace('APPROVAL_LEVEL',$('.approval_level_item').length + 1).replace('APPROVE_USER_INDEX',$('.approval_level_item').length));
 			$('#approval_level').append($htmlData);
 			$htmlData.find('.select2').select2();
+			$htmlData.find('.action-class, .action-url').hide();
 		});
 		
 	});

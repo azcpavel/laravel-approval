@@ -60,7 +60,7 @@
 	</div>
 	<div class="form-group">
 		<label for="approval_action_type">Action Type<span class="text-danger position-relative">*</span></label>
-		<select class="form-control" name="approval_action_type[]">												
+		<select class="form-control approval_action_type" name="approval_action_type[]">												
 			<option value="0">None</option>
 			<option value="1">Class Path</option>
 			<option value="2">Redirect URL</option>
@@ -68,8 +68,32 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_action_data">Action Data</label>
-		<input class="form-control" type="text" name="approval_action_data[]" placeholder="Action Data">
+		<label for="approval_action_data" class="action-class">Action Class Data</label>		
+		<label for="approval_action_data" class="action-url">Action URL Data</label>		
+		<div class="input-group action-class">
+			<input class="form-control" type="text" name="approval_action_class_before_path[]" placeholder="Before Namespace">
+			<input class="form-control" type="text" name="approval_action_class_before_method[]" placeholder="Before Method">
+		</div>
+		<div class="input-group action-class mt-2">
+			<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace">
+			<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method">
+		</div>
+		<div class="input-group action-class mt-2">
+			<input class="form-control" type="text" name="approval_action_class_approve_path[]" placeholder="Approve Namespace">
+			<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method">
+		</div>
+		<div class="input-group action-url">
+			<input class="form-control" type="text" name="approval_action_url_before_path[]" placeholder="Before Route Name">
+			<input class="form-control" type="text" name="approval_action_url_before_method[]" placeholder="Before Params JSON">
+		</div>
+		<div class="input-group action-url mt-2">
+			<input class="form-control" type="text" name="approval_action_url_reject_path[]" placeholder="Reject Route Name">
+			<input class="form-control" type="text" name="approval_action_url_reject_method[]" placeholder="Reject Params JSON">
+		</div>
+		<div class="input-group action-url mt-2">
+			<input class="form-control" type="text" name="approval_action_url_approve_path[]" placeholder="Approve Route Name">
+			<input class="form-control" type="text" name="approval_action_url_approve_method[]" placeholder="Approve Params JSON">
+		</div>
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
@@ -83,7 +107,8 @@
 	</div>
 	<div class="form-group">
 		<label for="approval_status_fields">Status Fields</label>
-		<input class="form-control" type="text" name="approval_status_fields[]" placeholder="Status Fields">
+		<input class="form-control" type="text" name="approval_status_fields_approve[]" placeholder="Status Fields Approve JSON">
+		<input class="form-control mt-2" type="text" name="approval_status_fields_reject[]" placeholder="Status Fields Reject JSON">
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
@@ -98,7 +123,7 @@
 	</div>
 	<div class="form-group">
 		<label for="approval_notifiable_params">Notification Params</label>
-		<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Notification Params">
+		<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Notification Params JSON">
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
