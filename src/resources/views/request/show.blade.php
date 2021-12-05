@@ -120,8 +120,7 @@
 												else
 													$newFieldData = $valueMF->field_data;
 											}
-											if(strpos($currentFieldData, ' 00:00:00') === false)
-												$newFieldData = str_replace(' 00:00:00', '', $newFieldData);
+											
 											$isChanged = ($currentFieldData != $newFieldData);
 											?>
 											<tr>

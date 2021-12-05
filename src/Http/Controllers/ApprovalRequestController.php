@@ -260,6 +260,13 @@ class ApprovalRequestController extends Controller
 
 					if($currentLevel->is_flexible == 0){
 						if($rejectCount == 0){
+							if($currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
+								$actionClassPath = $currentLevel->action_data->before->class;
+								$actionClassMethod = $currentLevel->action_data->before->method;
+								$actionClass = new $actionClassPath();
+								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+							}
+
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve')){
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
@@ -286,6 +293,13 @@ class ApprovalRequestController extends Controller
 						}
 					}else{
 						if($approveCount >= $currentLevel->is_flexible){
+							if($currentLevel->action_data && property_exists($currentLevel->action_data, 'before')){
+								$actionClassPath = $currentLevel->action_data->before->class;
+								$actionClassMethod = $currentLevel->action_data->before->method;
+								$actionClass = new $actionClassPath();
+								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+							}
+							
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve')){
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
@@ -433,12 +447,12 @@ class ApprovalRequestController extends Controller
 		\DB::commit();
 
 		if($currentLevel->action_type == 1){
-			if($request->approval_option == 1 && $currentLevel->action_data->approve){
+			if($request->approval_option == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'approve')){
 				$actionClassPath = $currentLevel->action_data->approve->class;
 				$actionClassMethod = $currentLevel->action_data->approve->method;
 				$actionClass = new $actionClassPath();
 				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
-			}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
+			}elseif($request->approval_option == 0 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'reject')){
 				$actionClassPath = $currentLevel->action_data->reject->class;
 				$actionClassMethod = $currentLevel->action_data->reject->method;
 				$actionClass = new $actionClassPath();
@@ -448,14 +462,14 @@ class ApprovalRequestController extends Controller
 			return redirect()->back()->with($message);
 		}
 		elseif($currentLevel->action_type == 2){
-			if($request->approval_option == 1 && $currentLevel->action_data->approve){
+			if($request->approval_option == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'approve')){
 				$routeParams = [];
 				foreach($currentLevel->action_data->approve->param as $keyRP => $valueRP){
 					$routeParams[$keyRP] = $approvalItem->$valueRP;
 				}
 				$routeParams['approver_id'] = $approvalRequestApprover->id;
 				return redirect()->route($currentLevel->action_data->approve->route,$routeParams);
-			}elseif($request->approval_option == 0 && $currentLevel->action_data->reject){
+			}elseif($request->approval_option == 0 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'reject')){
 				$routeParams = [];
 				foreach($currentLevel->action_data->reject->param as $keyRP => $valueRP){
 					$routeParams[$keyRP] = $approvalItem->$valueRP;
