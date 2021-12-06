@@ -455,11 +455,6 @@
 		updateFormIndex();
 	});
 
-	$(document).on("change","#model_namespace_relation_input",function(){
-		var $input = $(this);
-		$('#model_namespace_relation_div').toggle();
-	});
-
 	$(document).on("change","#approval_type",function(){
 		var $input = $(this);
 		if($input.val() == 2){
@@ -655,7 +650,10 @@
 	
 	$(document).on("change",".approval_form",function(){
 		var $input = $(this);
-		$input.closest('.approval_level_item').find('.approval_form_div').toggle();
+		if($input.val() == 1)
+			$input.closest('.approval_level_item').find('.approval_form_div').show();
+		else
+			$input.closest('.approval_level_item').find('.approval_form_div').hide();
 	});
 
 	$(document).on("click",".approval_form_add",function(){	

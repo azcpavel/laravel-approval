@@ -332,7 +332,10 @@
 	
 	$(document).on("change",".approval_form",function(){
 		var $input = $(this);
-		$input.closest('.approval_level_item').find('.approval_form_div').toggle();
+		if($input.val() == 1)
+			$input.closest('.approval_level_item').find('.approval_form_div').show();
+		else
+			$input.closest('.approval_level_item').find('.approval_form_div').hide();
 	});
 
 	$(document).on("click",".approval_form_add",function(){	
