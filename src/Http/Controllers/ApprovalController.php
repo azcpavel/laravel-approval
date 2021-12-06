@@ -149,18 +149,71 @@ class ApprovalController extends Controller
 
 			if($request->approval_title)
 			foreach($request->approval_title as $keyL => $valueL){
+				$action_data = null;
+				$status_fields = null;
+				if($request->approval_action_type[$keyL] == 1){
+					if($request->approval_action_class_before_path[$keyL] != ''){
+						$action_data['before'] = [
+							'class' => $request->approval_action_class_before_path[$keyL],
+							'method' => $request->approval_action_class_before_method[$keyL]
+						];
+					}
+
+					if($request->approval_action_class_approve_path[$keyL] != ''){
+						$action_data['approve'] = [
+							'class' => $request->approval_action_class_approve_path[$keyL],
+							'method' => $request->approval_action_class_approve_method[$keyL]
+						];
+					}
+
+					if($request->approval_action_class_reject_path[$keyL] != ''){
+						$action_data['reject'] = [
+							'class' => $request->approval_action_class_reject_path[$keyL],
+							'method' => $request->approval_action_class_reject_method[$keyL]
+						];
+					}
+				}
+
+				if($request->approval_action_type[$keyL] == 2){
+					if($request->approval_action_url_approve_route[$keyL] != ''){
+						$action_data['approve'] = [
+							'route' => $request->approval_action_url_approve_route[$keyL],
+							'param' => json_decode($request->approval_action_url_approve_param[$keyL])
+						];
+					}
+
+					if($request->approval_action_url_reject_route[$keyL] != ''){
+						$action_data['reject'] = [
+							'route' => $request->approval_action_url_reject_route[$keyL],
+							'param' => json_decode($request->approval_action_url_reject_param[$keyL])
+						];
+					}
+				}
+
+				if($request->approval_status_fields_approve_column[$keyL]){
+					foreach($request->approval_status_fields_approve_column[$keyL] as $keySF => $valueSF){
+						$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
+					}
+				}
+
+				if($request->approval_status_fields_reject_column[$keyL]){
+					foreach($request->approval_status_fields_reject_column[$keyL] as $keySF => $valueSF){
+						$status_fields['reject'][$request->approval_status_fields_reject_column[$keyL][$keySF]] = $request->approval_status_fields_reject_value[$keyL][$keySF];						
+					}
+				}
+
 				$approvalLevel = $approval->levels()->create([
 					'title' => $request->approval_title[$keyL],
 					'is_flexible' => $request->approval_flex[$keyL],
 					'is_form_required' => $request->approval_form[$keyL],
 					'level' => $request->approval_level[$keyL],
 					'action_type' => $request->approval_action_type[$keyL],
-					'action_data' => json_decode($request->approval_action_data[$keyL]),
+					'action_data' => $action_data,
 					'action_frequency' => $request->approval_action_frequency[$keyL],
-					'status_fields' => json_decode($request->approval_status_fields[$keyL]),
+					'status_fields' => $status_fields,
 					'is_data_mapped' => $request->approval_data_mapped[$keyL],
 					'notifiable_class' => $request->approval_notifiable_namespace[$keyL],
-					'notifiable_params' => json_decode($request->approval_notifiable_params[$keyL]),
+					'notifiable_params' => ['channels' => json_decode($request->approval_notifiable_params[$keyL])],
 					'group_notification' => $request->approval_group_notification[$keyL],
 					'next_level_notification' => $request->approval_next_notification[$keyL],
 					'is_approve_reason_required' => $request->approval_approve_reason[$keyL],

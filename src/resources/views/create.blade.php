@@ -53,7 +53,7 @@
 									<div class="col-12">
 										<div class="form-group">
 											<label for="title">Update Slug <span class="text-danger position-relative">*</span></label>
-											<input class="form-control" type="text" name="slug" placeholder="Slug" id="slug" required>
+											<input class="form-control" type="text" name="slug" placeholder="Slug" id="slug">
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="row form-group">
@@ -142,8 +142,10 @@
 		var $input = $(this);
 		if($input.val() == 2){
 			$('#model_namespace_relation_div').show();
+			$('#slug').prop('required',true);
 		}else{			
 			$('#model_namespace_relation_div').hide();
+			$('#slug').removeAttr('required');
 		}
 	});
 
@@ -270,8 +272,61 @@
 			$('#approval_level').append($htmlData);
 			$htmlData.find('.select2').select2();
 			$htmlData.find('.action-class, .action-url').hide();
+			updateFormIndex();
 		});
 		
+	});
+
+	$(document).on("click",".level_status_fields_approve_btn_add",function(){
+		var $item = $(this);
+		$item.closest('.level_status_fields_approve_div').append(
+			'<div class="input-group level_status_fields_approve_div_item mb-2">'+
+				'<div class="input-group-prepend">'+
+				    '<span class="input-group-text">Approve</span>'+
+				'</div>'+
+				'<input class="form-control" type="text" name="approval_status_fields_approve_column[]" placeholder="Column Name">'+
+				'<input class="form-control" type="text" name="approval_status_fields_approve_value[]" placeholder="Column Value">'+
+				'<div class="input-group-append">'+
+				    '<button type="button" class="btn btn-success level_status_fields_approve_btn_add">+</button>'+
+				    '<button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>'+
+				'</div>'+
+			'</div>'
+		);
+		updateFormIndex();
+	});
+
+	$(document).on("click",".level_status_fields_approve_btn_rem",function(){
+		var $item = $(this);
+		if($item.closest('.level_status_fields_approve_div').children().length > 1){
+			$item.closest('.level_status_fields_approve_div_item').remove();
+			updateFormIndex();
+		}
+	});
+
+	$(document).on("click",".level_status_fields_reject_btn_add",function(){
+		var $item = $(this);
+		$item.closest('.level_status_fields_reject_div').append(
+			'<div class="input-group level_status_fields_reject_div_item mb-2">'+
+				'<div class="input-group-prepend">'+
+				    '<span class="input-group-text">Reject</span>'+
+				'</div>'+
+				'<input class="form-control" type="text" name="approval_status_fields_reject_column[]" placeholder="Column Name">'+
+				'<input class="form-control" type="text" name="approval_status_fields_reject_value[]" placeholder="Column Value">'+
+				'<div class="input-group-append">'+
+				    '<button type="button" class="btn btn-success level_status_fields_reject_btn_add">+</button>'+
+				    '<button type="button" class="btn btn-danger level_status_fields_reject_btn_rem">-</button>'+
+				'</div>'+
+			'</div>'
+		);
+		updateFormIndex();
+	});
+
+	$(document).on("click",".level_status_fields_reject_btn_rem",function(){
+		var $item = $(this);
+		if($item.closest('.level_status_fields_reject_div').children().length > 1){
+			$item.closest('.level_status_fields_reject_div_item').remove();
+			updateFormIndex();
+		}
 	});
 
 	
@@ -358,6 +413,12 @@
 			var $item = $(elForm);
 			$item.find('.approval_level_no > h5 > span').html(indForm+1);
 			$item.find(':input[name^=approval_user]').attr('name','approval_user['+(indForm)+'][]');
+
+			$item.find(':input[name^=approval_status_fields_approve_column]').attr('name','approval_status_fields_approve_column['+(indForm)+'][]');
+			$item.find(':input[name^=approval_status_fields_approve_value]').attr('name','approval_status_fields_approve_value['+(indForm)+'][]');
+			
+			$item.find(':input[name^=approval_status_fields_reject_column]').attr('name','approval_status_fields_reject_column['+(indForm)+'][]');
+			$item.find(':input[name^=approval_status_fields_reject_value]').attr('name','approval_status_fields_reject_value['+(indForm)+'][]');
 
 			$item.find(':input[name^=approval_form_path]').attr('name','approval_form_path['+(indForm)+'][]');
 			$item.find(':input[name^=approval_form_key]').attr('name','approval_form_key['+(indForm)+'][]');

@@ -75,24 +75,20 @@
 			<input class="form-control" type="text" name="approval_action_class_before_method[]" placeholder="Before Method">
 		</div>
 		<div class="input-group action-class mt-2">
-			<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace">
-			<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method">
-		</div>
-		<div class="input-group action-class mt-2">
 			<input class="form-control" type="text" name="approval_action_class_approve_path[]" placeholder="Approve Namespace">
 			<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method">
 		</div>
-		<div class="input-group action-url">
-			<input class="form-control" type="text" name="approval_action_url_before_path[]" placeholder="Before Route Name">
-			<input class="form-control" type="text" name="approval_action_url_before_method[]" placeholder="Before Params JSON">
+		<div class="input-group action-class mt-2">
+			<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace">
+			<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method">
+		</div>		
+		<div class="input-group action-url mt-2">
+			<input class="form-control" type="text" name="approval_action_url_approve_route[]" placeholder="Approve Route Name">
+			<input class="form-control" type="text" name="approval_action_url_approve_param[]" placeholder="JSON {'param_name':'main_model_column'}">
 		</div>
 		<div class="input-group action-url mt-2">
-			<input class="form-control" type="text" name="approval_action_url_reject_path[]" placeholder="Reject Route Name">
-			<input class="form-control" type="text" name="approval_action_url_reject_method[]" placeholder="Reject Params JSON">
-		</div>
-		<div class="input-group action-url mt-2">
-			<input class="form-control" type="text" name="approval_action_url_approve_path[]" placeholder="Approve Route Name">
-			<input class="form-control" type="text" name="approval_action_url_approve_method[]" placeholder="Approve Params JSON">
+			<input class="form-control" type="text" name="approval_action_url_reject_route[]" placeholder="Reject Route Name">
+			<input class="form-control" type="text" name="approval_action_url_reject_param[]" placeholder="JSON {'param_name':'main_model_column'}">
 		</div>
 		<span class="d-none invalid-feedback"></span>
 	</div>
@@ -107,8 +103,32 @@
 	</div>
 	<div class="form-group">
 		<label for="approval_status_fields">Status Fields</label>
-		<input class="form-control" type="text" name="approval_status_fields_approve[]" placeholder="Status Fields Approve JSON">
-		<input class="form-control mt-2" type="text" name="approval_status_fields_reject[]" placeholder="Status Fields Reject JSON">
+		<div class="level_status_fields_approve_div">
+			<div class="input-group level_status_fields_approve_div_item mb-2">				
+				<div class="input-group-prepend">
+				    <span class="input-group-text">Approve</span>
+				</div>
+				<input class="form-control" type="text" name="approval_status_fields_approve_column[]" placeholder="Column Name">
+				<input class="form-control" type="text" name="approval_status_fields_approve_value[]" placeholder="Column Value">
+				<div class="input-group-append">
+				    <button type="button" class="btn btn-success level_status_fields_approve_btn_add">+</button>
+				    <button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>
+				</div>
+			</div>			
+		</div>
+		<div class="level_status_fields_reject_div">
+			<div class="input-group level_status_fields_reject_div_item mb-2">				
+				<div class="input-group-prepend">
+				    <span class="input-group-text">Reject</span>
+				</div>
+				<input class="form-control" type="text" name="approval_status_fields_reject_column[]" placeholder="Column Name">
+				<input class="form-control" type="text" name="approval_status_fields_reject_value[]" placeholder="Column Value">
+				<div class="input-group-append">
+				    <button type="button" class="btn btn-success level_status_fields_reject_btn_add">+</button>
+				    <button type="button" class="btn btn-danger level_status_fields_reject_btn_rem">-</button>
+				</div>
+			</div>
+		</div>		
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
@@ -122,8 +142,8 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_notifiable_params">Notification Params</label>
-		<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Notification Params JSON">
+		<label for="approval_notifiable_params">Notification Channel</label>
+		<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Channel JSON ['mail','database']">
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
