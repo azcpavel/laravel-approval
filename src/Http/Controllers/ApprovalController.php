@@ -316,7 +316,170 @@ class ApprovalController extends Controller
 	 */
 	public function update(Request $request, Approval $approval)
 	{
-		//
+		DB::beginTransaction();
+		try{
+			if(config('approval-config.dev-mode')){
+				$approval->update([
+					'title' => $request->title,
+					'approvable_type' => $request->model_namespace,
+					'view_route_name' => $request->view_route_name,
+					'view_route_param' => array_combine($request->view_route_param_key,$request->view_route_param_value),
+					'slug' => $request->slug,
+					'list_data_fields' => $request->list_data_fields,
+					'on_create' => $request->approval_type == 1 ? 1 : 0,
+					'on_update' => $request->approval_type == 2 ? 1 : 0,
+					'on_delete' => $request->approval_type == 3 ? 1 : 0,
+				]);
+
+				$approval->levels()->delete();
+				$approval->mappings()->delete();
+
+				if($request->model_namespace_relation_key)
+				foreach($request->model_namespace_relation_key as $keyR => $valueR){
+					$approvalMap = $approval->mappings()->create([
+						'title' => $request->model_namespace_relation_title[$keyR],
+						'approvable_type' => $request->model_namespace_relation_path[$keyR],
+						'relation' => $request->model_relation_path[$keyR],
+					]);
+
+					foreach($request->model_namespace_relation_tbody_check[$valueR] as $keyRD => $valueRD){
+						$approvalMap->fields()->create([
+							'field_name' => $request->model_namespace_relation_tbody_name[$valueR][$valueRD],
+					        'field_label' => $request->model_namespace_relation_tbody_label[$valueR][$valueRD],
+					        'field_relation' => $request->model_namespace_relation_tbody_relation[$valueR][$valueRD],
+					        'field_relation_pk' => $request->model_namespace_relation_tbody_relation_pk[$valueR][$valueRD],
+					        'field_relation_show' => $request->model_namespace_relation_tbody_relation_show[$valueR][$valueRD],
+					        'field_type' => $request->model_namespace_relation_tbody_type[$valueR][$valueRD]
+					    ]);
+					}
+				}
+
+				if($request->approval_title)
+				foreach($request->approval_title as $keyL => $valueL){
+					$action_data = null;
+					$status_fields = null;
+					if($request->approval_action_type[$keyL] == 1){
+						if($request->approval_action_class_before_path[$keyL] != ''){
+							$action_data['before'] = [
+								'class' => $request->approval_action_class_before_path[$keyL],
+								'method' => $request->approval_action_class_before_method[$keyL]
+							];
+						}
+
+						if($request->approval_action_class_approve_path[$keyL] != ''){
+							$action_data['approve'] = [
+								'class' => $request->approval_action_class_approve_path[$keyL],
+								'method' => $request->approval_action_class_approve_method[$keyL]
+							];
+						}
+
+						if($request->approval_action_class_reject_path[$keyL] != ''){
+							$action_data['reject'] = [
+								'class' => $request->approval_action_class_reject_path[$keyL],
+								'method' => $request->approval_action_class_reject_method[$keyL]
+							];
+						}
+					}
+
+					if($request->approval_action_type[$keyL] == 2){
+						if($request->approval_action_url_approve_route[$keyL] != ''){
+							$action_data['approve'] = [
+								'route' => $request->approval_action_url_approve_route[$keyL],
+								'param' => json_decode($request->approval_action_url_approve_param[$keyL])
+							];
+						}
+
+						if($request->approval_action_url_reject_route[$keyL] != ''){
+							$action_data['reject'] = [
+								'route' => $request->approval_action_url_reject_route[$keyL],
+								'param' => json_decode($request->approval_action_url_reject_param[$keyL])
+							];
+						}
+					}
+
+					if($request->approval_status_fields_approve_column[$keyL]){
+						foreach($request->approval_status_fields_approve_column[$keyL] as $keySF => $valueSF){
+							$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
+						}
+					}
+
+					if($request->approval_status_fields_reject_column[$keyL]){
+						foreach($request->approval_status_fields_reject_column[$keyL] as $keySF => $valueSF){
+							$status_fields['reject'][$request->approval_status_fields_reject_column[$keyL][$keySF]] = $request->approval_status_fields_reject_value[$keyL][$keySF];						
+						}
+					}
+
+					$approvalLevel = $approval->levels()->create([
+						'title' => $request->approval_title[$keyL],
+						'is_flexible' => $request->approval_flex[$keyL],
+						'is_form_required' => $request->approval_form[$keyL],
+						'level' => $request->approval_level[$keyL],
+						'action_type' => $request->approval_action_type[$keyL],
+						'action_data' => $action_data,
+						'action_frequency' => $request->approval_action_frequency[$keyL],
+						'status_fields' => $status_fields,
+						'is_data_mapped' => $request->approval_data_mapped[$keyL],
+						'notifiable_class' => $request->approval_notifiable_namespace[$keyL],
+						'notifiable_params' => ['channels' => json_decode($request->approval_notifiable_params[$keyL])],
+						'group_notification' => $request->approval_group_notification[$keyL],
+						'next_level_notification' => $request->approval_next_notification[$keyL],
+						'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
+						'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
+					]);
+
+					foreach($request->approval_user[$keyL] as $keyU => $valueU){
+						$approvalLevel->approval_users()->create([
+							'user_id' => $valueU,
+						]);
+					}
+
+					if($request->approval_form[$keyL] == 1){
+						foreach($request->approval_form_title[$keyL] as $keyF => $valueF){
+							$approvalLevelForm = $approvalLevel->forms()->create([
+								'title' => $request->approval_form_title[$keyL][$keyF],
+								'approvable_type' => $request->approval_form_path[$keyL][$keyF],
+								'relation' => $request->approval_form_relation[$keyL][$keyF],
+							]);
+
+							$formKey = $request->approval_form_key[$keyL][$keyF];
+							foreach($request->approval_form_tbody_check[$keyL][$formKey] as $keyFK => $valueFK){
+								$approvalLevelForm->form_data()->create([
+									'mapped_field_name' => $request->approval_form_tbody_name[$keyL][$formKey][$valueFK],
+							        'mapped_field_label' => $request->approval_form_tbody_label[$keyL][$formKey][$valueFK],
+							        'mapped_field_relation' => $request->approval_form_tbody_relation[$keyL][$formKey][$valueFK],
+							        'mapped_field_relation_pk' => $request->approval_form_tbody_relation_pk[$keyL][$formKey][$valueFK],
+							        'mapped_field_relation_show' => $request->approval_form_tbody_relation_show[$keyL][$formKey][$valueFK],
+							        'mapped_field_type' => $request->approval_form_tbody_type[$keyL][$formKey][$valueFK],
+								]);
+							}						
+						}
+					}
+				}
+
+				Artisan::call('view:clear');
+				DB::commit();
+			}else{
+				if($request->approval_title)
+				foreach($request->approval_title as $keyL => $valueL){
+					$approvalLevel = $approval->levels->where('level',$request->approval_level[$keyL])->first();
+					$approvalLevel->approval_users()->delete();
+					foreach($request->approval_user[$keyL] as $keyU => $valueU){
+						$approvalLevel->approval_users()->create([
+							'user_id' => $valueU,
+						]);
+					}
+				}
+				DB::commit();
+				return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Level User Updated', 'msg_type' => 'success']);
+			}
+		}catch(\Exception $e){
+			DB::rollBack();
+			if(env('APP_DEBUG'))
+				dd($request->all(),$e);
+			return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Submission Error', 'msg_type' => 'danger']);		
+		}
+
+		return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Updated', 'msg_type' => 'success']);
 	}
 
 	/**

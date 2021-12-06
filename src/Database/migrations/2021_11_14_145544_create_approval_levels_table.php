@@ -33,7 +33,7 @@ class CreateApprovalLevelsTable extends Migration
             $table->tinyInteger('is_reject_reason_required')->default(1);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
-            $table->foreign('approval_id')->on('ex_approvals')->references('id');
+            $table->foreign('approval_id')->on('ex_approvals')->references('id')->onDelete('cascade');
         });
     }
 

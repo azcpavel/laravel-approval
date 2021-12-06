@@ -22,7 +22,7 @@ class CreateApprovalMappingFieldsTable extends Migration
             $table->string('field_relation_pk',150)->nullable();
             $table->string('field_relation_show',150)->nullable();
             $table->string('field_type',150);
-            $table->foreign('approval_mapping_id')->on('ex_approval_mappings')->references('id');
+            $table->foreign('approval_mapping_id')->on('ex_approval_mappings')->references('id')->onDelete('cascade');
         });
     }
 

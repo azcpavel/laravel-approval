@@ -5,8 +5,10 @@
 				<div class="container">
 					<div class="row justify-content-center">
 						<div class="col-12 col-sm-8 col-md-6">
-							<form class="form-horizontal" action="{{route('approvals.edit',['approval' => $approval->id])}}" method="post">
+							<form class="form-horizontal" action="{{route('approvals.update',['approval' => $approval->id])}}" method="post">
 								@csrf
+								@method('PUT')
+
 								<div class="form-group">
 									<label for="title">Title <span class="text-danger position-relative">*</span></label>
 									<input class="form-control" type="text" name="title" placeholder="Title" id="title" value="{{old('title',$approval->title)}}" required>
@@ -111,10 +113,10 @@
 														<td>{{$valueMR->Field}}</td>
 														<td>
 															<input type="text" name="model_namespace_relation_tbody_label[{{$inputKey}}][]" class="form-control model_namespace_relation_tbody_label" placeholder="Label" value="{{$useColumn->field_label??''}}">
-															<input type="hidden" name="model_namespace_relation_tbody_name[{{$inputKey}}][]" class="form-control model_namespace_relation_tbody_name" value="{{$useColumn->field_name??''}}" required>
+															<input type="hidden" name="model_namespace_relation_tbody_name[{{$inputKey}}][]" class="form-control model_namespace_relation_tbody_name" value="{{$valueMR->Field}}" required>
 															<input type="text" name="model_namespace_relation_tbody_relation[{{$inputKey}}][]" class="mt-2 form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation" value="{{$useColumn->field_relation??''}}">
 															<div class="input-group">
-																<input type="text" name="model_namespace_relation_tbody_relation_pk[{{$inputKey}}][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Repation PK" value="{{$useColumn->field_relation_pk??''}}">
+																<input type="text" name="model_namespace_relation_tbody_relation_pk[{{$inputKey}}][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Relation PK" value="{{$useColumn->field_relation_pk??''}}">
 																<input type="text" name="model_namespace_relation_tbody_relation_show[{{$inputKey}}][]" class="mt-2 form-control model_namespace_relation_tbody_relation_show mt-2" placeholder="Relation Show" value="{{$useColumn->field_relation_show??''}}">
 															</div>
 															<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type[{{$inputKey}}][]" required>
@@ -126,7 +128,7 @@
 																<option value="select" {{($useColumn->field_type??'') == 'select' ? 'selected' : ''}}>Dropdown</option>
 															</select>
 														</td>
-														<td><input type="checkbox" name="model_namespace_relation_tbody_check[{{$inputKey}}][]" class="model_namespace_relation_tbody_check" value="{{$inputKey}}" {{$useColumn ? 'checked' : ''}}></td>
+														<td><input type="checkbox" name="model_namespace_relation_tbody_check[{{$inputKey}}][]" class="model_namespace_relation_tbody_check" value="{{$keyMR}}" {{$useColumn ? 'checked' : ''}}></td>
 													</tr>
 												@endforeach
 												</tdody>
@@ -270,38 +272,46 @@
 											<label for="approval_action_frequency">Action Frequency</label>
 											<select class="form-control" name="approval_action_frequency[]">												
 												<option value="0">None</option>
-												<option value="1">Every Time</option>
-												<option value="2">Final</option>
+												<option value="1" {{$valueAL->action_frequency == 1 ? 'selected' : ''}}>Every Time</option>
+												<option value="2" {{$valueAL->action_frequency == 2 ? 'selected' : ''}}>Final</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_status_fields">Status Fields</label>
 											<div class="level_status_fields_approve_div">
+												@if($valueAL->status_fields && property_exists($valueAL->status_fields, 'approve'))
+												@foreach($valueAL->status_fields->approve as $keyALSF => $valueALSF)
 												<div class="input-group level_status_fields_approve_div_item mb-2">				
 													<div class="input-group-prepend">
 													    <span class="input-group-text">Approve</span>
 													</div>
-													<input class="form-control" type="text" name="approval_status_fields_approve_column[]" placeholder="Column Name">
-													<input class="form-control" type="text" name="approval_status_fields_approve_value[]" placeholder="Column Value">
+													<input class="form-control" type="text" name="approval_status_fields_approve_column[]" placeholder="Column Name" value="{{$keyALSF}}">
+													<input class="form-control" type="text" name="approval_status_fields_approve_value[]" placeholder="Column Value" value="{{$valueALSF}}">
 													<div class="input-group-append">
 													    <button type="button" class="btn btn-success level_status_fields_approve_btn_add">+</button>
 													    <button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>
 													</div>
-												</div>			
+												</div>
+												@endforeach
+												@endif
 											</div>
 											<div class="level_status_fields_reject_div">
+												@if($valueAL->status_fields && property_exists($valueAL->status_fields, 'reject'))
+												@foreach($valueAL->status_fields->reject as $keyALSF => $valueALSF)
 												<div class="input-group level_status_fields_reject_div_item mb-2">				
 													<div class="input-group-prepend">
 													    <span class="input-group-text">Reject</span>
 													</div>
-													<input class="form-control" type="text" name="approval_status_fields_reject_column[]" placeholder="Column Name">
-													<input class="form-control" type="text" name="approval_status_fields_reject_value[]" placeholder="Column Value">
+													<input class="form-control" type="text" name="approval_status_fields_reject_column[]" placeholder="Column Name" value="{{$keyALSF}}">
+													<input class="form-control" type="text" name="approval_status_fields_reject_value[]" placeholder="Column Value" value="{{$valueALSF}}">
 													<div class="input-group-append">
 													    <button type="button" class="btn btn-success level_status_fields_reject_btn_add">+</button>
 													    <button type="button" class="btn btn-danger level_status_fields_reject_btn_rem">-</button>
 													</div>
 												</div>
+												@endforeach
+												@endif
 											</div>		
 											<span class="d-none invalid-feedback"></span>
 										</div>
@@ -310,21 +320,27 @@
 											<select class="form-control" name="approval_notifiable_namespace[]">
 												<option value="0">None</option>
 												@foreach($notifications as $notification_file)
-												<option value="{{str_replace('.php','',$notification_file)}}">{{str_replace('.php','',basename($notification_file))}}</option>
+												<?php
+												$notification_namespace = str_replace('.php','',$notification_file);
+												?>
+												<option value="{{$notification_namespace}}" {{$notification_namespace == $valueAL->notifiable_class ? 'selected' : ''}}>{{str_replace('.php','',basename($notification_file))}}</option>
 												@endforeach
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_notifiable_params">Notification Channel</label>
-											<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Channel JSON ['mail','database']">
+											<input class="form-control" type="text" name="approval_notifiable_params[]" placeholder="Channel JSON ['mail','database']" value="{{($valueAL->notifiable_params && property_exists($valueAL->notifiable_params,'channels')) ? json_encode($valueAL->notifiable_params->channels) : ''}}">
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_form">Approver<span class="text-danger position-relative">*</span></label>
 											<select class="form-control select2" name="approval_user[APPROVE_USER_INDEX][]" multiple>
+												<?php
+												$levelUsers = $valueAL->users->pluck('id')->toArray();
+												?>
 												@foreach($users as $user)
-												<option value="{{$user->id}}">{{$user->name}}</option>
+												<option value="{{$user->id}}" {{in_array($user->id,$levelUsers) ? 'selected' : ''}}>{{$user->name}}</option>
 												@endforeach
 											</select>
 											<span class="d-none invalid-feedback"></span>
@@ -333,7 +349,7 @@
 											<label for="approval_form">Form Required<span class="text-danger position-relative">*</span></label>
 											<select class="form-control approval_form" name="approval_form[]">
 												<option value="0">No</option>
-												<option value="1">Yes</option>
+												<option value="1" {{$valueAL->is_form_required == 1 ? 'selected' : ''}}>Yes</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
@@ -353,7 +369,62 @@
 											</div>
 											<span class="d-none invalid-feedback"></span>
 											<div class="col-12">
-												<div class="row approval_form_div_item_div"></div>
+												<div class="row approval_form_div_item_div">
+													@foreach($valueAL->forms as $keyALF => $valueALF)
+													<?php
+													$inputKeyFF = basename($valueALF->approvable_type);
+													$modelFF = new $valueALF->approvable_type();
+													$modelFFColumn = \DB::select('SHOW COLUMNS FROM '.$modelFF->getTable());										
+													?>
+													<div class="col-12 mt-3 approval_form_div_item_div_item card p-3">
+														<div class="w-100 float-left">
+															<h5 class="float-left">{{$inputKeyFF}}</h5>
+															<button type="button" class="btn btn-danger btn-sm float-right approval_form_div_item_div_item_remove">Remove</button>
+															<input type="hidden" name="approval_form_path[]" class="approval_form_path" value="{{$valueALF->approvable_type}}">
+															<input type="hidden" name="approval_form_key[]" class="approval_form_key" value="{{$inputKeyFF}}">
+															<input type="text" name="approval_form_title[]" class="float-left form-control approval_form_title" placeholder="Title" value="{{$valueALF->title}}" required>
+															<input type="text" name="approval_form_relation[]" class="float-left my-3 form-control approval_form_relation" placeholder="Relation" value="{{$valueALF->relation}}">
+														</div>
+														<table class="table">
+															<thead>
+																<tr>
+																	<th>Column Name</th>
+																	<th>Display Option</th>
+																	<th>Option</th>
+																</tr>
+															</thead>
+															<tbody class="approval_form_tbody">											
+															@foreach($modelFFColumn as $keyALFF => $valueALFF)
+																<?php
+																$useColumnFF = $valueALF->form_data->where('mapped_field_name',$valueALFF->Field)->first();													
+																?>
+																<tr>
+																	<td>{{$valueALFF->Field}}</td>
+																	<td>
+																		<input type="text" name="approval_form_tbody_label[{{$keyAL}}][{{$inputKeyFF}}][]" class="form-control approval_form_tbody_label" placeholder="Label" value="{{$useColumnFF->mapped_field_label??''}}">																		
+																		<input type="text" name="approval_form_tbody_relation[{{$keyAL}}][{{$inputKeyFF}}][]" class="mt-2 form-control approval_form_tbody_relation mt-2" placeholder="Relation" value="{{$useColumnFF->mapped_field_relation??''}}">
+																		<div class="input-group">
+																			<input type="text" name="approval_form_tbody_relation_pk[{{$keyAL}}][{{$inputKeyFF}}][]" class="mt-2 form-control approval_form_tbody_relation_pk mt-2" placeholder="Relation PK" value="{{$useColumnFF->mapped_field_relation_pk??''}}">
+																			<input type="text" name="approval_form_tbody_relation_show[{{$keyAL}}][{{$inputKeyFF}}][]" class="mt-2 form-control approval_form_tbody_relation_show mt-2" placeholder="Relation Show" value="{{$useColumnFF->mapped_field_relation_show??''}}">
+																		</div>
+																		<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type[{{$keyAL}}][{{$inputKeyFF}}][]" required>
+																			<option value="text" {{($useColumnFF->mapped_field_type??'') == 'text' ? 'selected' : ''}}>Text</option>
+																			<option value="number" {{($useColumnFF->mapped_field_type??'') == 'number' ? 'selected' : ''}}>Number</option>
+																			<option value="email" {{($useColumnFF->mapped_field_type??'') == 'email' ? 'selected' : ''}}>Email</option>
+																			<option value="textarea" {{($useColumnFF->mapped_field_type??'') == 'textarea' ? 'selected' : ''}}>Textarea</option>
+																			<option value="file" {{($useColumnFF->mapped_field_type??'') == 'file' ? 'selected' : ''}}>File</option>
+																			<option value="select" {{($useColumnFF->mapped_field_type??'') == 'select' ? 'selected' : ''}}>Dropdown</option>
+																		</select>
+																		<input type="hidden" name="approval_form_tbody_name[{{$keyAL}}][{{$inputKeyFF}}][]" class="form-control approval_form_tbody_name" value="{{$valueALFF->Field}}" required>
+																	</td>
+																	<td><input type="checkbox" name="approval_form_tbody_check[{{$keyAL}}][{{$inputKeyFF}}][]" class="approval_form_tbody_check" value="{{$keyALFF}}" {{$useColumnFF ? 'checked' : ''}}></td>
+																</tr>
+															@endforeach
+															</tdody>
+														</table>
+													</div>
+													@endforeach
+												</div>
 											</div>
 										</div>										
 									</div>
@@ -380,7 +451,7 @@
 @endif
 <script type="text/javascript">
 	$(window).on("load",function(){
-		$('#approval_type, .approval_action_type').trigger('change');
+		$('#approval_type, .approval_action_type, .approval_form').trigger('change');
 		updateFormIndex();
 	});
 
@@ -502,7 +573,7 @@
 						'<input type="hidden" name="model_namespace_relation_tbody_name['+inputKey+'][]" class="form-control model_namespace_relation_tbody_name" value="'+val.Field+'" required>'+
 						'<input type="text" name="model_namespace_relation_tbody_relation['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation">'+
 						'<div class="input-group">'+						
-						'<input type="text" name="model_namespace_relation_tbody_relation_pk['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Repation PK">'+
+						'<input type="text" name="model_namespace_relation_tbody_relation_pk['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="model_namespace_relation_tbody_relation_show['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
 						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
@@ -625,10 +696,10 @@
 						'<td><input type="text" name="approval_form_tbody_label['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_label" placeholder="Label">'+
 						'<input type="text" name="approval_form_tbody_relation['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation" placeholder="Relation">'+
 						'<div class="input-group">'+						
-						'<input type="text" name="approval_form_tbody_relation_pk['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_pk mt-2" placeholder="Repation PK">'+
+						'<input type="text" name="approval_form_tbody_relation_pk['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="approval_form_tbody_relation_show['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
-						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
+						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select>'+
 						'<input type="hidden" name="approval_form_tbody_name['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_name" value="'+val.Field+'" required></td>'+
 						'<td><input type="checkbox" name="approval_form_tbody_check['+approvalLevel+']['+inputKey+'][]" class="approval_form_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'
@@ -675,6 +746,7 @@
 			$item.find(':input[name^=approval_form_path]').attr('name','approval_form_path['+(indForm)+'][]');
 			$item.find(':input[name^=approval_form_key]').attr('name','approval_form_key['+(indForm)+'][]');
 			$item.find(':input[name^=approval_form_title]').attr('name','approval_form_title['+(indForm)+'][]');
+			$item.find(':input[name^=approval_form_relation]').attr('name','approval_form_relation['+(indForm)+'][]');
 
 			$item.find(':input[name^=approval_form_tbody_label]').each(function(indAFD, elAFD){				
 				var keyEL = $(elAFD).attr('name').match(/\[[a-zA-Z]+\]/)[0];

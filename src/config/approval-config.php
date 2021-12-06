@@ -30,5 +30,6 @@
         'load-script' => true,
         'script-stack' => 'script',
         'notification-dir' => 'Notifications',
-        'upload-dir' => 'uploads'
+        'upload-dir' => 'uploads',
+        'dev-mode' => env('APPROVALPERMISSION_DEV',false)
     ];

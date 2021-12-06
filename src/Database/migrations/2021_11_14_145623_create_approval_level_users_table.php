@@ -18,7 +18,7 @@ class CreateApprovalLevelUsersTable extends Migration
             $table->foreignId('approval_level_id');
             $table->foreignId('user_id');
             $table->tinyInteger('status')->default(1);
-            $table->foreign('approval_level_id')->on('ex_approval_levels')->references('id');
+            $table->foreign('approval_level_id')->on('ex_approval_levels')->references('id')->onDelete('cascade');
             $table->foreign('user_id')->on(config('approval-config.user-table'))->references('id');
         });
     }

@@ -22,7 +22,7 @@ class CreateApprovalLevelFormDataTable extends Migration
             $table->string('mapped_field_relation',150)->nullable();
             $table->string('mapped_field_relation_pk',150)->nullable();
             $table->string('mapped_field_relation_show',150)->nullable();
-            $table->foreign('approval_level_form_id')->on('ex_approval_level_forms')->references('id');
+            $table->foreign('approval_level_form_id')->on('ex_approval_level_forms')->references('id')->onDelete('cascade');
         });
     }
 

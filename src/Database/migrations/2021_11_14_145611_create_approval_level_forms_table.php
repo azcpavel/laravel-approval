@@ -19,7 +19,7 @@ class CreateApprovalLevelFormsTable extends Migration
             $table->string('title',150);            
             $table->string('approvable_type',150);            
             $table->string('relation',150)->nullable();
-            $table->foreign('approval_level_id')->on('ex_approval_levels')->references('id');
+            $table->foreign('approval_level_id')->on('ex_approval_levels')->references('id')->onDelete('cascade');
         });
     }
 
