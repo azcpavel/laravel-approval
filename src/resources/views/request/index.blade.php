@@ -54,7 +54,7 @@
 				}},
 				{'title': 'State', name: 'state', data: "approval_state",render : function(data, type, row){
 					var htmlData = row.completed == 1 ? 'Completed' : 'Pending';
-					if(approval.on_update && row.completed == 2){
+					if(!approval.on_create && row.completed == 2){
 						htmlData = 'Rejected';
 					}else{
 						$.each(approval.levels,function(infAL, valAL){						

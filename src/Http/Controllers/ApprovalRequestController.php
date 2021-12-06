@@ -441,6 +441,10 @@ class ApprovalRequestController extends Controller
 				}
 			}
 		}
+
+		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_delete){
+			$approvalRequest->approvable->delete();
+		}
 	}
 
 	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message){		
