@@ -153,7 +153,7 @@
 		var $input = $(this);
 		var $parent = $(this).closest('.approval_level_item');
 
-		$('.action-class, .action-url').hide();
+		$parent.find('.action-class, .action-url').hide();
 		if($input.val() == 1){
 			$parent.find('.action-class').show();
 		}else if($input.val() == 2){			
@@ -240,10 +240,10 @@
 						'<th>Option</th>'+
 					'</tr>'+
 					'</thead>'+
-					'<tbody id="model_namespace_relation_tbody"></tdody>'+
+					'<tbody class="model_namespace_relation_tbody"></tdody>'+
 				'</table>');
 			$.each(response,function(indKey, val){
-				$htmlWrap.find('#model_namespace_relation_tbody').append(
+				$htmlWrap.find('.model_namespace_relation_tbody').append(
 					'<tr>'+
 						'<td>'+val.Field+'</td>'+
 						'<td><input type="text" name="model_namespace_relation_tbody_label['+inputKey+'][]" class="form-control model_namespace_relation_tbody_label" placeholder="Label">'+

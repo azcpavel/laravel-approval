@@ -1,6 +1,6 @@
 <div class="col-12 approval_level_item mt-3">
 	<div class="form-group approval_level_no">
-		<h5>Lavel <span>APPROVAL_LEVEL</span> <button type="button" class="btn btn-danger btn-sm float-right approval_level_item_remove">Remove</button></h5>
+		<h5>Level <span>APPROVAL_LEVEL</span> <button type="button" class="btn btn-danger btn-sm float-right approval_level_item_remove">Remove</button></h5>
 		<hr>
 	</div>
 	<div class="form-group">
@@ -35,7 +35,7 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_approve_reason">Approve Reason Mendatory<span class="text-danger position-relative">*</span></label>
+		<label for="approval_approve_reason">Approve Reason Mandatory<span class="text-danger position-relative">*</span></label>
 		<select class="form-control" name="approval_approve_reason[]">
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -43,7 +43,7 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_reject_reason">Reject Reason Mendatory<span class="text-danger position-relative">*</span></label>
+		<label for="approval_reject_reason">Reject Reason Mandatory<span class="text-danger position-relative">*</span></label>
 		<select class="form-control" name="approval_reject_reason[]">
 			<option value="1">Yes</option>
 			<option value="0">No</option>

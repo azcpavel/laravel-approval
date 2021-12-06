@@ -280,7 +280,31 @@ class ApprovalController extends Controller
 	 */
 	public function edit(Approval $approval)
 	{
-		//
+		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.model-dir')));
+		$Iterator = new \RecursiveIteratorIterator($Directory);
+		$Regex = new \RegexIterator($Iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+		$data['models'] = [];
+
+		foreach($Regex as $file){
+			$data['models'][]=str_replace(app_path(), 'App', $file[0]);
+		}
+
+		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.notification-dir')));
+		$Iterator = new \RecursiveIteratorIterator($Directory);
+		$Regex = new \RegexIterator($Iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+		$data['notifications'] = [];
+
+		foreach($Regex as $file){
+			$data['notifications'][]=str_replace(app_path(), 'App', $file[0]);
+		}
+
+		$userModel = config('approval-config.user-model');
+		$users = new $userModel();
+		
+		$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		
+		$data['approval'] = $approval;
+		return view("laravel-approval::edit",$data);
 	}
 
 	/**
