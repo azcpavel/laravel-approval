@@ -56,6 +56,18 @@
 									</div>
 									<span class="d-none invalid-feedback"></span>
 								</div>
+								<div class="row" id="model_delete_div" style="display:none;">
+									<div class="col-12">
+										<div class="form-group">
+											<label for="do_delete">Data Delete<span class="text-danger position-relative">*</span></label>
+											<select class="form-control" name="do_delete">
+												<option value="0" {{(($approval->do_delete == 0) ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($approval->do_delete == 1) ? 'selected' : '')}}>Yes</option>
+											</select>
+											<span class="d-none invalid-feedback"></span>
+										</div>
+									</div>
+								</div>
 								<div class="row" id="model_namespace_relation_div" style="display:none;">
 									<div class="col-12">
 										<div class="form-group">
@@ -197,40 +209,40 @@
 										<div class="form-group">
 											<label for="approval_group_notification">Group Notification<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_group_notification[]">
-												<option value="0" {{(($valueAL->group_notification == '0') ? 'selected' : '')}}>No</option>
-												<option value="1" {{(($valueAL->group_notification == '1') ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->group_notification == 0) ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->group_notification == 1) ? 'selected' : '')}}>Yes</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_next_notification">Next Level Notification<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_next_notification[]">
-												<option value="1" {{(($valueAL->next_level_notification == '1') ? 'selected' : '')}}>Yes</option>
-												<option value="0" {{(($valueAL->next_level_notification == '0') ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->next_level_notification == 1) ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->next_level_notification == 0) ? 'selected' : '')}}>No</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
-										</div>
+										</div>										
 										<div class="form-group">
 											<label for="approval_approve_reason">Approve Reason Mandatory<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_approve_reason[]">
-												<option value="0" {{(($valueAL->is_approve_reason_required == '0') ? 'selected' : '')}}>No</option>
-												<option value="1" {{(($valueAL->is_approve_reason_required == '1') ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->is_approve_reason_required == 0) ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->is_approve_reason_required == 1) ? 'selected' : '')}}>Yes</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_reject_reason">Reject Reason Mandatory<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_reject_reason[]">
-												<option value="1" {{(($valueAL->is_reject_reason_required == '1') ? 'selected' : '')}}>Yes</option>
-												<option value="0" {{(($valueAL->is_reject_reason_required == '0') ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->is_reject_reason_required == 1) ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->is_reject_reason_required == 0) ? 'selected' : '')}}>No</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
 											<label for="approval_data_mapped">Data Mapped<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_data_mapped[]">
-												<option value="1" {{(($valueAL->is_data_mapped == '1') ? 'selected' : '')}}>Yes</option>
-												<option value="0" {{(($valueAL->is_data_mapped == '0') ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->is_data_mapped == 1) ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->is_data_mapped == 0) ? 'selected' : '')}}>No</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
@@ -238,8 +250,8 @@
 											<label for="approval_action_type">Action Type<span class="text-danger position-relative">*</span></label>
 											<select class="form-control approval_action_type" name="approval_action_type[]">												
 												<option value="0">None</option>
-												<option value="1" {{(($valueAL->action_type == '1') ? 'selected' : '')}}>Class Path</option>
-												<option value="2" {{(($valueAL->action_type == '2') ? 'selected' : '')}}>Redirect URL</option>
+												<option value="1" {{(($valueAL->action_type == 1) ? 'selected' : '')}}>Class Path</option>
+												<option value="2" {{(($valueAL->action_type == 2) ? 'selected' : '')}}>Redirect URL</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>
@@ -457,12 +469,16 @@
 
 	$(document).on("change","#approval_type",function(){
 		var $input = $(this);
+		$('#model_namespace_relation_div, #model_delete_div').hide();
+		$('#slug').removeAttr('required');
+		$('#do_delete').removeAttr('required');
+		
 		if($input.val() == 2){
 			$('#model_namespace_relation_div').show();
 			$('#slug').prop('required',true);
-		}else{			
-			$('#model_namespace_relation_div').hide();
-			$('#slug').removeAttr('required');
+		}else if($input.val() == 3){
+			$('#model_delete_div').show();
+			$('#do_delete').prop('required',true);
 		}
 	});
 

@@ -49,6 +49,18 @@
 									</div>
 									<span class="d-none invalid-feedback"></span>
 								</div>
+								<div class="row" id="model_delete_div" style="display:none;">
+									<div class="col-12">
+										<div class="form-group">
+											<label for="do_delete">Data Delete<span class="text-danger position-relative">*</span></label>
+											<select class="form-control" name="do_delete" id="do_delete">
+												<option value="0">No</option>
+												<option value="1">Yes</option>
+											</select>
+											<span class="d-none invalid-feedback"></span>
+										</div>
+									</div>
+								</div>
 								<div class="row" id="model_namespace_relation_div" style="display:none;">
 									<div class="col-12">
 										<div class="form-group">
@@ -140,12 +152,16 @@
 
 	$(document).on("change","#approval_type",function(){
 		var $input = $(this);
+		$('#model_namespace_relation_div, #model_delete_div').hide();
+		$('#slug').removeAttr('required');
+		$('#do_delete').removeAttr('required');
+		
 		if($input.val() == 2){
 			$('#model_namespace_relation_div').show();
 			$('#slug').prop('required',true);
-		}else{			
-			$('#model_namespace_relation_div').hide();
-			$('#slug').removeAttr('required');
+		}else if($input.val() == 3){
+			$('#model_delete_div').show();
+			$('#do_delete').prop('required',true);
 		}
 	});
 

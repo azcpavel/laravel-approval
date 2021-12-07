@@ -329,6 +329,7 @@ class ApprovalController extends Controller
 					'on_create' => $request->approval_type == 1 ? 1 : 0,
 					'on_update' => $request->approval_type == 2 ? 1 : 0,
 					'on_delete' => $request->approval_type == 3 ? 1 : 0,
+					'on_delete' => $request->do_delete,
 				]);
 
 				$approval->levels()->delete();

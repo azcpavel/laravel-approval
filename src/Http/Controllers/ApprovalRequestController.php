@@ -442,7 +442,7 @@ class ApprovalRequestController extends Controller
 			}
 		}
 
-		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_delete){
+		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_delete && $approvalRequest->approval->do_delete){
 			$approvalRequest->approvable->delete();
 		}
 	}
