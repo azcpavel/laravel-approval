@@ -57,9 +57,9 @@ Add the package to your application service providers in `config/app.php` file.
 Publish the package config file to your application. Run these commands inside your terminal.
 
     php artisan vendor:publish --provider="Exceptio\ApprovalPermission\ApprovalPermissionServiceProvider" --tag="config"
-    you may set `approvalpermission-enable` to `false` to disable the feature.
-    you may set `do-migration` to `false` in config file to disable the migration.
-    Note: database must have all the necessary tables and columns if you disable migration.
+you may set `approvalpermission-enable` to `false` to disable the feature.
+you may set `do-migration` to `false` in config file to disable the migration.
+Note: database must have all the necessary tables and columns if you disable migration.
 
 ### View Files
 
