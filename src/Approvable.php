@@ -133,8 +133,8 @@ trait Approvable
     	try{
     		if($approval){
     			$old_request = $approval->requests->where('approvable_id',$approvalItem->id)->where('completed',0)->first();
-    			if($old_request)
-    				return -2;
+    			if($old_request){
+    				return -2;    			
     			}else{
     				$approvalRequest = $approval->requests()->create([
 			    		'approvable_type' => $approvalble,

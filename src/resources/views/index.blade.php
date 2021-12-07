@@ -113,8 +113,16 @@
 
         $(document).on('click', '.deleteEvent', function () {
             var $el = $(this);
-            if(confirm("Are you sure you want to delete?")){
-                let deleteRoute = "{{route('approvals.destroy','ITEM_ID')}}".replace("ITEM_ID",$el.attr('data-val'));
+            if(confirm("Are you sure you want to delete?")){                
+                $.ajax({
+                    'type' : 'POST',
+                    'data' : {'_method' : 'delete', '_token' : $('meta[name=csrf-token]').attr('content')},
+                    'url' : '{{route('approvals.destroy',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
+                }).done(function(){
+                    approvalDataTable.rows()
+                    .invalidate()
+                    .draw();
+                });
             }
         });
     </script>

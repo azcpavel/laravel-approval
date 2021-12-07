@@ -491,7 +491,16 @@ class ApprovalController extends Controller
 	 */
 	public function destroy(Approval $approval)
 	{
-		//
+		if($approval->requests->count() > 0){
+			$message = ['msg_data' => 'Deleted Fail, Data Exist!', 'msg_type' => 'danger'];
+		}
+		else{
+			$approval->levels()->delete();
+			$approval->levels()->mappings();
+			$approval->delete();
+			$message = ['msg_data' => 'Approval Deleted', 'msg_type' => 'success'];			
+		}
+		return redirect()->route('approvals.index')->with($message);
 	}
 
 	public function modelColumn(Request $request){
