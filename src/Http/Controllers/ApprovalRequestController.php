@@ -327,7 +327,7 @@ class ApprovalRequestController extends Controller
 					}					
 					
 					if($currentLevel->next_level_notification && $approveCount > $rejectCount){
-						if($nextLevel && $nextLevel->notifiable_class != 0){
+						if($nextLevel && $nextLevel->notifiable_class){
 							$notifiableClass = $nextLevel->notifiable_class;
 							$userModel = config('approval-config.user-model');
 							$users = new $userModel();
