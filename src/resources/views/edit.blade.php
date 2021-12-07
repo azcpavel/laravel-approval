@@ -259,24 +259,24 @@
 											<label for="approval_action_data" class="action-class">Action Class Data</label>		
 											<label for="approval_action_data" class="action-url">Action URL Data</label>		
 											<div class="input-group action-class">
-												<input class="form-control" type="text" name="approval_action_class_before_path[]" placeholder="Before Namespace" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'before') ? $valueAL->action_data->before->class??'' : '' }}">
-												<input class="form-control" type="text" name="approval_action_class_before_method[]" placeholder="Before Method" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'before') ? $valueAL->action_data->before->method??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_before_path[]" placeholder="Before Namespace" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'before') ? $valueAL->action_data->before->class??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_before_method[]" placeholder="Before Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'before') ? $valueAL->action_data->before->method??'' : '' }}">
 											</div>
 											<div class="input-group action-class mt-2">
-												<input class="form-control" type="text" name="approval_action_class_approve_path[]" placeholder="Approve Namespace" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->class??'' : '' }}">
-												<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->method??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_approve_path[]" placeholder="Approve Namespace" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->class??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->method??'' : '' }}">
 											</div>
 											<div class="input-group action-class mt-2">
-												<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->class??'' : '' }}">
-												<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method" value="{{$valueAL->action_type == 1 && property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->method??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->class??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->method??'' : '' }}">
 											</div>		
 											<div class="input-group action-url mt-2">
-												<input class="form-control" type="text" name="approval_action_url_approve_route[]" placeholder="Approve Route Name" value="{{$valueAL->action_type == 2 && property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->route??'' : '' }}">
-												<input class="form-control" type="text" name="approval_action_url_approve_param[]" placeholder="JSON {'param_name':'main_model_column'}" value="{{$valueAL->action_type == 2 && property_exists($valueAL->action_data,'approve') ? json_encode($valueAL->action_data->approve->param)??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_url_approve_route[]" placeholder="Approve Route Name" value="{{$valueAL->action_type == 2 && $valueAL->action_data &&property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->route??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_url_approve_param[]" placeholder="JSON {'param_name':'main_model_column'}" value="{{$valueAL->action_type == 2 && $valueAL->action_data &&property_exists($valueAL->action_data,'approve') ? json_encode($valueAL->action_data->approve->param)??'' : '' }}">
 											</div>
 											<div class="input-group action-url mt-2">
-												<input class="form-control" type="text" name="approval_action_url_reject_route[]" placeholder="Reject Route Name" value="{{$valueAL->action_type == 2 && property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->route??'' : '' }}">
-												<input class="form-control" type="text" name="approval_action_url_reject_param[]" placeholder="JSON {'param_name':'main_model_column'}" value="{{$valueAL->action_type == 2 && property_exists($valueAL->action_data,'reject') ? json_encode($valueAL->action_data->reject->param)??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_url_reject_route[]" placeholder="Reject Route Name" value="{{$valueAL->action_type == 2 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->route??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_url_reject_param[]" placeholder="JSON {'param_name':'main_model_column'}" value="{{$valueAL->action_type == 2 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? json_encode($valueAL->action_data->reject->param)??'' : '' }}">
 											</div>
 											<span class="d-none invalid-feedback"></span>
 										</div>
@@ -472,7 +472,7 @@
 		$('#model_namespace_relation_div, #model_delete_div').hide();
 		$('#slug').removeAttr('required');
 		$('#do_delete').removeAttr('required');
-		
+
 		if($input.val() == 2){
 			$('#model_namespace_relation_div').show();
 			$('#slug').prop('required',true);
@@ -587,7 +587,7 @@
 						'<input type="text" name="model_namespace_relation_tbody_relation_pk['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="model_namespace_relation_tbody_relation_show['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
-						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
+						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="date">Date</option><option value="select">Dropdown</option></select></td>'+
 						'<td><input type="checkbox" name="model_namespace_relation_tbody_check['+inputKey+'][]" class="model_namespace_relation_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'
 				);
@@ -713,7 +713,7 @@
 						'<input type="text" name="approval_form_tbody_relation_pk['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="approval_form_tbody_relation_show['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
-						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select>'+
+						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="date">Date</option><option value="select">Dropdown</option></select>'+
 						'<input type="hidden" name="approval_form_tbody_name['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_name" value="'+val.Field+'" required></td>'+
 						'<td><input type="checkbox" name="approval_form_tbody_check['+approvalLevel+']['+inputKey+'][]" class="approval_form_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'

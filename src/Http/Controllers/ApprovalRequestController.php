@@ -241,7 +241,7 @@ class ApprovalRequestController extends Controller
 					$notifiableClass = $currentLevel->notifiable_class;
 					$userModel = config('approval-config.user-model');
 					$users = new $userModel();
-					Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$currentLevel->notifiable_params->channels));
+					Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
 				}				
 
 				if($complete){					
@@ -331,7 +331,7 @@ class ApprovalRequestController extends Controller
 							$notifiableClass = $nextLevel->notifiable_class;
 							$userModel = config('approval-config.user-model');
 							$users = new $userModel();
-							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, $approvalRequestApprover,$nextLevel->notifiable_params->channels));
+							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $nextLevel->notifiable_params->channels));
 						}						
 					}
 

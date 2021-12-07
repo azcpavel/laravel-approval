@@ -269,7 +269,7 @@
 						'<input type="text" name="model_namespace_relation_tbody_relation_pk['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="model_namespace_relation_tbody_relation_show['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
-						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select></td>'+
+						'<select class="mt-2 form-control model_namespace_relation_tbody_type" name="model_namespace_relation_tbody_type['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="date">Date</option><option value="select">Dropdown</option></select></td>'+
 						'<td><input type="checkbox" name="model_namespace_relation_tbody_check['+inputKey+'][]" class="model_namespace_relation_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'
 				);
@@ -395,7 +395,7 @@
 						'<input type="text" name="approval_form_tbody_relation_pk['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_pk mt-2" placeholder="Relation PK">'+
 						'<input type="text" name="approval_form_tbody_relation_show['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation_show mt-2" placeholder="Relation Show">'+
 						'</div>'+
-						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="select">Dropdown</option></select>'+
+						'<select class="mt-2 form-control approval_form_tbody_type" name="approval_form_tbody_type['+approvalLevel+']['+inputKey+'][]" required><option value="text">Text</option><option value="number">Number</option><option value="email">Email</option><option value="textarea">Textarea</option><option value="file">File</option><option value="date">Date</option><option value="select">Dropdown</option></select>'+
 						'<input type="hidden" name="approval_form_tbody_name['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_name" value="'+val.Field+'" required></td>'+
 						'<td><input type="checkbox" name="approval_form_tbody_check['+approvalLevel+']['+inputKey+'][]" class="approval_form_tbody_check" value="'+indKey+'"></td>'+
 					'</tr>'

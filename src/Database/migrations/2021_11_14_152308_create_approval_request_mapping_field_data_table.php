@@ -19,7 +19,7 @@ class CreateApprovalRequestMappingFieldDataTable extends Migration
             $table->string('field_name',150);
             $table->string('field_label',150);
             $table->string('field_type',150);
-            $table->string('field_relation',150)->nullable();
+            $table->text('field_relation')->nullable();
             $table->string('field_relation_pk',150)->nullable();
             $table->string('field_relation_show',150)->nullable();
             $table->longText('field_data')->nullable();

@@ -92,6 +92,7 @@
 											$fieldName = $valueMF->field_name;
 											$currentFieldData = '';
 											$newFieldData = '';
+											$fieldRelation = json_decode($valueMF->field_relation);
 											if($valueMF->field_type == 'text'){
 												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
 												$newFieldData = $valueMF->field_data;
@@ -101,9 +102,20 @@
 											}elseif ($valueMF->field_type == 'textarea') {
 												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
 												$newFieldData = $valueMF->field_data;
-											}elseif ($valueMF->field_type == 'file') {
+											}elseif ($valueMF->field_type == 'date') {
+												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
+												$newFieldData = $valueMF->field_data;
+											}
+											elseif ($valueMF->field_type == 'file') {
 												$currentFieldData = ($currentItem) ? '<a href="'.asset($currentItem->$fieldName).'">'.basename($currentItem->$fieldName).'</a>' : '';
 												$newFieldData = '<a href="'.asset($valueMF->field_data).'">'.basename($valueMF->field_data).'</a>';
+											}elseif ($valueMF->field_type == 'select' && is_object($fieldRelation)){												
+												$fieldRelation->values = collect($fieldRelation->values);
+												$currentFieldData = ($currentItem) ? $currentItem->$fieldName : '';
+												$currentFieldData = ($currentFieldData != '' && $fieldRelation->values->where('key',$currentFieldData)->first()) ? $fieldRelation->values->where('key',$currentFieldData)->first()->value : '';
+												$newFieldData = $fieldRelation->values->where('key',$valueMF->field_data)->first();
+												if($newFieldData)
+													$newFieldData = $newFieldData->value;												
 											}elseif ($valueMF->field_type == 'select' && $valueMF->field_relation != '' && $valueMF->field_relation_pk != '' && $valueMF->field_relation_show != '') {
 												$relationName = $valueMF->field_relation;
 												$relationShow = $valueMF->field_relation_show;
@@ -164,12 +176,23 @@
 												@foreach($valueALS->forms as $keyAFS => $valueAFS)
 											        <br><b>{{$valueAFS->title}}</b>
 											        @foreach($valueAFS->form_data as $keyAFSS => $valueAFSS)
+											        	<?php
+											        	$fieldRelation = json_decode($valueAFSS->mapped_field_relation);
+											        	?>
 												        @if($valueAFSS->mapped_field_type == 'text')
 												        	<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
 												        @elseif($valueAFSS->mapped_field_type == 'email')
 												        	<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
 												        @elseif($valueAFSS->mapped_field_type == 'file')
 												        	<br><a href="{{asset($valueAFSS->mapped_field_value)}}">{{basename($valueAFSS->mapped_field_value)}}</a>
+												        @elseif ($valueAFSS->mapped_field_type == 'select' && is_object($fieldRelation))
+												        <?php
+															$fieldRelation->values = collect($fieldRelation->values);
+															$newFieldData = $fieldRelation->values->where('key',$valueAFSS->mapped_field_value)->first();
+															if($newFieldData)
+																$newFieldData = $newFieldData->value;															
+														?>
+															<br>{{$valueAFSS->mapped_field_label.' : '.$newFieldData}}
 												        @elseif($valueAFSS->mapped_field_type == 'select' && $valueAFSS->mapped_field_relation != "" && $valueAFSS->mapped_field_relation_pk != "" && $valueAFSS->mapped_field_relation_show != "")
 															<?php
 															$itemModel = $valueAFS->approvable_type;
@@ -248,6 +271,7 @@
 					        @foreach($valueAF->form_data as $keyAFS => $valueAFS)
 						        <?php
 						        $fieldName = $valueAFS->mapped_field_name;
+						        $fieldRelation = json_decode($valueAFS->mapped_field_relation);
 						    	?>
 						    	<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
 						        @if($valueAFS->mapped_field_type == 'text')
@@ -256,6 +280,18 @@
 						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
 						        @elseif($valueAFS->mapped_field_type == 'file')
 						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+						        @elseif($valueAFS->mapped_field_type == 'date')
+						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+						        @elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
+						        <?php
+									$fieldRelation->values = collect($fieldRelation->values);
+									$input_name = $valueAF->id.'_'.$fieldName.($fieldRelation->type == 'multiple' ? '[]' : '');
+								?>
+									<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($fieldRelation->type == 'multiple') ? 'multiple' : '')}}>
+									@foreach($fieldRelation->values as $keyAFSR => $valueAFSR)
+										<option value="{{$valueAFSR->key}}" {{(($valueAFSR->key == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->value}}</option>
+									@endforeach
+									</select>
 						        @elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
 									@if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
 										<?php

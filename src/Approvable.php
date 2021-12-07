@@ -48,7 +48,7 @@ trait Approvable
 						$notifiableClass = $firstLevel->notifiable_class;
 						$userModel = config('approval-config.user-model');
 						$users = new $userModel();
-						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, null, $firstLevel->notifiable_params->channels));
+						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, null, $firstLevel->notifiable_params->channels));
 					}
 			    	return $approvalRequest;
     			}    			
@@ -112,7 +112,7 @@ trait Approvable
 						$notifiableClass = $firstLevel->notifiable_class;
 						$userModel = config('approval-config.user-model');
 						$users = new $userModel();
-						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, null, $firstLevel->notifiable_params->channels));
+						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, null, $firstLevel->notifiable_params->channels));
 					}
 			    	return $approvalRequest;
     			}    			
@@ -147,7 +147,7 @@ trait Approvable
 						$notifiableClass = $firstLevel->notifiable_class;
 						$userModel = config('approval-config.user-model');
 						$users = new $userModel();
-						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalItem, null, $firstLevel->notifiable_params->channels));
+						Notification::send($users->whereIn('id',$firstLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, null, $firstLevel->notifiable_params->channels));
 					}
 			    	return $approvalRequest;
     			}    			
