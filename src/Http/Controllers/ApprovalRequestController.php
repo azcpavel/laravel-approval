@@ -400,6 +400,7 @@ class ApprovalRequestController extends Controller
 					
 					foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
 						$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
+						$fieldRelation = json_decode($valueAFRF->mapped_field_relation);
 						if($request->has($fieldItem)){													
 							$approvalRequestApproverForm->form_data()->create([
 								'mapped_field_name' => $valueAFRF->mapped_field_name,
@@ -411,11 +412,52 @@ class ApprovalRequestController extends Controller
 								'mapped_field_value' => $request->$fieldItem,
 							]);
 
-							$approvalItem->update([
-								$valueAFRF->mapped_field_name => $request->$fieldItem
-							]);
+							if($valueAFRF->mapped_field_type != 'select'){
+								$approvalItem->update([
+									$valueAFRF->mapped_field_name => $request->$fieldItem
+								]);
+							}else{
+								if(is_object($fieldRelation) && property_exists($fieldRelation, 'type') && property_exists($fieldRelation, 'values')){
+									if($fieldRelation->type == "single"){
+										$approvalItem->update([
+											$valueAFRF->mapped_field_name => $request->$fieldItem
+										]);
+									}elseif($fieldRelation->type == "multiple" && property_exists($fieldRelation, 'relation') && $valueAFRF->mapped_field_relation_pk != '' && $valueAFRF->mapped_field_relation_show != ''){
+										// $approvalItem->$fieldRelation()->delete();
+										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
+										// 	$approvalItem->$fieldRelation()->create([
+
+										// 	]);
+										// }
+									}
+								}elseif($valueAFRF->mapped_field_relation != '' && $valueAFRF->mapped_field_relation_pk != '' && $valueAFRF->mapped_field_relation_show != ''){
+									$itemModel = $valueAFR->approvable_type;
+									$itemField = $valueAFRF->mapped_field_name;
+									$itemRelation = $valueAFRF->mapped_field_relation;
+									$itemRelationPK = $valueAFRF->mapped_field_relation_pk;
+									$itemRelationShow = $valueAFRF->mapped_field_relation_show;
+									$itemObject = new $itemModel();
+									$itemRelationObject = $itemModel->$itemRelation();
+									$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+									$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
+									if(!$input_multiple){
+										$approvalItem->update([
+											$valueAFRF->mapped_field_name => $request->$fieldItem
+										]);
+									}else{
+										// $approvalItem->$itemRelation()->delete();
+										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
+										// 	$approvalItem->$itemRelation()->create([
+										// 		$valueAFRF->mapped_field_name => $valueMRC
+										// 	]);
+										// }
+									}
+								}
+							}
 						}
 					}
+				}else{
+					
 				}
 			}
 		}
