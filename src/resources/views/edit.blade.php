@@ -137,6 +137,7 @@
 																<option value="email" {{($useColumn->field_type??'') == 'email' ? 'selected' : ''}}>Email</option>
 																<option value="textarea" {{($useColumn->field_type??'') == 'textarea' ? 'selected' : ''}}>Textarea</option>
 																<option value="file" {{($useColumn->field_type??'') == 'file' ? 'selected' : ''}}>File</option>
+																<option value="date" {{($useColumn->field_type??'') == 'date' ? 'selected' : ''}}>Date</option>
 																<option value="select" {{($useColumn->field_type??'') == 'select' ? 'selected' : ''}}>Dropdown</option>
 															</select>
 														</td>
@@ -425,6 +426,7 @@
 																			<option value="email" {{($useColumnFF->mapped_field_type??'') == 'email' ? 'selected' : ''}}>Email</option>
 																			<option value="textarea" {{($useColumnFF->mapped_field_type??'') == 'textarea' ? 'selected' : ''}}>Textarea</option>
 																			<option value="file" {{($useColumnFF->mapped_field_type??'') == 'file' ? 'selected' : ''}}>File</option>
+																			<option value="date" {{($useColumnFF->mapped_field_type??'') == 'date' ? 'selected' : ''}}>Date</option>
 																			<option value="select" {{($useColumnFF->mapped_field_type??'') == 'select' ? 'selected' : ''}}>Dropdown</option>
 																		</select>
 																		<input type="hidden" name="approval_form_tbody_name[{{$keyAL}}][{{$inputKeyFF}}][]" class="form-control approval_form_tbody_name" value="{{$valueALFF->Field}}" required>

@@ -498,7 +498,8 @@ class ApprovalController extends Controller
 			$approval->levels()->delete();
 			$approval->levels()->mappings();
 			$approval->delete();
-			$message = ['msg_data' => 'Approval Deleted', 'msg_type' => 'success'];			
+			$message = ['msg_data' => 'Approval Deleted', 'msg_type' => 'success'];
+			Artisan::call('view:clear');
 		}
 		return redirect()->route('approvals.index')->with($message);
 	}
