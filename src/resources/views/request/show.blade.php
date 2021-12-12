@@ -121,13 +121,15 @@
 												$relationShow = $valueMF->field_relation_show;
 												$currentFieldData = (($currentItem && $currentItem->$relationName) ? $currentItem->$relationName->$relationShow : (($currentItem) ? $currentItem->$fieldName : ''));
 												
-												$itemModel = $currentItem;
+												$itemModel = $valueM->approvable_type;
 												$itemRelation = $relationName;
 												$itemRelationPK = $valueMF->field_relation_pk;
 												$itemRelationShow = $valueMF->field_relation_show;
 												$itemObject = new $itemModel();
 												$itemRelationObject = $itemObject->$itemRelation()->getRelated();
-												if($itemRelationObject::find($valueMF->field_data))
+												$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+												$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
+												if($itemRelationObject::find($valueMF->field_data) && !$input_multiple)
 													$newFieldData = $itemRelationObject::find($valueMF->field_data)->$relationShow;
 												else
 													$newFieldData = $valueMF->field_data;
