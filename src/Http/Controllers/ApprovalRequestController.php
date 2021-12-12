@@ -445,6 +445,9 @@ class ApprovalRequestController extends Controller
 											$valueAFRF->mapped_field_name => $request->$fieldItem
 										]);
 									}else{
+										if($itemRelationObjectType == 'belongstomany'){
+
+										}
 										// $approvalItem->$itemRelation()->delete();
 										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
 										// 	$approvalItem->$itemRelation()->create([
@@ -457,7 +460,76 @@ class ApprovalRequestController extends Controller
 						}
 					}
 				}else{
+					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
+						'approvable_id' => $valueAFR->approvable_id,
+				        'approvable_type' => $valueAFR->approvable_type,
+				        'title' => $valueAFR->title
+					]);
 
+					$approvable_typeR = $valueAFR->approvable_type;
+					$approvalItemR = $approvable_typeR()::where('id',$valueAFR->approvable_id)->first();
+					if(!$approvalItemR){
+						$approvalItemR = new $approvable_typeR();
+						$approvalItemR->id = $valueAFR->approvable_id;
+					}
+					
+					foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
+						$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
+						$fieldRelation = json_decode($valueAFRF->mapped_field_relation);
+						if($request->has($fieldItem)){													
+							$approvalRequestApproverForm->form_data()->create([
+								'mapped_field_name' => $valueAFRF->mapped_field_name,
+								'mapped_field_label' => $valueAFRF->mapped_field_label,
+								'mapped_field_type' => $valueAFRF->mapped_field_type,
+								'mapped_field_relation' => $valueAFRF->mapped_field_relation,
+								'mapped_field_relation_pk' => $valueAFRF->mapped_field_relation_pk,
+								'mapped_field_relation_show' => $valueAFRF->mapped_field_relation_show,
+								'mapped_field_value' => $request->$fieldItem,
+							]);
+
+							if($valueAFRF->mapped_field_type != 'select'){
+								$approvalItemR->$fieldItem = $request->$fieldItem;
+							}else{
+								if(is_object($fieldRelation) && property_exists($fieldRelation, 'type') && property_exists($fieldRelation, 'values')){
+									if($fieldRelation->type == "single"){
+										$approvalItemR->$fieldItem = $request->$fieldItem;
+									}elseif($fieldRelation->type == "multiple" && property_exists($fieldRelation, 'relation') && $valueAFRF->mapped_field_relation_pk != '' && $valueAFRF->mapped_field_relation_show != ''){
+										// $approvalItem->$fieldRelation()->delete();
+										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
+										// 	$approvalItem->$fieldRelation()->create([
+
+										// 	]);
+										// }
+									}
+								}elseif($valueAFRF->mapped_field_relation != '' && $valueAFRF->mapped_field_relation_pk != '' && $valueAFRF->mapped_field_relation_show != ''){
+									$itemModel = $valueAFR->approvable_type;
+									$itemField = $valueAFRF->mapped_field_name;
+									$itemRelation = $valueAFRF->mapped_field_relation;
+									$itemRelationPK = $valueAFRF->mapped_field_relation_pk;
+									$itemRelationShow = $valueAFRF->mapped_field_relation_show;
+									$itemObject = new $itemModel();
+									$itemRelationObject = $itemModel->$itemRelation();
+									$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+									$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
+									if(!$input_multiple){
+										$approvalItemR->$fieldItem = $request->$fieldItem;
+									}else{
+										if($itemRelationObjectType == 'belongstomany'){
+											
+										}
+										// $approvalItem->$itemRelation()->delete();
+										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
+										// 	$approvalItem->$itemRelation()->create([
+										// 		$valueAFRF->mapped_field_name => $valueMRC
+										// 	]);
+										// }
+									}
+								}
+							}
+						}
+					}
+
+					$approvalItemR->save();
 				}
 			}
 		}
