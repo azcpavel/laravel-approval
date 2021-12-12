@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Notification;
 
 class ApprovalRequestController extends Controller
 {
+	private $is_dofinal = false;
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -268,6 +270,7 @@ class ApprovalRequestController extends Controller
 							}
 
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
+								look($currentLevel->status_fields);
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
 								}
@@ -361,7 +364,7 @@ class ApprovalRequestController extends Controller
 
 				}
 
-				if($request->approval_option == 1)
+				if($request->approval_option == 1 && !$this->is_dofinal)
 					$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 
 				if($currentLevel->action_type != 0 && $currentLevel->action_frequency == 1)
@@ -388,12 +391,16 @@ class ApprovalRequestController extends Controller
 	}
 
 	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
+		if(!$this->is_dofinal)
+			$this->is_dofinal = true;
+		else
+			return false;
 		if($currentLevel->is_form_required && $request->approval_option == 1){
 			foreach($currentLevel->forms as $keyAFR => $valueAFR){									
 				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
 					
 					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
-						'approvable_id' => $approvalItem->id,
+						'approvable_id' => $approvalItem->approvable_id,
 				        'approvable_type' => $valueAFR->approvable_type,
 				        'title' => $valueAFR->title
 					]);
@@ -545,7 +552,7 @@ class ApprovalRequestController extends Controller
 							$currentItem->id = $valueM->approvable_id;
 						}						
 					}
-
+					
 					foreach($valueM->form_data as $keyMF => $valueMF){
 						$fieldName = $valueMF->field_name;
 						$currentItem->$fieldName = $valueMF->field_data;

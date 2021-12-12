@@ -400,13 +400,15 @@ class ApprovalController extends Controller
 
 					if($request->approval_status_fields_approve_column[$keyL]){
 						foreach($request->approval_status_fields_approve_column[$keyL] as $keySF => $valueSF){
-							$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
+							if($request->approval_status_fields_approve_value[$keyL][$keySF])
+								$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
 						}
 					}
 
 					if($request->approval_status_fields_reject_column[$keyL]){
 						foreach($request->approval_status_fields_reject_column[$keyL] as $keySF => $valueSF){
-							$status_fields['reject'][$request->approval_status_fields_reject_column[$keyL][$keySF]] = $request->approval_status_fields_reject_value[$keyL][$keySF];						
+							if($request->approval_status_fields_reject_value[$keyL][$keySF])
+								$status_fields['reject'][$request->approval_status_fields_reject_column[$keyL][$keySF]] = $request->approval_status_fields_reject_value[$keyL][$keySF];						
 						}
 					}
 
