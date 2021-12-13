@@ -79,6 +79,8 @@ class ApprovalController extends Controller
 	 */
 	public function create()
 	{
+		if(!config('approval-config.dev-mode'))
+			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.model-dir')));
 		$Iterator = new \RecursiveIteratorIterator($Directory);
 		$Regex = new \RegexIterator($Iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
@@ -113,6 +115,8 @@ class ApprovalController extends Controller
 	 */
 	public function store(Request $request)
 	{
+		if(!config('approval-config.dev-mode'))
+			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		DB::beginTransaction();
 		try{
 			$approval = Approval::create([
