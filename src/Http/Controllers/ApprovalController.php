@@ -507,6 +507,8 @@ class ApprovalController extends Controller
 	 */
 	public function destroy(Approval $approval)
 	{
+		if(!config('approval-config.dev-mode'))
+			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		if($approval->requests->count() > 0){
 			$message = ['msg_data' => 'Deleted Fail, Data Exist!', 'msg_type' => 'danger'];
 		}
@@ -553,6 +555,8 @@ class ApprovalController extends Controller
 	}
 
 	public function changeStatus(Request $request, Approval $approval){
+		if(!config('approval-config.dev-mode'))
+			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		$approval->status = !$approval->status;
 		$approval->update();
 		Artisan::call('view:clear');
