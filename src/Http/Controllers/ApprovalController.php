@@ -465,6 +465,16 @@ class ApprovalController extends Controller
 				if($request->approval_title)
 				foreach($request->approval_title as $keyL => $valueL){
 					$approvalLevel = $approval->levels->where('level',$request->approval_level[$keyL])->first();
+					
+					$approvalLevel->update([
+						'title' => $request->approval_title[$keyL],
+						'is_flexible' => $request->approval_flex[$keyL],						
+						'action_frequency' => $request->approval_action_frequency[$keyL],						
+						'group_notification' => $request->approval_group_notification[$keyL],
+						'next_level_notification' => $request->approval_next_notification[$keyL],
+						'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
+						'is_reject_reason_required' => $request->approval_reject_reason[$keyL]
+					]);
 					$approvalLevel->approval_users()->delete();
 					foreach($request->approval_user[$keyL] as $keyU => $valueU){
 						$approvalLevel->approval_users()->create([
