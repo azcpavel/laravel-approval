@@ -269,8 +269,7 @@ class ApprovalRequestController extends Controller
 								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 							}
 
-							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
-								look($currentLevel->status_fields);
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){								
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
 								}
