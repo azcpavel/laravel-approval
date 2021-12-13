@@ -396,10 +396,9 @@ class ApprovalRequestController extends Controller
 			return false;
 		if($currentLevel->is_form_required && $request->approval_option == 1){
 			foreach($currentLevel->forms as $keyAFR => $valueAFR){									
-				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){
-					
+				if($valueAFR->approvable_type == $approvalRequest->approval->approvable_type){					
 					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
-						'approvable_id' => $approvalItem->approvable_id,
+						'approvable_id' => $approvalItem->id,
 				        'approvable_type' => $valueAFR->approvable_type,
 				        'title' => $valueAFR->title
 					]);
