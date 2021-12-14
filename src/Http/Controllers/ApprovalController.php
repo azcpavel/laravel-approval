@@ -469,7 +469,7 @@ class ApprovalController extends Controller
 				$approval->update([
 					'title' => $request->title
 				]);
-				
+
 				if($request->approval_title)
 				foreach($request->approval_title as $keyL => $valueL){
 					$approvalLevel = $approval->levels->where('level',$request->approval_level[$keyL])->first();
@@ -490,6 +490,7 @@ class ApprovalController extends Controller
 						]);
 					}
 				}
+				Artisan::call('view:clear');
 				DB::commit();
 				return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Level User Updated', 'msg_type' => 'success']);
 			}
