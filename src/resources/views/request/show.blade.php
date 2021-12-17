@@ -219,6 +219,37 @@
 							</table>
 						</div>
 						@endforeach
+						@if($approvalRequest->approvals)
+						<div class="col-12 mt-4">
+							<h5>Approval Submissions Log</h5>
+							<table class="table table-sm table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>SL</th>
+										<th>Approver</th>
+										<th>Previous Level</th>
+										<th>Current Level</th>
+										<th>Submission</th>
+										<th>Date</th>
+										<th>Remarks</th>
+									</tr>
+								</thead>
+								<tbody>
+								@foreach($approvalRequest->approvals as $keyARL => $valueARL)
+									<tr>
+										<td>{{$keyARL+1}}</td>
+										<td>{{$valueARL->user->name}}</td>
+										<td>{{$valueARL->prev_level_title}}</td>
+										<td>{{$valueARL->next_level_title}}</td>
+										<td>{{(($valueARL->is_swaped) ? 'Swap' : (($valueARL->is_approved) ? 'Approved' : 'Rejected'))}}</td>
+										<td width="150">{{approvalDate($valueARL->created_at)}}</td>
+										<td>{{$valueARL->reason}}</td>
+									</tr>
+								@endforeach
+								</tbody>
+							</table>
+						</div>
+						@endif
 					</div>
 				</div>
 			</div>

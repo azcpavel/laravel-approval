@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Exceptio\ApprovalPermission\Models\ApprovalLevel;
 use Exceptio\ApprovalPermission\Models\ApprovalMapping;
 use Exceptio\ApprovalPermission\Models\ApprovalRequest;
+use Exceptio\ApprovalPermission\Models\ApprovalRequestApproval;
 use Exceptio\ApprovalPermission\Models\ApprovalRequestApprover;
 
 class Approval extends Model
@@ -45,7 +46,11 @@ class Approval extends Model
 		return $this->hasMany(ApprovalRequest::class);
 	}
 
-	public function request_approver(){
-		return $this->hasMany(ApprovalRequestApprover::class);
+	public function request_approvals(){
+		return $this->hasMany(ApprovalRequestApproval::class);
 	}
+
+	public function request_approvers(){
+		return $this->hasMany(ApprovalRequestApprover::class);
+	}	
 }

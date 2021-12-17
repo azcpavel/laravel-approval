@@ -104,7 +104,8 @@ class ApprovalRequestController extends Controller
 						'approval.mappings.fields',
 						'approvers.forms.form_data',
 						'mappings.form_data',
-						'approvable')->first();
+						'approvable',
+						'approvals')->first();
 		return view('laravel-approval::request.show',['approvalRequest' => $approvalRequest]);
 	}
 
@@ -337,6 +338,8 @@ class ApprovalRequestController extends Controller
 						}						
 					}
 
+					$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
 					$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 
 					if($currentLevel->action_type != 0){						
@@ -357,6 +360,8 @@ class ApprovalRequestController extends Controller
 
 					$approvalRequest->completed = 2;
 					$approvalRequest->save();
+
+					$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
 
 					if($currentLevel->action_type != 0)
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
@@ -389,7 +394,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){		
+	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){
 		if(!$this->is_dofinal)
 			$this->is_dofinal = true;
 		else
@@ -536,7 +541,7 @@ class ApprovalRequestController extends Controller
 
 					$approvalItemR->save();
 				}
-			}
+			}			
 		}
 
 		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_update){
@@ -566,7 +571,7 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
-	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message){		
+	private function doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message){
 		\DB::commit();
 
 		if($currentLevel->action_type == 1){
@@ -603,5 +608,20 @@ class ApprovalRequestController extends Controller
 
 			return redirect()->back()->with($message);
 		}		
+	}
+
+	private function doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel){
+		$approvalRequest->approvals()->create([
+			'approval_id' => $approvalRequestApprover->approval_id,
+			'approval_request_id' => $approvalRequestApprover->approval_request_id,
+			'user_id' => $approvalRequestApprover->user_id,
+			'prev_level' => ($prevLevel) ? $prevLevel->level : null,
+			'prev_level_title' => ($prevLevel) ? $prevLevel->title : null,
+			'next_level' => $approvalRequestApprover->level,
+			'next_level_title' => $approvalRequestApprover->title,
+			'is_approved' => $approvalRequestApprover->is_approved,
+			'is_rejected' => $approvalRequestApprover->is_rejected,
+			'reason' => $approvalRequestApprover->reason,
+		]);
 	}	
 }

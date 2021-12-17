@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\Approval;
+use Exceptio\ApprovalPermission\Models\ApprovalRequestApproval;
 use Exceptio\ApprovalPermission\Models\ApprovalRequestApprover;
 use Exceptio\ApprovalPermission\Models\ApprovalRequestMappingField;
 
@@ -24,6 +25,10 @@ class ApprovalRequest extends Model
 
 	public function approval(){
 		return $this->belongsTo(Approval::class);
+	}
+
+	public function approvals(){
+		return $this->hasMany(ApprovalRequestApproval::class);
 	}
 
 	public function approvers(){
