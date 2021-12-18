@@ -33,4 +33,10 @@ function namespacePath($file){
 	$filePath = str_replace(app_path(), 'App', $file);
 	return str_replace('/','\\',$filePath);
 }
+
+function namespaceBasePath($file){
+	return $file;
+	$base_name = explode('\\',$file);
+	return end($base_name);
+}
 ?>
