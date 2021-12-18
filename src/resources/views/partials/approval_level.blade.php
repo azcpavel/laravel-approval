@@ -136,7 +136,7 @@
 		<select class="form-control" name="approval_notifiable_namespace[]">
 			<option value="0">None</option>
 			@foreach($notifications as $notification_file)
-			<option value="{{str_replace('.php','',$notification_file)}}">{{str_replace('.php','',basename($notification_file))}}</option>
+			<option value="{{str_replace('.php','',$notification_file)}}">{{str_replace('.php','',namespaceBasePath($notification_file))}}</option>
 			@endforeach
 		</select>
 		<span class="d-none invalid-feedback"></span>
@@ -170,7 +170,7 @@
 		<div class="col-8">
 			<select class="form-control approval_form_namespace">
 				@foreach($models as $model_file)
-				<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',basename($model_file))}}</option>
+				<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 				@endforeach
 			</select>
 		</div>

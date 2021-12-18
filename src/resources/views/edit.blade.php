@@ -38,7 +38,7 @@
 										<?php
 										$model_namespace = str_replace('.php','',$model_file);
 										?>
-										<option value="{{$model_namespace}}" {{($approval->approvable_type == $model_namespace) ? 'selected' : ''}}>{{str_replace('.php','',basename($model_file))}}</option>
+										<option value="{{$model_namespace}}" {{($approval->approvable_type == $model_namespace) ? 'selected' : ''}}>{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 										@endforeach
 									</select>
 									<span class="d-none invalid-feedback"></span>
@@ -90,7 +90,7 @@
 											<div class="col-8">
 												<select class="form-control" id="model_namespace_relation">
 													@foreach($models as $model_file)
-													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',basename($model_file))}}</option>
+													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 													@endforeach
 												</select>
 											</div>
@@ -103,7 +103,7 @@
 									<div class="w-100" id="model_namespace_relation_div_item">
 										@foreach($approval->mappings as $keyM => $valueM)
 										<?php
-										$inputKey = basename($valueM->approvable_type);
+										$inputKey = namespaceBasePath($valueM->approvable_type);
 										$model = new $valueM->approvable_type();
 										$modelColumn = \DB::select('SHOW COLUMNS FROM '.$model->getTable());										
 										?>
@@ -212,7 +212,7 @@
 										</div>
 										<div class="form-group">
 											<label for="approval_flex">Flexible<span class="text-danger position-relative">*</span></label>
-											<input class="form-control" type="number" min="0" max="100" name="approval_flex[]" value="0" placeholder="Flexible" value="{{$valueAL->is_flexible}}" required>
+											<input class="form-control" type="number" min="0" max="100" name="approval_flex[]" placeholder="Flexible" value="{{$valueAL->is_flexible}}" required>
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
@@ -344,7 +344,7 @@
 												<?php
 												$notification_namespace = str_replace('.php','',$notification_file);
 												?>
-												<option value="{{$notification_namespace}}" {{$notification_namespace == $valueAL->notifiable_class ? 'selected' : ''}}>{{str_replace('.php','',basename($notification_file))}}</option>
+												<option value="{{$notification_namespace}}" {{$notification_namespace == $valueAL->notifiable_class ? 'selected' : ''}}>{{str_replace('.php','',namespaceBasePath($notification_file))}}</option>
 												@endforeach
 											</select>
 											<span class="d-none invalid-feedback"></span>
@@ -381,7 +381,7 @@
 											<div class="col-8">
 												<select class="form-control approval_form_namespace">
 													@foreach($models as $model_file)
-													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',basename($model_file))}}</option>
+													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 													@endforeach
 												</select>
 											</div>
@@ -393,7 +393,7 @@
 												<div class="row approval_form_div_item_div">
 													@foreach($valueAL->forms as $keyALF => $valueALF)
 													<?php
-													$inputKeyFF = basename($valueALF->approvable_type);
+													$inputKeyFF = namespaceBasePath($valueALF->approvable_type);
 													$modelFF = new $valueALF->approvable_type();
 													$modelFFColumn = \DB::select('SHOW COLUMNS FROM '.$modelFF->getTable());										
 													?>

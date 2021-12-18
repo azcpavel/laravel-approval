@@ -33,7 +33,7 @@
 									<label for="model_namespace">Model <span class="text-danger position-relative">*</span></label>
 									<select class="form-control" name="model_namespace">
 										@foreach($models as $model_file)
-										<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',basename($model_file))}}</option>
+										<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 										@endforeach
 									</select>
 									<span class="d-none invalid-feedback"></span>
@@ -83,7 +83,7 @@
 											<div class="col-8">
 												<select class="form-control" id="model_namespace_relation">
 													@foreach($models as $model_file)
-													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',basename($model_file))}}</option>
+													<option value="{{str_replace('.php','',$model_file)}}">{{str_replace('.php','',namespaceBasePath($model_file))}}</option>
 													@endforeach
 												</select>
 											</div>
