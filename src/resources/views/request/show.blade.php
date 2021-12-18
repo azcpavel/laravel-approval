@@ -304,7 +304,7 @@
 							?>
 							@if($maxLevelApproved)
 							<?php
-							$maxLevelList = $approvalRequest->approval->levels->where('level','<=',$maxLevelApproved->next_level+1)->all();
+							$maxLevelList = $approvalRequest->approval->levels->where('level','!=',$currentLevel->level)->where('level','<=',$maxLevelApproved->next_level+1)->all();
 							?>
 							<textarea id="swap-reason" name="swap_reason" placeholder="Reason" class="form-control mb-3" required></textarea>
 							<select class="form-control mb-3" name="do_swap" required>
