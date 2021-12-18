@@ -226,6 +226,7 @@ class ApprovalController extends Controller
 					'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 				]);
 
+				if(isset($request->approval_user[$keyL]))
 				foreach($request->approval_user[$keyL] as $keyU => $valueU){
 					$approvalLevel->approval_users()->create([
 						'user_id' => $valueU,
@@ -437,6 +438,7 @@ class ApprovalController extends Controller
 						'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 					]);
 
+					if(isset($request->approval_user[$keyL]))
 					foreach($request->approval_user[$keyL] as $keyU => $valueU){
 						$approvalLevel->approval_users()->create([
 							'user_id' => $valueU,
@@ -488,6 +490,7 @@ class ApprovalController extends Controller
 						'is_reject_reason_required' => $request->approval_reject_reason[$keyL]
 					]);
 					$approvalLevel->approval_users()->delete();
+					if(isset($request->approval_user[$keyL]))
 					foreach($request->approval_user[$keyL] as $keyU => $valueU){
 						$approvalLevel->approval_users()->create([
 							'user_id' => $valueU,
