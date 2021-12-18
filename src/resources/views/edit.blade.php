@@ -24,6 +24,14 @@
 									<span class="d-none invalid-feedback"></span>
 								</div>
 								<div class="form-group">
+									<label for="do_swap">Enable Swap<span class="text-danger position-relative">*</span></label>
+									<select class="form-control" name="do_swap" id="do_swap">
+										<option value="0" {{$approval->do_swap == 0 ? 'selected' : ''}}>No</option>
+										<option value="1" {{$approval->do_swap == 1 ? 'selected' : ''}}>Yes</option>
+									</select>
+									<span class="d-none invalid-feedback"></span>
+								</div>
+								<div class="form-group">
 									<label for="model_namespace">Model <span class="text-danger position-relative">*</span></label>
 									<select class="form-control" name="model_namespace">
 										@foreach($models as $model_file)

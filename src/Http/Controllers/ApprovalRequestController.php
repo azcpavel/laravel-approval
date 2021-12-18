@@ -394,6 +394,43 @@ class ApprovalRequestController extends Controller
 		}
 	}
 
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Models\ApprovalRequest  $approvalRequest
+	 * @return \Illuminate\Http\Response
+	 */
+	public function swapLevel(Request $request, ApprovalRequest $approvalRequest)
+	{
+		if(!$approvalRequest->approval->status)
+			abort(404);
+		$level = $approvalRequest->approval->levels->where('level',$request->do_swap)->first();
+		if($level){
+			$currentLevel = $approvalRequest->currentLevel(true);
+			$message['msg_type'] = 'success';
+			$message['msg_data'] = 'Approval level changed to '.$level->title;
+			
+			$approvalRequest->approvals()->create([
+				'approval_id' => $approvalRequest->approval_id,
+				'user_id' => auth()->id(),
+				'prev_level' => $currentLevel->level,
+				'prev_level_title' => $currentLevel->title,
+				'next_level' => $level->level,
+				'next_level_title' => $level->title,
+				'is_swaped' => 1,
+				'reason' => $request->swap_reason,
+			]);
+
+			$approvalRequest->approval_state = $level->level;
+			$approvalRequest->save();
+		}else{
+			$message['msg_type'] = 'denger';
+			$message['msg_data'] = 'Approval level not valid!';
+		}
+		return redirect()->back()->with($message);
+	}
+
 	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){
 		if(!$this->is_dofinal)
 			$this->is_dofinal = true;

@@ -6,10 +6,10 @@
 					<div class="row justify-content-center">
 						@if(session()->has('msg_type'))
 						<div class="alert alert-{{session('msg_type')}} alert-dismissible fade show" role="alert">
-						  	{{session('msg_data')}}
-						  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						  		<span aria-hidden="true">&times;</span>
-						  	</button>
+							{{session('msg_data')}}
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						@endif
 						<div class="col-12">
@@ -18,7 +18,7 @@
 						<div class="col-12 col-md-4 mt-4 top-card">
 							<div class="card">
 								<div class="card-header">
-								    Requested By
+									Requested By
 								</div>
 								<div class="card-body">									
 									@foreach($approvalRequest->approval->list_data_fields as $keyFN => $valueFN)
@@ -32,7 +32,7 @@
 						<div class="col-12 col-md-4 mt-4 top-card">
 							<div class="card">
 								<div class="card-header">
-								    Approval Information
+									Approval Information
 								</div>
 								<div class="card-body">									
 									Total Level: {{$approvalRequest->approval->levels->count()}}<br>
@@ -45,7 +45,7 @@
 						<div class="col-12 col-md-4 mt-4 top-card">
 							<div class="card">
 								<div class="card-header">
-								    Current Approval Status
+									Current Approval Status
 								</div>
 								<div class="card-body">
 									<?php
@@ -64,6 +64,9 @@
 									@endif
 									@else
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
+									@endif
+									@if($approvalRequest->approval->do_swap && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
+									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Swap Level</button>
 									@endif
 								</div>
 							</div>							
@@ -176,26 +179,26 @@
 													<br><a href="{{asset($valueAF)}}">{{basename($valueAF)}}</a>
 												@endforeach
 												@foreach($valueALS->forms as $keyAFS => $valueAFS)
-											        <br><b>{{$valueAFS->title}}</b>
-											        @foreach($valueAFS->form_data as $keyAFSS => $valueAFSS)
-											        	<?php
-											        	$fieldRelation = json_decode($valueAFSS->mapped_field_relation);
-											        	?>
-												        @if($valueAFSS->mapped_field_type == 'text')
-												        	<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
-												        @elseif($valueAFSS->mapped_field_type == 'email')
-												        	<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
-												        @elseif($valueAFSS->mapped_field_type == 'file')
-												        	<br><a href="{{asset($valueAFSS->mapped_field_value)}}">{{basename($valueAFSS->mapped_field_value)}}</a>
-												        @elseif ($valueAFSS->mapped_field_type == 'select' && is_object($fieldRelation))
-												        <?php
+													<br><b>{{$valueAFS->title}}</b>
+													@foreach($valueAFS->form_data as $keyAFSS => $valueAFSS)
+														<?php
+														$fieldRelation = json_decode($valueAFSS->mapped_field_relation);
+														?>
+														@if($valueAFSS->mapped_field_type == 'text')
+															<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
+														@elseif($valueAFSS->mapped_field_type == 'email')
+															<br>{{$valueAFSS->mapped_field_label.' : '.$valueAFSS->mapped_field_value}}
+														@elseif($valueAFSS->mapped_field_type == 'file')
+															<br><a href="{{asset($valueAFSS->mapped_field_value)}}">{{basename($valueAFSS->mapped_field_value)}}</a>
+														@elseif ($valueAFSS->mapped_field_type == 'select' && is_object($fieldRelation))
+														<?php
 															$fieldRelation->values = collect($fieldRelation->values);
 															$newFieldData = $fieldRelation->values->where('key',$valueAFSS->mapped_field_value)->first();
 															if($newFieldData)
 																$newFieldData = $newFieldData->value;															
 														?>
 															<br>{{$valueAFSS->mapped_field_label.' : '.$newFieldData}}
-												        @elseif($valueAFSS->mapped_field_type == 'select' && $valueAFSS->mapped_field_relation != "" && $valueAFSS->mapped_field_relation_pk != "" && $valueAFSS->mapped_field_relation_show != "")
+														@elseif($valueAFSS->mapped_field_type == 'select' && $valueAFSS->mapped_field_relation != "" && $valueAFSS->mapped_field_relation_pk != "" && $valueAFSS->mapped_field_relation_show != "")
 															<?php
 															$itemModel = $valueAFS->approvable_type;
 															$itemRelation = $valueAFSS->mapped_field_relation;
@@ -207,10 +210,10 @@
 															@if($valueAFS->approvable_type == $approvalRequest->approvable_type)
 															<br>{{$valueAFSS->mapped_field_label.' : '.$itemRelationObject->where($itemRelationPK,$valueAFSS->mapped_field_value)->first()->$itemRelationShow}}
 															@endif
-												        @endif
-											        @endforeach
-											        <br>
-										        @endforeach
+														@endif
+													@endforeach
+													<br>
+												@endforeach
 											@endif
 										</td>
 									</tr>
@@ -228,7 +231,7 @@
 										<th>SL</th>
 										<th>Approver</th>
 										<th>Previous Level</th>
-										<th>Current Level</th>
+										<th>Submission Level</th>
 										<th>Submission</th>
 										<th>Date</th>
 										<th>Remarks</th>
@@ -264,59 +267,96 @@
 		</style>
 		<div class="modal" tabindex="-1" id="approval-data-modal">
 		  <div class="modal-dialog">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title">Approval Data</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	                <span aria-hidden="true">&times;</span>
-	            </button>
-		      </div>
-		      <div class="modal-body">
-		      </div>
-		      <div class="modal-footer justify-content-between">
-	              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
-	          </div>
-		    </div>
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title">Approval Data</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+			  </div>
+			  <div class="modal-footer justify-content-between">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
+			  </div>
+			</div>
 		  </div>
 		</div>
+		@if($currentLevel && $approvalRequest->approval->do_swap)
+		<div class="modal" tabindex="-1" id="swap-level-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+					<h5 class="modal-title">Swap Level</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					</div>
+					<div class="modal-body">
+						<form method="POST" action="{{route('approval_request.swap_level',['approvalRequest' => $approvalRequest->id])}}">
+							@csrf
+							<?php
+							$maxLevelApproved = $approvalRequest->approvals->where('is_approved',1)->sortByDesc('next_level')->first();
+							?>
+							@if($maxLevelApproved)
+							<?php
+							$maxLevelList = $approvalRequest->approval->levels->where('level','<=',$maxLevelApproved->next_level+1)->all();
+							?>
+							<textarea id="swap-reason" name="swap_reason" placeholder="Reason" class="form-control mb-3" required></textarea>
+							<select class="form-control mb-3" name="do_swap" required>
+								@foreach($maxLevelList as $keyALSI => $valueALSI)
+								<option value="{{$valueALSI->level}}">{{$valueALSI->title}}</option>
+								@endforeach
+							</select>
+							@endif
+							<button type="submit" class="btn btn-primary">Save changes</button>
+						</form>
+					</div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
+					</div>
+				</div>
+			</div>
+		</div>
+		@endif
 		@if($currentLevel)
 		<div class="modal" tabindex="-1" id="approval-modal">
 		  <div class="modal-dialog">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title">Modal title</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	                <span aria-hidden="true">&times;</span>
-	            </button>
-		      </div>
-		      <div class="modal-body">
-		      	<form method="POST" enctype="multipart/form-data" action="{{route('approval_request.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
-			        @csrf
-			        <textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
-			        <input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
-			        <select name="approval_option" class="form-control mb-3" id="approval-option">
-			        	<option value="1">Approve</option>
-			        	<option value="0">Reject</option>
-			        </select>			        
-			        @if($currentLevel->forms)
-				        @foreach($currentLevel->forms as $keyAF => $valueAF)
-					        <label class="approval-form">{{$valueAF->title}}</label><br>
-					        @foreach($valueAF->form_data as $keyAFS => $valueAFS)
-						        <?php
-						        $fieldName = $valueAFS->mapped_field_name;
-						        $fieldRelation = json_decode($valueAFS->mapped_field_relation);
-						    	?>
-						    	<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
-						        @if($valueAFS->mapped_field_type == 'text')
-						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-						        @elseif($valueAFS->mapped_field_type == 'email')
-						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-						        @elseif($valueAFS->mapped_field_type == 'file')
-						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-						        @elseif($valueAFS->mapped_field_type == 'date')
-						        	<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-						        @elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
-						        <?php
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title">Modal title</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<form method="POST" enctype="multipart/form-data" action="{{route('approval_request.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
+					@csrf
+					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
+					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
+					<select name="approval_option" class="form-control mb-3" id="approval-option">
+						<option value="1">Approve</option>
+						<option value="0">Reject</option>
+					</select>			        
+					@if($currentLevel->forms)
+						@foreach($currentLevel->forms as $keyAF => $valueAF)
+							<label class="approval-form">{{$valueAF->title}}</label><br>
+							@foreach($valueAF->form_data as $keyAFS => $valueAFS)
+								<?php
+								$fieldName = $valueAFS->mapped_field_name;
+								$fieldRelation = json_decode($valueAFS->mapped_field_relation);
+								?>
+								<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
+								@if($valueAFS->mapped_field_type == 'text')
+									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+								@elseif($valueAFS->mapped_field_type == 'email')
+									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+								@elseif($valueAFS->mapped_field_type == 'file')
+									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+								@elseif($valueAFS->mapped_field_type == 'date')
+									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+								@elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
+								<?php
 									$fieldRelation->values = collect($fieldRelation->values);
 									$input_name = $valueAF->id.'_'.$fieldName.($fieldRelation->type == 'multiple' ? '[]' : '');
 								?>
@@ -325,7 +365,7 @@
 										<option value="{{$valueAFSR->key}}" {{(($valueAFSR->key == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->value}}</option>
 									@endforeach
 									</select>
-						        @elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
+								@elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
 									@if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
 										<?php
 										$itemModel = $valueAF->approvable_type;
@@ -345,16 +385,16 @@
 										</select>
 									@endif
 								@endif
-					        @endforeach
-				        @endforeach
-			        @endif
-			        <button type="submit" class="btn btn-primary">Save changes</button>
-		        </form>
-		      </div>
-		      <div class="modal-footer justify-content-between">
-	              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
-	          </div>
-		    </div>
+							@endforeach
+						@endforeach
+					@endif
+					<button type="submit" class="btn btn-primary">Save changes</button>
+				</form>
+			  </div>
+			  <div class="modal-footer justify-content-between">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
+			  </div>
+			</div>
 		  </div>
 		</div>
 		<script type="text/javascript">

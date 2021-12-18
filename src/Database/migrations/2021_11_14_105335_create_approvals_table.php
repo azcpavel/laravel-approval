@@ -25,6 +25,7 @@ class CreateApprovalsTable extends Migration
             $table->tinyInteger('on_update')->default(0);
             $table->tinyInteger('on_delete')->default(0);
             $table->tinyInteger('do_delete')->default(0);
+            $table->tinyInteger('do_swap')->default(0);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });

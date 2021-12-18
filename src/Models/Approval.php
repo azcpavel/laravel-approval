@@ -26,6 +26,7 @@ class Approval extends Model
 		'on_update',
 		'on_delete',
 		'do_delete',
+		'do_swap',
 		'status',
 	];
 

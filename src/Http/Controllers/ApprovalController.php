@@ -129,6 +129,8 @@ class ApprovalController extends Controller
 				'on_create' => $request->approval_type == 1 ? 1 : 0,
 				'on_update' => $request->approval_type == 2 ? 1 : 0,
 				'on_delete' => $request->approval_type == 3 ? 1 : 0,
+				'do_delete' => $request->do_delete,
+				'do_swap' => $request->do_swap,
 			]);
 
 			if($request->model_namespace_relation_key)
@@ -333,7 +335,8 @@ class ApprovalController extends Controller
 					'on_create' => $request->approval_type == 1 ? 1 : 0,
 					'on_update' => $request->approval_type == 2 ? 1 : 0,
 					'on_delete' => $request->approval_type == 3 ? 1 : 0,
-					'on_delete' => $request->do_delete,
+					'do_delete' => $request->do_delete,
+					'do_swap' => $request->do_swap,
 				]);
 
 				$approval->levels()->delete();
@@ -467,7 +470,8 @@ class ApprovalController extends Controller
 				DB::commit();
 			}else{
 				$approval->update([
-					'title' => $request->title
+					'title' => $request->title,					
+					'do_swap' => $request->do_swap,
 				]);
 
 				if($request->approval_title)

@@ -58,6 +58,9 @@
                 {'title': 'Delete', name: 'on_delete', data: "on_delete",render: function(data){
                     return (data) ? 'Yes' : 'No';
                 }},
+                {'title': 'Swap Enable', name: 'do_swap', data: "do_swap",render: function(data){
+                    return (data) ? 'Yes' : 'No';
+                }},
                 {'title': 'Status', name: 'status', data: "status",render: function(data){
                     return (data) ? 'Enable' : 'Disable';
                 }},
@@ -88,7 +91,7 @@
             columnDefs: [{
                 searchable: false,
                 orderable: false,
-                targets: [0,2,3,4]
+                targets: [0,2,3,4,5]
             }],
             responsive: true,
             autoWidth: false,
