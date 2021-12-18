@@ -34,8 +34,9 @@ function namespacePath($file){
 	return str_replace('/','\\',$filePath);
 }
 
-function namespaceBasePath($file){
-	return $file;
+function namespaceBasePath($file, $base_path = true){
+	if(!$base_path)
+		return $file;
 	$base_name = explode('\\',$file);
 	return end($base_name);
 }
