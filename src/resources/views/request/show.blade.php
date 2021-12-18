@@ -134,7 +134,7 @@
 												$itemRelationShow = $valueMF->field_relation_show;
 												$itemObject = new $itemModel();
 												$itemRelationObject = $itemObject->$itemRelation()->getRelated();
-												$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+												$itemRelationObjectType = strtolower(namespaceBasePath(get_class($itemRelationObject)));
 												$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 												if($itemRelationObject::find($valueMF->field_data) && !$input_multiple)
 													$newFieldData = $itemRelationObject::find($valueMF->field_data)->$relationShow;
@@ -378,7 +378,7 @@
 										$itemRelationShow = $valueAFS->mapped_field_relation_show;
 										$itemObject = new $itemModel();
 										$itemRelationObject = $itemObject->$itemRelation();
-										$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
+										$itemRelationObjectType = strtolower(namespaceBasePath(get_class($itemRelationObject)));
 										$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 										$input_name = $valueAF->id.'_'.$fieldName.($input_multiple ? '[]' : '');
 										?>
