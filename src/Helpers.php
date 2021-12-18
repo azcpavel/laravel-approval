@@ -28,4 +28,9 @@ function approvalFileName($name, $withExt = 1, $prefix = NULL, $suffix = NULL)
 
 	return $name;
 }
+
+function namespacePath($file){
+	$filePath = str_replace(app_path(), 'App', $file);
+	return str_replace('/','\\',$filePath);
+}
 ?>

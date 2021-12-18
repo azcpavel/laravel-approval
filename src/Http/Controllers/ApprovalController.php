@@ -87,7 +87,7 @@ class ApprovalController extends Controller
 		$data['models'] = [];
 
 		foreach($Regex as $file){
-			$data['models'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['models'][]=namespacePath($file[0]);
 		}
 
 		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.notification-dir')));
@@ -96,7 +96,7 @@ class ApprovalController extends Controller
 		$data['notifications'] = [];
 
 		foreach($Regex as $file){
-			$data['notifications'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['notifications'][]=namespacePath($file[0]);
 		}
 
 		$userModel = config('approval-config.user-model');
@@ -293,7 +293,7 @@ class ApprovalController extends Controller
 		$data['models'] = [];
 
 		foreach($Regex as $file){
-			$data['models'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['models'][]=namespacePath($file[0]);
 		}
 
 		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.notification-dir')));
@@ -302,7 +302,7 @@ class ApprovalController extends Controller
 		$data['notifications'] = [];
 
 		foreach($Regex as $file){
-			$data['notifications'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['notifications'][]=namespacePath($file[0]);
 		}
 
 		$userModel = config('approval-config.user-model');
@@ -546,7 +546,7 @@ class ApprovalController extends Controller
 		$data['models'] = [];
 
 		foreach($Regex as $file){
-			$data['models'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['models'][]=namespacePath($file[0]);
 		}
 
 		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.notification-dir')));
@@ -555,7 +555,7 @@ class ApprovalController extends Controller
 		$data['notifications'] = [];
 
 		foreach($Regex as $file){
-			$data['notifications'][]=str_replace(app_path(), 'App', $file[0]);
+			$data['notifications'][]=namespacePath($file[0]);
 		}
 
 		$userModel = config('approval-config.user-model');
