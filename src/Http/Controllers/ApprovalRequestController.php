@@ -240,7 +240,7 @@ class ApprovalRequestController extends Controller
 					}
 				}
 
-				if($currentLevel->group_notification){
+				if($currentLevel->group_notification && $currentLevel->notifiable_class){
 					$notifiableClass = $currentLevel->notifiable_class;
 					$userModel = config('approval-config.user-model');
 					$users = new $userModel();
