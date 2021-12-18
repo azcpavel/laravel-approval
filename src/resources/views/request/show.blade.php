@@ -51,6 +51,10 @@
 									<?php
 									$currentLevel = $approvalRequest->currentLevel(true);
 									$currentLevelStatus = $approvalRequest->currentLevel();
+									$do_swap = $currentLevel && $approvalRequest->approval->do_swap;
+									if($do_swap && !$approvalRequest->approvals->where('is_approved',1)->first()){										
+										$do_swap = false;										
+									}
 									?>
 									State: {{$currentLevelStatus}}<br>
 									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected')
@@ -65,7 +69,7 @@
 									@else
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
 									@endif
-									@if($approvalRequest->approval->do_swap && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
+									@if($do_swap && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
 									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Swap Level</button>
 									@endif
 								</div>
@@ -282,7 +286,7 @@
 			</div>
 		  </div>
 		</div>
-		@if($currentLevel && $approvalRequest->approval->do_swap)
+		@if($do_swap)
 		<div class="modal" tabindex="-1" id="swap-level-modal">
 			<div class="modal-dialog">
 				<div class="modal-content">
