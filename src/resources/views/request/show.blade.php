@@ -51,7 +51,7 @@
 									<?php
 									$currentLevel = $approvalRequest->currentLevel(true);
 									$currentLevelStatus = $approvalRequest->currentLevel();
-									$do_swap = $currentLevel && $approvalRequest->approval->do_swap;
+									$do_swap = $currentLevel && $approvalRequest->approval->do_swap && $approvalRequest->completed == 0;
 									if($do_swap && !$approvalRequest->approvals->where('is_approved',1)->first()){										
 										$do_swap = false;										
 									}
