@@ -35,6 +35,14 @@ trait Approvable
     				$old_request->completed = 0;
     				$old_request->save();
 
+    				$currentLevel = $old_request->currentLevel(true);
+    				if($currentLevel && $currentLevel->group_notification && $currentLevel->notifiable_class){
+    					$notifiableClass = $currentLevel->notifiable_class;
+						$userModel = config('approval-config.user-model');
+						$users = new $userModel();
+						Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, null, $currentLevel->notifiable_params->channels));
+    				}
+
     				return $old_request;
     			}else{
     				$approvalRequest = $approval->requests()->create([

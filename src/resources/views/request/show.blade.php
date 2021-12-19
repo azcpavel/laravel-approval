@@ -306,7 +306,7 @@
 							<?php
 							$maxLevelList = $approvalRequest->approval->levels->where('level','!=',$currentLevel->level)->where('level','<=',$maxLevelApproved->next_level+1)->all();
 							?>
-							<textarea id="swap-reason" name="swap_reason" placeholder="Reason" class="form-control mb-3" required></textarea>
+							<textarea id="swap-reason" name="swap_reason" placeholder="Remarks" class="form-control mb-3" required></textarea>
 							<select class="form-control mb-3" name="do_swap" required>
 								@foreach($maxLevelList as $keyALSI => $valueALSI)
 								<option value="{{$valueALSI->level}}">{{$valueALSI->title}}</option>
@@ -404,11 +404,11 @@
 		<script type="text/javascript">
 			function chkApprovalValidate(){
 				if(currentLevel.is_approve_reason_required && $('#approval-option').val() == 1 && $('#approval-reason').val().trim().length == 0){
-					alert("Reason is required!");
+					alert("Remarks is required!");
 					return false;
 				}
 				if(currentLevel.is_reject_reason_required && $('#approval-option').val() == 0 && $('#approval-reason').val().trim().length == 0){
-					alert("Reason is required!");
+					alert("Remarks is required!");
 					return false;
 				}				
 			}
