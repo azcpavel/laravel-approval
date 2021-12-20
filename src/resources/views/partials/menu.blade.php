@@ -12,8 +12,8 @@ $approvals = Exceptio\ApprovalPermission\Models\Approval::where('status',1)->get
 $isMenuActive = strpos($currentRouteName,"approvals.") !== false || strpos($currentRouteName,"approval_request.") !== false;
 ?>
 
-<{{$menuChieldEl}} class="{{$menuChieldClass.' '.($isMenuActive ? $menuChieldActiveClass : '')}}">
-	<a href="javascript:void(0);" class="{{$menuLinkClass.' '.($isMenuActive ? $menuChieldActiveClass : '')}}">{!!config('approval-config.menu-parent-title')!!}</a>
+<{{$menuChieldEl}} class="{{$menuChieldClass.' '.($isMenuActive ? $menuLinkActiveClass : '')}}">
+	<a href="javascript:void(0);" class="{{$menuLinkClass.' '.($isMenuActive ? $menuLinkActiveClass : '')}}">{!!config('approval-config.menu-parent-title')!!}</a>
 
 	<{{$menuParentEl}} class="{{config('approval-config.menu-parent-class').' '.($isMenuActive ? config('approval-config.menu-parent-active-class') : '')}}">
 
