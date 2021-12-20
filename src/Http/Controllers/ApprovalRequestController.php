@@ -238,13 +238,6 @@ class ApprovalRequestController extends Controller
 						$complete = false;
 						break;
 					}
-				}
-
-				if($currentLevel->group_notification && $currentLevel->notifiable_class){
-					$notifiableClass = $currentLevel->notifiable_class;
-					$userModel = config('approval-config.user-model');
-					$users = new $userModel();
-					Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
 				}				
 
 				if($complete){					
@@ -329,16 +322,23 @@ class ApprovalRequestController extends Controller
 						}
 					}					
 					
+					$approvalRequestApproval = $this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
+					if($currentLevel->group_notification && $currentLevel->notifiable_class){
+						$notifiableClass = $currentLevel->notifiable_class;
+						$userModel = config('approval-config.user-model');
+						$users = new $userModel();
+						Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+					}
+
 					if($currentLevel->next_level_notification && $approveCount > $rejectCount){
 						if($nextLevel && $nextLevel->notifiable_class){
 							$notifiableClass = $nextLevel->notifiable_class;
 							$userModel = config('approval-config.user-model');
 							$users = new $userModel();
-							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $nextLevel->notifiable_params->channels));
+							Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $nextLevel->notifiable_params->channels, $approvalRequestApproval));
 						}						
-					}
-
-					$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+					}					
 
 					$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
 
@@ -361,11 +361,25 @@ class ApprovalRequestController extends Controller
 					$approvalRequest->completed = 2;
 					$approvalRequest->save();
 
+					if($currentLevel->group_notification && $currentLevel->notifiable_class){
+						$notifiableClass = $currentLevel->notifiable_class;
+						$userModel = config('approval-config.user-model');
+						$users = new $userModel();
+						Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+					}
+
 					$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
 
 					if($currentLevel->action_type != 0)
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 
+				}else{
+					if($currentLevel->group_notification && $currentLevel->notifiable_class){
+						$notifiableClass = $currentLevel->notifiable_class;
+						$userModel = config('approval-config.user-model');
+						$users = new $userModel();
+						Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+					}
 				}
 
 				if($request->approval_option == 1 && !$this->is_dofinal)
@@ -662,7 +676,7 @@ class ApprovalRequestController extends Controller
 	}
 
 	private function doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel){
-		$approvalRequest->approvals()->create([
+		$approvalRequestApproval = $approvalRequest->approvals()->create([
 			'approval_id' => $approvalRequestApprover->approval_id,
 			'approval_request_id' => $approvalRequestApprover->approval_request_id,
 			'user_id' => $approvalRequestApprover->user_id,
@@ -674,5 +688,7 @@ class ApprovalRequestController extends Controller
 			'is_rejected' => $approvalRequestApprover->is_rejected,
 			'reason' => $approvalRequestApprover->reason,
 		]);
+
+		return $approvalRequestApproval;
 	}	
 }
