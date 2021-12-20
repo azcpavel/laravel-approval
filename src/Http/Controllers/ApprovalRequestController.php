@@ -353,10 +353,12 @@ class ApprovalRequestController extends Controller
 						]);						
 					}
 
-					foreach($currentLevel->status_fields->reject as $keyA => $valueA){
-						$approvalItem->$keyA = $valueA;
+					if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject') && $currentLevel->status_fields->reject){
+						foreach($currentLevel->status_fields->reject as $keyA => $valueA){
+							$approvalItem->$keyA = $valueA;
+						}
+						$approvalItem->save();
 					}
-					$approvalItem->save();
 
 					$approvalRequest->completed = 2;
 					$approvalRequest->save();
