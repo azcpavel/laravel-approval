@@ -422,10 +422,13 @@ class ApprovalRequestController extends Controller
 		if(!$approvalRequest->approval->status)
 			abort(404);
 		$level = $approvalRequest->approval->levels->where('level',$request->do_swap)->first();
-		if($level){
-			$currentLevel = $approvalRequest->currentLevel(true);
+		$currentLevel = $approvalRequest->currentLevel(true);
+		if($level && $request->do_swap != $currentLevel->level){
+			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval level changed to '.$level->title;
+
+			$approvalRequest->approvers()->update(['status'=>1]);
 			
 			$approvalRequestApproval = $approvalRequest->approvals()->create([
 				'approval_id' => $approvalRequest->approval_id,

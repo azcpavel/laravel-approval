@@ -166,6 +166,7 @@
 										<th>Approver</th>
 										<th>Submission</th>
 										<th>Date</th>
+										<th>Status</th>
 										<th>Remarks</th>
 									</tr>
 								</thead>
@@ -176,6 +177,7 @@
 										<td>{{$valueALS->user->name}}</td>
 										<td>{{($valueALS->is_approved) ? 'Approved' : 'Rejected'}}</td>
 										<td width="150">{{approvalDate($valueALS->created_at)}}</td>
+										<td width="50">{{$valueALS->status ? 'Done' : 'Pending'}}</td>
 										<td>
 											{{$valueALS->reason}}
 											@if(is_array($valueALS->reason_file))
