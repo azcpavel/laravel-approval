@@ -70,7 +70,7 @@
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
 									@endif
 									@if($do_swap && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
-									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Swap Level</button>
+									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Forward Level</button>
 									@endif
 								</div>
 							</div>							
@@ -250,7 +250,7 @@
 										<td>{{$valueARL->user->name}}</td>
 										<td>{{$valueARL->prev_level_title}}</td>
 										<td>{{$valueARL->next_level_title}}</td>
-										<td>{{(($valueARL->is_swaped) ? 'Swap' : (($valueARL->is_approved) ? 'Approved' : 'Rejected'))}}</td>
+										<td>{{(($valueARL->is_swaped) ? 'Forwarded' : (($valueARL->is_approved) ? 'Approved' : 'Rejected'))}}</td>
 										<td width="150">{{approvalDate($valueARL->created_at)}}</td>
 										<td>{{$valueARL->reason}}</td>
 									</tr>
@@ -293,7 +293,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-					<h5 class="modal-title">Swap Level</h5>
+					<h5 class="modal-title">Forward Level</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
