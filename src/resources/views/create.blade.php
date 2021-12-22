@@ -22,7 +22,7 @@
 									<span class="d-none invalid-feedback"></span>
 								</div>
 								<div class="form-group">
-									<label for="do_swap">Enable Swap<span class="text-danger position-relative">*</span></label>
+									<label for="do_swap">Enable Forward<span class="text-danger position-relative">*</span></label>
 									<select class="form-control" name="do_swap" id="do_swap">
 										<option value="0">No</option>
 										<option value="1">Yes</option>

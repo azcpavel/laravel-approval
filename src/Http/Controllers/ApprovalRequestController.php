@@ -346,7 +346,115 @@ class ApprovalRequestController extends Controller
 						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
 					}
 
+				}elseif($currentLevel->is_flexible){
+					//Flexible
+					$approveCount = 0;
+					$rejectCount = 0;
+					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){						
+
+						if($valueASD->is_approved)
+							$approveCount++;
+						if($valueASD->is_rejected)
+							$rejectCount++;
+					}
+					
+					if($approveCount >= $currentLevel->is_flexible){
+						//Approve
+						foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
+							$valueASD->update([
+								'status' => 1
+							]);						
+						}
+
+						if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'before') && $currentLevel->action_data->before){
+							$actionClassPath = $currentLevel->action_data->before->class;
+							$actionClassMethod = $currentLevel->action_data->before->method;
+							$actionClass = new $actionClassPath();
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+						}
+
+						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
+							foreach($currentLevel->status_fields->approve as $keyA => $valueA){
+								$approvalItem->$keyA = $valueA;
+							}
+							$approvalItem->save();
+						}
+
+						if($finalLevel->id == $currentLevel->id){
+							$approvalRequest->completed = 1;
+						}elseif($nextLevel){
+							$approvalRequest->approval_state = $nextLevel->level;
+						}
+						$approvalRequest->save();
+
+						$approvalRequestApproval = $this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
+						$this->doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request);
+
+						if($currentLevel->group_notification && $currentLevel->notifiable_class){
+							$notifiableClass = $currentLevel->notifiable_class;
+							$userModel = config('approval-config.user-model');
+							$users = new $userModel();
+							Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+						}
+
+						if($currentLevel->next_level_notification && $approveCount > $rejectCount){
+							if($nextLevel && $nextLevel->notifiable_class){
+								$notifiableClass = $nextLevel->notifiable_class;
+								$userModel = config('approval-config.user-model');
+								$users = new $userModel();
+								Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $nextLevel->notifiable_params->channels, $approvalRequestApproval));
+							}						
+						}
+					}elseif($rejectCount > ($currentLevel->approval_users->count() - $currentLevel->is_flexible)){
+						//Reject
+						foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
+							$valueASD->update([
+								'status' => 1
+							]);						
+						}
+
+						if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'before') && $currentLevel->action_data->before){
+							$actionClassPath = $currentLevel->action_data->before->class;
+							$actionClassMethod = $currentLevel->action_data->before->method;
+							$actionClass = new $actionClassPath();
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+						}
+
+						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject') && $currentLevel->status_fields->reject){
+							foreach($currentLevel->status_fields->reject as $keyA => $valueA){
+								$approvalItem->$keyA = $valueA;
+							}
+							$approvalItem->save();
+						}
+
+						$approvalRequest->completed = 2;
+						$approvalRequest->save();
+
+						$approvalRequestApproval = $this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
+						if($currentLevel->group_notification && $currentLevel->notifiable_class){
+							$notifiableClass = $currentLevel->notifiable_class;
+							$userModel = config('approval-config.user-model');
+							$users = new $userModel();
+							Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+						}
+					}else{
+						$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
+						if($currentLevel->group_notification && $currentLevel->notifiable_class){
+							$notifiableClass = $currentLevel->notifiable_class;
+							$userModel = config('approval-config.user-model');
+							$users = new $userModel();
+							Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+						}
+					}					
+
+					if($currentLevel->action_type != 0)
+						return $this->doApprovalAction($currentLevel, $approvalItem, $approvalRequestApprover, $request, $message);
+
 				}elseif($request->approval_option == 0 && $currentLevel->is_flexible == 0){
+					//Reject and Not Flexible
 					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
 						$valueASD->update([
 							'status' => 1
