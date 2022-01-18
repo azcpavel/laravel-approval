@@ -625,7 +625,7 @@ class ApprovalRequestController extends Controller
 									$itemRelationPK = $valueAFRF->mapped_field_relation_pk;
 									$itemRelationShow = $valueAFRF->mapped_field_relation_show;
 									$itemObject = new $itemModel();
-									$itemRelationObject = $itemModel->$itemRelation();
+									$itemRelationObject = $itemObject->$itemRelation();
 									$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
 									$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 									if(!$input_multiple){
@@ -696,7 +696,7 @@ class ApprovalRequestController extends Controller
 									$itemRelationPK = $valueAFRF->mapped_field_relation_pk;
 									$itemRelationShow = $valueAFRF->mapped_field_relation_show;
 									$itemObject = new $itemModel();
-									$itemRelationObject = $itemModel->$itemRelation();
+									$itemRelationObject = $itemObject->$itemRelation();
 									$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
 									$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 									if(!$input_multiple){
