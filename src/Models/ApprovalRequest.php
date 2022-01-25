@@ -59,6 +59,8 @@ class ApprovalRequest extends Model
 
 		if($this->completed == 1)
 			return 'Completed';
+		if($this->approval->on_create && $this->completed == 2)
+			return 'Declined';
 		if(!$this->approval->on_create && $this->completed == 2)
 			return 'Rejected';
 		else if($this->completed == 0 && count($current) > 0)
