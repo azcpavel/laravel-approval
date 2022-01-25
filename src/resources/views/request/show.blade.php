@@ -57,7 +57,7 @@
 									}
 									?>
 									State: {{$currentLevelStatus}}<br>
-									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected')
+									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected' && $currentLevelStatus != 'Declined')
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}									
 									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
