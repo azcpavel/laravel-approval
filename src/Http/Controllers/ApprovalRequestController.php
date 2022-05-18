@@ -57,8 +57,16 @@ class ApprovalRequestController extends Controller
 			
 			$where[] = ['approval_id',$approval->id];
 			$fields = $approval->list_data_fields;
-			
-			$with[] = 'approvable:id,'.implode(',', $fields);
+			$relations = [];
+			foreach($fields as $keyR => $relation){
+				if(strpos($relation,":") !== false){
+					$relations[] = 'approvable.'.explode(":",$relation)[0];
+					unset($fields[$keyR]);
+				}
+			}
+			$with[] = 'approvable:id'.(count($fields) > 0 ? ','.implode(',', $fields) : '');
+			$with = array_merge($with, $relations);
+
 			$approvalRequest = $approvalRequest->getDataForDataTable($limit, $offset, $search, $where, $with, $join, $orderBy, $request->all(), null, $approval->list_data_fields);
 
 			return response()->json($approvalRequest);

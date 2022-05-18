@@ -45,10 +45,20 @@
 				},
 				{'title': 'Title', name: 'title', data: "id", render : function(data, type, row){
 					var htmlData = '';
+					var relations = dataField.filter(function(item, ind){
+									    return item.indexOf(":") != -1;
+									});
+
 					$.each(row.approvable,function(infA, valA){
 						if(dataField.indexOf(infA) != -1){
 						   htmlData += valA+'<br>'; 
 						}
+
+						$.each(relations,function(indR, valR){
+							var relationIndex = valR.split(":")[0];
+							if(relationIndex == infA)
+								htmlData += valA[valR.split(":")[1]]+'<br>'; 
+						})
 					})
 					return htmlData;
 				}},
