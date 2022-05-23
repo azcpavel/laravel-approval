@@ -22,14 +22,14 @@
 								</div>
 								<div class="card-body">									
 									@foreach($approvalRequest->approval->list_data_fields as $keyFN => $valueFN)
-									{{$approvalRequest->approvable->$valueFN}}</br>
 									<?php
 									if(strpos($valueFN,":") !== false){
 										$relationItem = explode(":", $valueFN);
 										$relationItemModel = $relationItem[0];
 										$relationItemModelField = $relationItem[1];
 										echo $approvalRequest->approvable->$relationItemModel->$relationItemModelField.'</br>';
-									}
+									}else
+										echo $approvalRequest->approvable->$valueFN.'<br>';
 									?>
 									@endforeach
 									{{approvalDate($approvalRequest->created_at, true)}}<br>
