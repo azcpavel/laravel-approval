@@ -315,6 +315,18 @@
 													</div>
 												</div>
 												@endforeach
+												@else
+												<div class="input-group level_status_fields_approve_div_item mb-2">				
+													<div class="input-group-prepend">
+													    <span class="input-group-text">Approve</span>
+													</div>
+													<input class="form-control" type="text" name="approval_status_fields_approve_column[]" placeholder="Column Name">
+													<input class="form-control" type="text" name="approval_status_fields_approve_value[]" placeholder="Column Value">
+													<div class="input-group-append">
+													    <button type="button" class="btn btn-success level_status_fields_approve_btn_add">+</button>
+													    <button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>
+													</div>
+												</div>
 												@endif
 											</div>
 											<div class="level_status_fields_reject_div">
@@ -332,6 +344,18 @@
 													</div>
 												</div>
 												@endforeach
+												@else
+												<div class="input-group level_status_fields_reject_div_item mb-2">				
+													<div class="input-group-prepend">
+													    <span class="input-group-text">Reject</span>
+													</div>
+													<input class="form-control" type="text" name="approval_status_fields_reject_column[]" placeholder="Column Name">
+													<input class="form-control" type="text" name="approval_status_fields_reject_value[]" placeholder="Column Value">
+													<div class="input-group-append">
+													    <button type="button" class="btn btn-success level_status_fields_reject_btn_add">+</button>
+													    <button type="button" class="btn btn-danger level_status_fields_reject_btn_rem">-</button>
+													</div>
+												</div>
 												@endif
 											</div>		
 											<span class="d-none invalid-feedback"></span>
