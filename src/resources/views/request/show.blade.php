@@ -355,51 +355,102 @@
 					@if($currentLevel->forms)
 						@foreach($currentLevel->forms as $keyAF => $valueAF)
 							<label class="approval-form">{{$valueAF->title}}</label><br>
-							@foreach($valueAF->form_data as $keyAFS => $valueAFS)
-								<?php
-								$fieldName = $valueAFS->mapped_field_name;
-								$fieldRelation = json_decode($valueAFS->mapped_field_relation);
-								?>
-								<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
-								@if($valueAFS->mapped_field_type == 'text')
-									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-								@elseif($valueAFS->mapped_field_type == 'email')
-									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-								@elseif($valueAFS->mapped_field_type == 'file')
-									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-								@elseif($valueAFS->mapped_field_type == 'date')
-									<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
-								@elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
-								<?php
-									$fieldRelation->values = collect($fieldRelation->values);
-									$input_name = $valueAF->id.'_'.$fieldName.($fieldRelation->type == 'multiple' ? '[]' : '');
-								?>
-									<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($fieldRelation->type == 'multiple') ? 'multiple' : '')}}>
-									@foreach($fieldRelation->values as $keyAFSR => $valueAFSR)
-										<option value="{{$valueAFSR->key}}" {{(($valueAFSR->key == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->value}}</option>
-									@endforeach
-									</select>
-								@elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
-									@if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
+							@if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
+								@foreach($valueAF->form_data as $keyAFS => $valueAFS)
+									<?php
+									$fieldName = $valueAFS->mapped_field_name;
+									$fieldRelation = json_decode($valueAFS->mapped_field_relation);
+									?>
+									<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
+									@if($valueAFS->mapped_field_type == 'text')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'email')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalRequest->approvable->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'file')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'date')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
+									<?php
+										$fieldRelation->values = collect($fieldRelation->values);
+										$input_name = $valueAF->id.'_'.$fieldName.($fieldRelation->type == 'multiple' ? '[]' : '');
+									?>
+										<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($fieldRelation->type == 'multiple') ? 'multiple' : '')}}>
+										@foreach($fieldRelation->values as $keyAFSR => $valueAFSR)
+											<option value="{{$valueAFSR->key}}" {{(($valueAFSR->key == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->value}}</option>
+										@endforeach
+										</select>
+									@elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
+										@if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
+											<?php
+											$itemModel = $valueAF->approvable_type;
+											$itemRelation = $valueAFS->mapped_field_relation;
+											$itemRelationPK = $valueAFS->mapped_field_relation_pk;
+											$itemRelationShow = $valueAFS->mapped_field_relation_show;
+											$itemObject = new $itemModel();
+											$itemRelationObject = $itemObject->$itemRelation();
+											$itemRelationObjectType = strtolower(namespaceBasePath(get_class($itemRelationObject)));
+											$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
+											$input_name = $valueAF->id.'_'.$fieldName.($input_multiple ? '[]' : '');
+											?>
+											<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($input_multiple) ? 'multiple' : '')}}>
+											@foreach($itemRelationObject->getRelated()::get() as $keyAFSR => $valueAFSR)
+												<option value="{{$valueAFSR->$itemRelationPK}}" {{(($valueAFSR->$itemRelationPK == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$itemRelationShow}}</option>
+											@endforeach
+											</select>
+										@endif
+									@endif
+								@endforeach
+							@else
+								@foreach($valueAF->form_data as $keyAFS => $valueAFS)
+									<?php
+									$approvable_typeR = $valueAF->approvable_type;
+									$approvalItemR = $approvalRequest->approvable->{$valueAF->relation};											
+									$fieldName = $valueAFS->mapped_field_name;
+									$fieldRelation = json_decode($valueAFS->mapped_field_relation);											
+									?>
+									<label class="approval-form">{{$valueAFS->mapped_field_label}}:</label>
+									@if($valueAFS->mapped_field_type == 'text')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalItemR->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'email')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalItemR->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'file')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif($valueAFS->mapped_field_type == 'date')
+										<input type="{{$valueAFS->mapped_field_type}}" class="form-control approval-form mb-3" name="{{$valueAF->id.'_'.$fieldName}}" value="{{$approvalItemR->$fieldName}}" placeholder="{{$valueAFS->mapped_field_label}}" required>
+									@elseif ($valueAFS->mapped_field_type == 'select' && is_object($fieldRelation))
+										<?php
+										$fieldRelation->values = collect($fieldRelation->values);
+										$input_name = $valueAF->id . '_' . $fieldName . ($fieldRelation->type == 'multiple' ? '[]' : '');
+										?>
+										<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($fieldRelation->type == 'multiple') ? 'multiple' : '')}}>
+											@foreach($fieldRelation->values as $keyAFSR => $valueAFSR)
+												<option value="{{$valueAFSR->key}}" {{(($valueAFSR->key == $approvalItemR->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->value}}</option>
+											@endforeach
+										</select>
+									@elseif($valueAFS->mapped_field_type == 'select' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
+										
 										<?php
 										$itemModel = $valueAF->approvable_type;
+										$itemField = $valueAFS->mapped_field_name;
 										$itemRelation = $valueAFS->mapped_field_relation;
 										$itemRelationPK = $valueAFS->mapped_field_relation_pk;
 										$itemRelationShow = $valueAFS->mapped_field_relation_show;
 										$itemObject = new $itemModel();
 										$itemRelationObject = $itemObject->$itemRelation();
-										$itemRelationObjectType = strtolower(namespaceBasePath(get_class($itemRelationObject)));
+										$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
 										$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
-										$input_name = $valueAF->id.'_'.$fieldName.($input_multiple ? '[]' : '');
+										$input_name = $valueAF->id . '_' . $fieldName . ($input_multiple ? '[]' : '');
 										?>
 										<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($input_multiple) ? 'multiple' : '')}}>
-										@foreach($itemRelationObject->getRelated()::get() as $keyAFSR => $valueAFSR)
-											<option value="{{$valueAFSR->$itemRelationPK}}" {{(($valueAFSR->$itemRelationPK == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$itemRelationShow}}</option>
-										@endforeach
+											@foreach($itemRelationObject->getRelated()::get() as $keyAFSR => $valueAFSR)
+												<option value="{{$valueAFSR->$itemRelationPK}}" {{(($valueAFSR->$itemRelationPK == $approvalItemR->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$itemRelationShow}}</option>
+											@endforeach
 										</select>
+										
 									@endif
-								@endif
-							@endforeach
+								@endforeach
+							@endif
 						@endforeach
 					@endif
 					<button type="submit" class="btn btn-primary">Save changes</button>

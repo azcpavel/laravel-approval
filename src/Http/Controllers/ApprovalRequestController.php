@@ -656,18 +656,18 @@ class ApprovalRequestController extends Controller
 						}
 					}
 				}else{
-					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
-						'approvable_id' => $valueAFR->approvable_id,
-				        'approvable_type' => $valueAFR->approvable_type,
-				        'title' => $valueAFR->title
-					]);
-
 					$approvable_typeR = $valueAFR->approvable_type;
-					$approvalItemR = $approvable_typeR()::where('id',$valueAFR->approvable_id)->first();
+					$approvalItemR = $approvalRequest->approvable->{$valueAFR->relation};
 					if(!$approvalItemR){
 						$approvalItemR = new $approvable_typeR();
 						$approvalItemR->id = $valueAFR->approvable_id;
 					}
+
+					$approvalRequestApproverForm = $approvalRequestApprover->forms()->create([
+						'approvable_id' => $approvalItemR->id,
+				        'approvable_type' => $valueAFR->approvable_type,
+				        'title' => $valueAFR->title
+					]);				
 					
 					foreach($valueAFR->form_data as $keyAFRF => $valueAFRF){
 						$fieldItem = $valueAFR->id.'_'.$valueAFRF->mapped_field_name;
@@ -684,11 +684,11 @@ class ApprovalRequestController extends Controller
 							]);
 
 							if($valueAFRF->mapped_field_type != 'select'){
-								$approvalItemR->$fieldItem = $request->$fieldItem;
+								$approvalItemR->{$valueAFRF->mapped_field_name} = $request->$fieldItem;
 							}else{
 								if(is_object($fieldRelation) && property_exists($fieldRelation, 'type') && property_exists($fieldRelation, 'values')){
 									if($fieldRelation->type == "single"){
-										$approvalItemR->$fieldItem = $request->$fieldItem;
+										$approvalItemR->{$valueAFRF->mapped_field_name} = $request->$fieldItem;
 									}elseif($fieldRelation->type == "multiple" && property_exists($fieldRelation, 'relation') && $valueAFRF->mapped_field_relation_pk != '' && $valueAFRF->mapped_field_relation_show != ''){
 										// $approvalItem->$fieldRelation()->delete();
 										// foreach($request->$fieldItem as $keyMRC => $valueMRC){
@@ -708,7 +708,7 @@ class ApprovalRequestController extends Controller
 									$itemRelationObjectType = strtolower(basename(get_class($itemRelationObject)));
 									$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 									if(!$input_multiple){
-										$approvalItemR->$fieldItem = $request->$fieldItem;
+										$approvalItemR->{$valueAFRF->mapped_field_name} = $request->$fieldItem;
 									}else{
 										if($itemRelationObjectType == 'belongstomany'){
 											
