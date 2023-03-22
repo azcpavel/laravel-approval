@@ -101,8 +101,10 @@ class ApprovalController extends Controller
 
 		$userModel = config('approval-config.user-model');
 		$users = new $userModel();
-		
-		$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		if(is_array(config('approval-config.user-type-value')))
+			$data['users'] = $users->whereIn(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		else
+			$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
 
 		return view("laravel-approval::create",$data);
 	}
@@ -308,7 +310,10 @@ class ApprovalController extends Controller
 		$userModel = config('approval-config.user-model');
 		$users = new $userModel();
 		
-		$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		if(is_array(config('approval-config.user-type-value')))
+			$data['users'] = $users->whereIn(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		else
+			$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
 		
 		$data['approval'] = $approval;
 		return view("laravel-approval::edit",$data);
@@ -561,7 +566,10 @@ class ApprovalController extends Controller
 		$userModel = config('approval-config.user-model');
 		$users = new $userModel();
 		
-		$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		if(is_array(config('approval-config.user-type-value')))
+			$data['users'] = $users->whereIn(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
+		else
+			$data['users'] = $users->where(config('approval-config.user-type-column'),config('approval-config.user-type-value'))->get();
 
 		return view("laravel-approval::partials.approval_level",$data);
 	}
