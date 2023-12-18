@@ -19,7 +19,7 @@ $isMenuActive = strpos($currentRouteName,"approvals.") !== false || strpos($curr
 	<{{$menuParentEl}} class="{{config('approval-config.menu-parent-class').' '.($isMenuActive ? $menuChildActiveClass : '')}}">
 
 		<{{$menuChildEl}} class="{{$menuChildClass.' '.(strpos($currentRouteName,"approvals.index") !== false ? $menuLinkActiveClass : '')}}">
-		<a href="{{route('approvals.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,"approvals.index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.'Approvals'.$menuLinkTitlePostfix!!}</a>
+		<a href="{{route(config('approval-config.route-name-prefix').'.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,"approvals.index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.'Approvals'.$menuLinkTitlePostfix!!}</a>
 		</{{$menuChildEl}}>
 
 		@foreach($approvals as $keyA => $valueA)

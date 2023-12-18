@@ -128,7 +128,7 @@
 			if(confirm("Are you sure you want to change the status?")){
 				$.ajax({
 					'type' : 'GET',
-					'url' : '{{route('approvals.change_status',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
+					'url' : '{{route(config('approval-config.route-name-prefix').'.change_status',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
 				}).done(function(){
 					approvalRequestDataTable.rows()
 					.invalidate()
@@ -140,7 +140,7 @@
 		$(document).on('click', '.deleteEvent', function () {
 			var $el = $(this);
 			if(confirm("Are you sure you want to delete?")){
-				let deleteRoute = "{{route('approvals.destroy','ITEM_ID')}}".replace("ITEM_ID",$el.attr('data-val'));
+				let deleteRoute = "{{route(config('approval-config.route-name-prefix').'.destroy','ITEM_ID')}}".replace("ITEM_ID",$el.attr('data-val'));
 			}
 		});
 	</script>

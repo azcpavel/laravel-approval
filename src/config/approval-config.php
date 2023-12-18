@@ -16,6 +16,7 @@
         'view-section' => 'content',
         'route-middleware' => ['web', 'auth'],
         'route-prefix' => 'admin',
+        'route-name-prefix' => 'approvals',
         'menu-parent' => 'ul',
         'menu-parent-class' => 'nav nav-treeview',
         'menu-parent-active-class' => 'active',

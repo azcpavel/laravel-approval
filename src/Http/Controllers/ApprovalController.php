@@ -80,7 +80,7 @@ class ApprovalController extends Controller
 	public function create()
 	{
 		if(!config('approval-config.dev-mode'))
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		$Directory = new \RecursiveDirectoryIterator(app_path(config('approval-config.model-dir')));
 		$Iterator = new \RecursiveIteratorIterator($Directory);
 		$Regex = new \RegexIterator($Iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
@@ -118,7 +118,7 @@ class ApprovalController extends Controller
 	public function store(Request $request)
 	{
 		if(!config('approval-config.dev-mode'))
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		DB::beginTransaction();
 		try{
 			$approval = Approval::create([
@@ -264,10 +264,10 @@ class ApprovalController extends Controller
 			DB::rollBack();
 			if(env('APP_DEBUG'))
 				dd($request->all(),$e);
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Submission Error', 'msg_type' => 'danger']);
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Approval Submission Error', 'msg_type' => 'danger']);
 		}
 
-		return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Added', 'msg_type' => 'success']);
+		return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Approval Added', 'msg_type' => 'success']);
 	}
 
 	/**
@@ -504,16 +504,16 @@ class ApprovalController extends Controller
 				}
 				Artisan::call('view:clear');
 				DB::commit();
-				return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Level User Updated', 'msg_type' => 'success']);
+				return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Approval Level User Updated', 'msg_type' => 'success']);
 			}
 		}catch(\Exception $e){
 			DB::rollBack();
 			if(env('APP_DEBUG'))
 				dd($request->all(),$e);
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Submission Error', 'msg_type' => 'danger']);		
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Approval Submission Error', 'msg_type' => 'danger']);		
 		}
 
-		return redirect()->route('approvals.index')->with(['msg_data' => 'Approval Updated', 'msg_type' => 'success']);
+		return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Approval Updated', 'msg_type' => 'success']);
 	}
 
 	/**
@@ -525,7 +525,7 @@ class ApprovalController extends Controller
 	public function destroy(Approval $approval)
 	{
 		if(!config('approval-config.dev-mode'))
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		if($approval->requests->count() > 0){
 			$message = ['msg_data' => 'Deleted Fail, Data Exist!', 'msg_type' => 'danger'];
 		}
@@ -536,7 +536,7 @@ class ApprovalController extends Controller
 			$message = ['msg_data' => 'Approval Deleted', 'msg_type' => 'success'];
 			Artisan::call('view:clear');
 		}
-		return redirect()->route('approvals.index')->with($message);
+		return redirect()->route(config('approval-config.route-name-prefix').'.index')->with($message);
 	}
 
 	public function modelColumn(Request $request){
@@ -576,7 +576,7 @@ class ApprovalController extends Controller
 
 	public function changeStatus(Request $request, Approval $approval){
 		if(!config('approval-config.dev-mode'))
-			return redirect()->route('approvals.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
+			return redirect()->route(config('approval-config.route-name-prefix').'.index')->with(['msg_data' => 'Invalid Action', 'msg_type' => 'danger']);
 		$approval->status = !$approval->status;
 		$approval->update();
 		Artisan::call('view:clear');

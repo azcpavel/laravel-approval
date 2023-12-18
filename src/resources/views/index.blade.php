@@ -37,7 +37,7 @@
                         class: 'btn btn-success btn-sm'
                     },
                     action: function ( e, dt, node, config ) {
-                        window.open("{{route('approvals.create')}}","_self");
+                        window.open("{{route(config('approval-config.route-name-prefix').'.create')}}","_self");
                     }
                 }
             ],
@@ -67,7 +67,7 @@
                 {
                     'title': 'Option', data: 'id', class: 'text-right width-5-per', render: function (data, type, row, col) {
                         let returnData = '';
-                        let editRoute = "{{route('approvals.edit','ITEM_ID')}}";
+                        let editRoute = "{{route(config('approval-config.route-name-prefix').'.edit','ITEM_ID')}}";
                         returnData += '<a href="'+editRoute.replace('ITEM_ID',data)+'" class="btn btn-sm btn-primary text-white text-center"><i class="far fa-edit"></i></a> ';
                         returnData += '<a href="javascript:void(0);" data-val="'+data+'" class="btn btn-sm btn-info text-white text-center changeStatus"><i class="fa fa-eye-slash"></i></a> ';
                         returnData += '<a href="javascript:void(0);" data-val="'+data+'" class="btn btn-sm btn-danger text-white text-center deleteEvent"><i class="fa-times fas"></i></a>';
@@ -78,7 +78,7 @@
             ],
 
             ajax: {
-                url: "{{route('approvals.index')}}",
+                url: "{{route(config('approval-config.route-name-prefix').'.index')}}",
 
             },
 
@@ -105,7 +105,7 @@
             if(confirm("Are you sure you want to change the status?")){
                 $.ajax({
                     'type' : 'GET',
-                    'url' : '{{route('approvals.change_status',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
+                    'url' : '{{route(config('approval-config.route-name-prefix').'.change_status',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
                 }).done(function(){
                     approvalDataTable.rows()
                     .invalidate()
@@ -120,7 +120,7 @@
                 $.ajax({
                     'type' : 'POST',
                     'data' : {'_method' : 'delete', '_token' : $('meta[name=csrf-token]').attr('content')},
-                    'url' : '{{route('approvals.destroy',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
+                    'url' : '{{route(config('approval-config.route-name-prefix').'.destroy',['approval' => 'ITEM_ID'])}}'.replace("ITEM_ID",$el.attr('data-val'))
                 }).done(function(){
                     approvalDataTable.rows()
                     .invalidate()

@@ -5,7 +5,7 @@
 				<div class="container">
 					<div class="row justify-content-center">
 						<div class="col-12 col-sm-8 col-md-6">
-							<form class="form-horizontal" action="{{route('approvals.store')}}" method="post">
+							<form class="form-horizontal" action="{{route(config('approval-config.route-name-prefix').'.store')}}" method="post">
 								@csrf
 								<div class="form-group">
 									<label for="title">Title <span class="text-danger position-relative">*</span></label>
@@ -252,7 +252,7 @@
 				'<input type="text" name="model_relation_path[]" class="float-left my-3 form-control model_relation_path" placeholder="Relation">'+
 			'</div>');
 		$.ajax({
-			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
+			'url' : '{{route(config('approval-config.route-name-prefix').'.model_info')}}?model_namespace='+inputVal,
 			'type' : 'GET',
 			'dataType' : 'JSON'
 		}).done(function(response){
@@ -288,7 +288,7 @@
 
 	$(document).on("click","#approval_level_add",function(){
 		$.ajax({
-			url : '{{route('approvals.model_level_form')}}',
+			url : '{{route(config('approval-config.route-name-prefix').'.model_level_form')}}',
 			'type' : 'GET',
 			'dataType' : 'html'
 		}).done(function(response){
@@ -379,7 +379,7 @@
 				'<input type="text" name="approval_form_relation['+approvalLevel+'][]" class="float-left my-3 form-control approval_form_relation" placeholder="Relation">'+
 			'</div>');
 		$.ajax({
-			'url' : '{{route('approvals.model_info')}}?model_namespace='+inputVal,
+			'url' : '{{route(config('approval-config.route-name-prefix').'.model_info')}}?model_namespace='+inputVal,
 			'type' : 'GET',
 			'dataType' : 'JSON'
 		}).done(function(response){
