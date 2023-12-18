@@ -2,7 +2,6 @@
 
 namespace Exceptio\ApprovalPermission\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\ApprovalRequest;
@@ -10,7 +9,6 @@ use Exceptio\ApprovalPermission\Models\ApprovalRequestMappingFieldData;
 
 class ApprovalRequestMappingField extends Model
 {
-	use HasFactory;
 	protected $table="ex_approval_request_mapping_fields";
 	protected $fillable=[
 		'approval_request_id',

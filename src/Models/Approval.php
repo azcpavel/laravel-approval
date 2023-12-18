@@ -2,7 +2,6 @@
 
 namespace Exceptio\ApprovalPermission\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\ApprovalLevel;
@@ -13,7 +12,7 @@ use Exceptio\ApprovalPermission\Models\ApprovalRequestApprover;
 
 class Approval extends Model
 {
-	use HasFactory,ModelCommonMethodTrait;
+	use ModelCommonMethodTrait;
 	protected $table="ex_approvals";
 	protected $fillable=[
 		'title',

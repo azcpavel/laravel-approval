@@ -2,7 +2,6 @@
 
 namespace Exceptio\ApprovalPermission\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\ApprovalLevel;
@@ -10,7 +9,6 @@ use Exceptio\ApprovalPermission\Models\ApprovalLevelFormData;
 
 class ApprovalLevelForm extends Model
 {
-	use HasFactory;
 	protected $table="ex_approval_level_forms";
 	protected $fillable = [
 		'approval_level_id',

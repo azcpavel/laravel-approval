@@ -2,14 +2,12 @@
 
 namespace Exceptio\ApprovalPermission\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\ApprovalRequestMappingField;
 
 class ApprovalRequestMappingFieldData extends Model
 {
-	use HasFactory;
 	protected $table="ex_approval_request_mapping_field_data";
 	protected $fillable=[
 		'approval_request_mapping_field_id',

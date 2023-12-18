@@ -2,14 +2,12 @@
 
 namespace Exceptio\ApprovalPermission\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Exceptio\ApprovalPermission\Models\ApprovalRequestApproverForm;
 
 class ApprovalRequestApproverFormData extends Model
 {
-	use HasFactory;
 	protected $table="ex_approval_request_approver_form_data";
 	protected $fillable=[
 		'approval_request_approver_form_id',
