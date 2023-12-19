@@ -10,7 +10,7 @@ $menuLinkActiveClass = config('approval-config.menu-link-active-class');
 $menuLinkTitlePrefix = config('approval-config.menu-link-title-prefix');
 $menuLinkTitlePostfix = config('approval-config.menu-link-title-postfix');
 $approvals = Exceptio\ApprovalPermission\Models\Approval::where('status',1)->get();
-$isMenuActive = strpos($currentRouteName,"approvals.") !== false || strpos($currentRouteName,"approval_request.") !== false;
+$isMenuActive = strpos($currentRouteName,config('approval-config.route-name-prefix').".") !== false || strpos($currentRouteName,"approval_request.") !== false;
 ?>
 
 <{{$menuChildEl}} class="{{$menuChildClass.' '.($isMenuActive ? $menuParentActiveClass : '')}}">
@@ -18,8 +18,8 @@ $isMenuActive = strpos($currentRouteName,"approvals.") !== false || strpos($curr
 
 	<{{$menuParentEl}} class="{{config('approval-config.menu-parent-class').' '.($isMenuActive ? $menuChildActiveClass : '')}}">
 
-		<{{$menuChildEl}} class="{{$menuChildClass.' '.(strpos($currentRouteName,"approvals.index") !== false ? $menuLinkActiveClass : '')}}">
-		<a href="{{route(config('approval-config.route-name-prefix').'.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,"approvals.index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.'Approvals'.$menuLinkTitlePostfix!!}</a>
+		<{{$menuChildEl}} class="{{$menuChildClass.' '.(strpos($currentRouteName,config('approval-config.route-name-prefix').".index") !== false ? $menuLinkActiveClass : '')}}">
+		<a href="{{route(config('approval-config.route-name-prefix').'.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,config('approval-config.route-name-prefix').".index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.'Approvals'.$menuLinkTitlePostfix!!}</a>
 		</{{$menuChildEl}}>
 
 		@foreach($approvals as $keyA => $valueA)
