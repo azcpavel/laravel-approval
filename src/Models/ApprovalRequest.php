@@ -85,7 +85,7 @@ class ApprovalRequest extends Model
      * @Time: 11:08 PM
      */
 
-    public function getDataForDataTable($limit = 20, $offset = 0, $search = '', $where = [], $with = [], $join = [], $order_by = [], $table_col_name = '', $select = null, $whereHas = null){
+    public function getDataForDataTable($limit = 20, $offset = 0, $search = '', $where = [], $with = [], $join = [], $order_by = [], $table_col_name = '', $select = null, $whereHas = null, $whereHasType = ['*']){
 
         $totalData = $this::query();
         $filterData = $this::query();
@@ -178,7 +178,7 @@ class ApprovalRequest extends Model
         }
 
         if(strlen($search) > 0){
-            $totalData->whereHas('approvable',function($query) use($search,$whereHas) {
+            $totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($search,$whereHas) {
 				$query->where(function($querySub) use($search,$whereHas){
 					foreach ($whereHas as $keyS => $valueS) {					
 						$querySub->orWhere($valueS, 'like', "%$search%");					
@@ -186,7 +186,7 @@ class ApprovalRequest extends Model
 				});				
 			});
 
-			$filterData->whereHas('approvable',function($query) use($search,$whereHas) {
+			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($search,$whereHas) {
 				$query->where(function($querySub) use($search,$whereHas){
 					foreach ($whereHas as $keyS => $valueS) {					
 						$querySub->orWhere($valueS, 'like', "%$search%");					
@@ -207,7 +207,7 @@ class ApprovalRequest extends Model
 		} else {
 			$totalData->orderBy($this->getTable() . '.id', 'DESC');
         }
-
+        // dd($totalData->toSql());
         return [
             'data' => $totalData->get(),
             'draw'      => request()->input('draw'), //prevent Cross Site Scripting (XSS) attacks. https://datatables.net/manual/server-side
