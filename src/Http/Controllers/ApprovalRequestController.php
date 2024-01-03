@@ -733,11 +733,15 @@ class ApprovalRequestController extends Controller
 		if($approvalRequest->completed == 1 && $request->approval_option == 1 && $approvalRequest->approval->on_update){
 			if($approvalRequest->mappings){
 				foreach($approvalRequest->mappings as $keyM => $valueM){
-					$currentItem = $valueM->approvable;
+					if($valueM->relation != "")
+						$currentItem = $approvalRequest->approvable->{$valueM->relation};
+					else
+						$currentItem = $valueM->approvable;
+
 					if(!$currentItem){
 						$itemModelPath = $valueM->approvable_type;
 						$currentItem = new $itemModelPath();
-						if($valueM->approvable_id){
+						if($valueM->approvable_id && $valueM->relation == ""){
 							$currentItem->id = $valueM->approvable_id;
 						}						
 					}
