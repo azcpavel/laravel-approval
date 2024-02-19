@@ -50,19 +50,19 @@
                 },
                 {'title': 'Title', name: 'title', data: "title"},
                 {'title': 'Create', name: 'on_create', data: "on_create",render: function(data){
-                    return (data) ? 'Yes' : 'No';
+                    return (data == "1") ? 'Yes' : 'No';
                 }},
                 {'title': 'Update', name: 'on_update', data: "on_update",render: function(data){
-                    return (data) ? 'Yes' : 'No';
+                    return (data == "1") ? 'Yes' : 'No';
                 }},
                 {'title': 'Delete', name: 'on_delete', data: "on_delete",render: function(data){
-                    return (data) ? 'Yes' : 'No';
+                    return (data == "1") ? 'Yes' : 'No';
                 }},
                 {'title': 'Swap Enable', name: 'do_swap', data: "do_swap",render: function(data){
-                    return (data) ? 'Yes' : 'No';
+                    return (data == "1") ? 'Yes' : 'No';
                 }},
                 {'title': 'Status', name: 'status', data: "status",render: function(data){
-                    return (data) ? 'Enable' : 'Disable';
+                    return (data == "1") ? 'Enable' : 'Disable';
                 }},
                 {
                     'title': 'Option', data: 'id', class: 'text-right width-5-per', render: function (data, type, row, col) {
