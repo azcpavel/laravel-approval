@@ -180,7 +180,8 @@ class ApprovalRequest extends Model
         if(strlen($search) > 0){
             $totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($search,$whereHas) {
 				$query->where(function($querySub) use($search,$whereHas){
-					foreach ($whereHas as $keyS => $valueS) {					
+					foreach ($whereHas as $keyS => $valueS) {
+						if(strpos($valueS, ":") === false)					
 						$querySub->orWhere($valueS, 'like', "%$search%");					
 					}
 				});				
@@ -188,7 +189,8 @@ class ApprovalRequest extends Model
 
 			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($search,$whereHas) {
 				$query->where(function($querySub) use($search,$whereHas){
-					foreach ($whereHas as $keyS => $valueS) {					
+					foreach ($whereHas as $keyS => $valueS) {
+						if(strpos($valueS, ":") === false)				
 						$querySub->orWhere($valueS, 'like', "%$search%");					
 					}
 				});				
