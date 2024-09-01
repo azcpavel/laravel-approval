@@ -182,7 +182,12 @@ class ApprovalRequest extends Model
 				$query->where(function($querySub) use($search,$whereHas){
 					foreach ($whereHas as $keyS => $valueS) {
 						if(strpos($valueS, ":") === false)					
-						$querySub->orWhere($valueS, 'like', "%$search%");					
+							$querySub->orWhere($valueS, 'like', "%$search%");
+						else{
+							$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
+						        $querySubSub->where(explode(':',$valueS)[1], 'like', "%$search%");
+						    });							
+						}					
 					}
 				});				
 			});
@@ -191,7 +196,12 @@ class ApprovalRequest extends Model
 				$query->where(function($querySub) use($search,$whereHas){
 					foreach ($whereHas as $keyS => $valueS) {
 						if(strpos($valueS, ":") === false)				
-						$querySub->orWhere($valueS, 'like', "%$search%");					
+							$querySub->orWhere($valueS, 'like', "%$search%");
+						else{
+							$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
+						        $querySubSub->where(explode(':',$valueS)[1], 'like', "%$search%");
+						    });							
+						}				
 					}
 				});				
 			});
