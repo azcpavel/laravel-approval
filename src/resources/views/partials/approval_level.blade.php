@@ -35,6 +35,14 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
+		<label for="approval_next_notification">Next Level User Selection<span class="text-danger position-relative">*</span></label>
+		<select class="form-control" name="approval_next_user[]">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</select>
+		<span class="d-none invalid-feedback"></span>
+	</div>
+	<div class="form-group">
 		<label for="approval_approve_reason">Approve Reason Mandatory<span class="text-danger position-relative">*</span></label>
 		<select class="form-control" name="approval_approve_reason[]">
 			<option value="0">No</option>

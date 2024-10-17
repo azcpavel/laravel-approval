@@ -202,6 +202,8 @@ class ApprovalRequestController extends Controller
 					$approvalRequestApprover = $approvalRequest->approvers()->create([
 						'approval_id' => $currentLevel->approval_id,
 						'user_id' => auth()->id(),
+						'next_user_id' => ($request->approval_next_user) ? $request->approval_next_user : null,
+						'next_level_user' => $currentLevel->next_level_user,
 						'title' => $currentLevel->title,
 						'is_flexible' => $currentLevel->is_flexible,
 						'is_form_required' => $currentLevel->is_form_required,
@@ -222,6 +224,8 @@ class ApprovalRequestController extends Controller
 					$approvalRequestApprover = $approvalRequest->approvers()->create([
 						'approval_id' => $currentLevel->approval_id,
 						'user_id' => auth()->id(),
+						'next_user_id' => ($request->approval_next_user) ? $request->approval_next_user : null,
+						'next_level_user' => $currentLevel->next_level_user,
 						'title' => $currentLevel->title,
 						'is_flexible' => $currentLevel->is_flexible,
 						'is_form_required' => $currentLevel->is_form_required,

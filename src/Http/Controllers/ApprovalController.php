@@ -224,6 +224,7 @@ class ApprovalController extends Controller
 					'notifiable_params' => ['channels' => json_decode($request->approval_notifiable_params[$keyL])],
 					'group_notification' => $request->approval_group_notification[$keyL],
 					'next_level_notification' => $request->approval_next_notification[$keyL],
+					'next_level_user' => $request->approval_next_user[$keyL],
 					'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
 					'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 				]);
@@ -439,6 +440,7 @@ class ApprovalController extends Controller
 						'notifiable_params' => ['channels' => json_decode($request->approval_notifiable_params[$keyL])],
 						'group_notification' => $request->approval_group_notification[$keyL],
 						'next_level_notification' => $request->approval_next_notification[$keyL],
+						'next_level_user' => $request->approval_next_user[$keyL],
 						'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
 						'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 					]);

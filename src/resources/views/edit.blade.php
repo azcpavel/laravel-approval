@@ -230,6 +230,14 @@
 												<option value="0" {{(($valueAL->next_level_notification == 0) ? 'selected' : '')}}>No</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
+										</div>
+										<div class="form-group">
+											<label for="approval_next_user">Next Level User Selection<span class="text-danger position-relative">*</span></label>
+											<select class="form-control" name="approval_next_user[]">
+												<option value="0" {{(($valueAL->next_level_user == 0) ? 'selected' : '')}}>No</option>
+												<option value="1" {{(($valueAL->next_level_user == 1) ? 'selected' : '')}}>Yes</option>
+											</select>
+											<span class="d-none invalid-feedback"></span>
 										</div>										
 										<div class="form-group">
 											<label for="approval_approve_reason">Approve Reason Mandatory<span class="text-danger position-relative">*</span></label>

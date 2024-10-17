@@ -15,6 +15,8 @@ class ApprovalRequestApprover extends Model
 		'approval_id',
 		'approval_request_id',
 		'user_id',
+		'next_user_id',
+		'next_level_user',
 		'title',
 		'is_flexible',
 		'is_form_required',
@@ -49,6 +51,10 @@ class ApprovalRequestApprover extends Model
 	}
 
 	public function user(){
+		return $this->belongsTo(config('approval-config.user-model'));
+	}
+
+	public function next_user(){
 		return $this->belongsTo(config('approval-config.user-model'));
 	}
 }

@@ -58,6 +58,7 @@
 								<div class="card-body">
 									<?php
 									$currentLevel = $approvalRequest->currentLevel(true);
+									$nextLevel = $approvalRequest->approval->levels->where('level',$currentLevel->level+1)->where('status',1)->first();
 									$currentLevelStatus = $approvalRequest->currentLevel();
 									$do_swap = $currentLevel && $approvalRequest->approval->do_swap && $approvalRequest->completed == 0;
 									if($do_swap && !$approvalRequest->approvals->where('is_approved',1)->first()){										
@@ -67,7 +68,8 @@
 									State: {{$currentLevelStatus}}<br>
 									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected' && $currentLevelStatus != 'Declined')
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
-									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}									
+									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}<br>								
+									Next Level User Selection: {{$currentLevel->next_level_user == 0 ? 'No' : 'Yes'}}
 									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
 									<script type="text/javascript">
 										var currentLevel = {!!json_encode($currentLevel)!!};
@@ -173,6 +175,9 @@
 										<th>SL</th>
 										<th>Approver</th>
 										<th>Submission</th>
+										@if($valueAL->where('next_level_user',1)->first())
+										<th>Next Level User</th>
+										@endif
 										<th>Date</th>
 										<th>Status</th>
 										<th>Remarks</th>
@@ -182,8 +187,11 @@
 									@foreach($valueAL->sortByDesc('id')->values()->all() as $keyALS => $valueALS)
 									<tr>
 										<td width="40">{{$keyALS+1}}</td>
-										<td>{{$valueALS->user->name}}</td>
+										<td>{{$valueALS->user[config('approval-config.user-name')]}}</td>
 										<td>{{($valueALS->is_approved) ? 'Approved' : 'Rejected'}}</td>
+										@if($valueAL->where('next_level_user',1)->first())
+										<td>{{($valueALS->next_user) ? $valueALS->next_user[config('approval-config.user-name')] : ''}}</td>
+										@endif
 										<td width="150">{{approvalDate($valueALS->created_at)}}</td>
 										<td width="50">{{$valueALS->status ? 'Done' : 'Pending'}}</td>
 										<td>
@@ -255,7 +263,7 @@
 								@foreach($approvalRequest->approvals as $keyARL => $valueARL)
 									<tr>
 										<td>{{$keyARL+1}}</td>
-										<td>{{$valueARL->user->name}}</td>
+										<td>{{$valueARL->user[config('approval-config.user-name')]}}</td>
 										<td>{{$valueARL->prev_level_title}}</td>
 										<td>{{$valueARL->next_level_title}}</td>
 										<td>{{(($valueARL->is_swaped) ? 'Forwarded' : (($valueARL->is_approved) ? 'Approved' : 'Rejected'))}}</td>
@@ -273,7 +281,7 @@
 		</div>		
 		<style type="text/css">
 			.top-card .card-body{
-				min-height: 140px !important;
+				min-height: 170px !important;
 			}
 			.data-changed{
 				border-bottom: 1px solid red !important;
@@ -351,7 +359,15 @@
 					<select name="approval_option" class="form-control mb-3" id="approval-option">
 						<option value="1">Approve</option>
 						<option value="0">Reject</option>
-					</select>			        
+					</select>
+					@if($nextLevel && $currentLevel->next_level_user)
+					<select name="approval_next_user" class="form-control mb-3" id="approval-next-user">
+						<option value="">Select Next Level User</option>
+						@foreach($nextLevel->users as $nextUser)
+						<option value="{{$nextUser[config('approval-config.user-primary-key')]}}">{{$nextUser[config('approval-config.user-name')]}}</option>
+						@endforeach
+					</select>
+					@endif	        
 					@if($currentLevel->forms)
 						@foreach($currentLevel->forms as $keyAF => $valueAF)
 							<label class="approval-form">{{$valueAF->title}}</label><br>
@@ -487,6 +503,7 @@
 
 		$(document).on("change","#approval-option",function(){
 			var $item = $(this);
+			$('#approval-next-user').toggle();
 			if($item.val() == 1){
 				$('.approval-form').show();
 				$(':input.approval-form').removeAttr('required').attr('required','required');

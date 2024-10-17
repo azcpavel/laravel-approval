@@ -26,6 +26,7 @@ class ApprovalLevel extends Model
 		'notifiable_params',
 		'group_notification',
 		'next_level_notification',
+		'next_level_user',
 		'is_approve_reason_required',
 		'is_reject_reason_required',
 		'status'

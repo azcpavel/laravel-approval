@@ -7,6 +7,7 @@
         'user-model' => 'App\Models\User',
         'user-table' => 'users',
         'user-primary-key' => 'id',
+        'user-name' => 'name',
         'user-type-column' => 'user_type',
         'user-type-value' => 1,
         'name' => 'name',

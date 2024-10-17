@@ -21,9 +21,14 @@ use Illuminate\Support\Facades\Notification;
 
 trait Approvable 
 {
-    public function notifyApprovalCreate($approvalItem){
+    public function notifyApprovalCreate($approvalItem, $approvalId = null){
     	$approvalble = get_class($approvalItem);
-    	$approval = Approval::where('approvable_type',$approvalble)->where('on_create',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	if($approvalId){
+    		$approval = Approval::where('id',$approvalId)->where('on_create',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}else{
+    		$approval = Approval::where('approvable_type',$approvalble)->where('on_create',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}
+    	
     	
     	try{
     		if($approval){
@@ -70,9 +75,15 @@ trait Approvable
     	}    	
     }
 
-    public function notifyApprovalUpdate($approvalItem, $approvalMapping, $slug){
+    public function notifyApprovalUpdate($approvalItem, $approvalMapping, $slug, $approvalId = null){
     	$approvalble = get_class($approvalItem);
-    	$approval = Approval::where('approvable_type',$approvalble)->where('on_update',1)->where('status',1)->where('slug',$slug)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	
+    	if($approvalId){
+    		$approval = Approval::where('id',$approvalId)->where('on_update',1)->where('status',1)->where('slug',$slug)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}
+    	else{
+    		$approval = Approval::where('approvable_type',$approvalble)->where('on_update',1)->where('status',1)->where('slug',$slug)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}
     	
     	try{
     		if($approval){
@@ -134,9 +145,15 @@ trait Approvable
     	}   	
     }
 
-    public function notifyApprovalDelete($approvalItem){
+    public function notifyApprovalDelete($approvalItem, $approvalId = null){
     	$approvalble = get_class($approvalItem);
-    	$approval = Approval::where('approvable_type',$approvalble)->where('on_delete',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	
+    	if($approvalId){
+    		$approval = Approval::where('id',$approvalId)->where('on_delete',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}
+    	else{
+    		$approval = Approval::where('approvable_type',$approvalble)->where('on_delete',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
+    	}
     	
     	try{
     		if($approval){
