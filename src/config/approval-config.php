@@ -18,6 +18,7 @@
         'route-middleware' => ['web', 'auth'],
         'route-prefix' => 'admin',
         'route-name-prefix' => 'approvals',
+        'route-name-request-prefix' => 'approval_request',
         'menu-parent' => 'ul',
         'menu-parent-class' => 'nav nav-treeview',
         'menu-parent-active-class' => 'active',

@@ -27,7 +27,14 @@
 										$relationItem = explode(":", $valueFN);
 										$relationItemModel = $relationItem[0];
 										$relationItemModelField = $relationItem[1];
-										echo $approvalRequest->approvable->$relationItemModel->$relationItemModelField.'</br>';
+										if($approvalRequest->approvable->$relationItemModel instanceof Illuminate\Database\Eloquent\Collection){
+		                                    foreach($approvalRequest->approvable->$relationItemModel as $keyRMIR => $valueRMIR){
+		                                        echo $valueRMIR->$relationItemModelField.'</br>';
+		                                    }
+		                                }
+		                                else{
+		                                    echo $approvalRequest->approvable->$relationItemModel->$relationItemModelField.'</br>';
+		                                }
 									}else
 										echo $approvalRequest->approvable->$valueFN.'<br>';
 									?>

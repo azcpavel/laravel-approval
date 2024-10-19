@@ -63,8 +63,16 @@
 
 						$.each(relations,function(indR, valR){
 							var relationIndex = valR.split(":")[0];
-							if(relationIndex == infA)
-								htmlData += valA[valR.split(":")[1]]+'<br>'; 
+							if(relationIndex == infA){							
+								if (Array.isArray(valA)){
+                                    $.each(valA, function(indAR, valAR){
+                                        htmlData += valAR[valR.split(":")[1]] +
+                                        '<br>';
+                                    });
+                                }else
+                                    htmlData += valA[valR.split(":")[1]] +
+                                '<br>'
+							}	
 						})
 					})
 					return htmlData;
@@ -98,7 +106,7 @@
 				{
 					'title': 'Option', data: 'id', class: 'text-right width-5-per', render: function (data, type, row, col) {
 						let returnData = '';
-						let editRoute = "{{route('approval_request.show','ITEM_ID')}}";
+						let editRoute = "{{route(config('route-name-request-prefix').'.show','ITEM_ID')}}";
 						returnData += '<a href="'+editRoute.replace('ITEM_ID',data)+'" class="btn btn-sm btn-primary text-white text-center"><i class="far fa-edit"></i></a> ';
 						// returnData += '<a href="javascript:void(0);" data-val="'+data+'" class="btn btn-sm btn-info text-white text-center changeStatus"><i class="fa fa-eye-slash"></i></a> ';
 						// returnData += '<a href="javascript:void(0);" data-val="'+data+'" class="btn btn-sm btn-danger text-white text-center deleteEvent"><i class="fa-times fas"></i></a>';
@@ -109,7 +117,7 @@
 			],
 
 			ajax: {
-				url: "{{route('approval_request.index',['approval' => $approval->id])}}",
+				url: "{{route(config('route-name-request-prefix').'.index',['approval' => $approval->id])}}",
 				data: function(query){
                     query.approval_level = $('#approval_level').val();                        
                 }
