@@ -19,7 +19,7 @@ $isMenuActive = strpos($currentRouteName,config('approval-config.route-name-pref
 	<{{$menuParentEl}} class="{{config('approval-config.menu-parent-class').' '.($isMenuActive ? $menuChildActiveClass : '')}}">
 
 		<{{$menuChildEl}} class="{{$menuChildClass.' '.(strpos($currentRouteName,config('approval-config.route-name-prefix').".index") !== false ? $menuLinkActiveClass : '')}}">
-		<a href="{{route(config('approval-config.route-name-prefix').'.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,config('approval-config.route-name-prefix').".index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.' '.config('approval-config.menu-config-title').' '.$menuLinkTitlePostfix!!}</a>
+		<a href="{{route(config('approval-config.route-name-prefix').'.index')}}" class="{{$menuLinkClass.' '.(strpos($currentRouteName,config('approval-config.route-name-prefix').".index") !== false ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.config('approval-config.menu-config-title').$menuLinkTitlePostfix!!}</a>
 		</{{$menuChildEl}}>
 
 		@foreach($approvals as $keyA => $valueA)
@@ -27,7 +27,7 @@ $isMenuActive = strpos($currentRouteName,config('approval-config.route-name-pref
 			$isChildActive = strpos($currentRouteName,config('approval-config.route-name-request-prefix').".index") !== false && request()->route('approval')->id == $valueA->id;
 			?>
 			<{{$menuChildEl}} class="{{$menuChildClass.' '.($isChildActive ? $menuLinkActiveClass : '')}}">
-			<a href="{{route(config('approval-config.route-name-request-prefix').'.index',['approval' => $valueA->id])}}" class="{{$menuLinkClass.' '.( $isChildActive ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.' '.$valueA->title.' '.$menuLinkTitlePostfix!!}</a>
+			<a href="{{route(config('approval-config.route-name-request-prefix').'.index',['approval' => $valueA->id])}}" class="{{$menuLinkClass.' '.( $isChildActive ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.$valueA->title.$menuLinkTitlePostfix!!}</a>
 			</{{$menuChildEl}}>
 		@endforeach
 
