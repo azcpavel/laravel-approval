@@ -23,6 +23,7 @@
         'menu-parent-class' => 'nav nav-treeview',
         'menu-parent-active-class' => 'active',
         'menu-parent-title' => '<i class="nav-icon fas fa-cog left"></i><p> Approval Management<i class="fas fa-angle-left right"></i></p>',
+        'menu-config-title' => 'Approval Config',
         'menu-child' => 'li',
         'menu-child-class' => 'nav-item',
         'menu-child-active-class' => 'active',        
