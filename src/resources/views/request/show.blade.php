@@ -322,7 +322,7 @@
 					</button>
 					</div>
 					<div class="modal-body">
-						<form method="POST" action="{{route('approval_request.swap_level',['approvalRequest' => $approvalRequest->id])}}">
+						<form method="POST" action="{{route(config('approval-config.route-name-request-prefix').'.swap_level',['approvalRequest' => $approvalRequest->id])}}">
 							@csrf
 							<?php
 							$maxLevelApproved = $approvalRequest->approvals->where('is_approved',1)->sortByDesc('next_level')->first();
@@ -359,7 +359,7 @@
 				</button>
 			  </div>
 			  <div class="modal-body">
-				<form method="POST" enctype="multipart/form-data" action="{{route('approval_request.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
+				<form method="POST" enctype="multipart/form-data" action="{{route(config('approval-config.route-name-request-prefix').'.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
 					@csrf
 					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
 					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
