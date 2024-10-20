@@ -140,7 +140,7 @@
 												$newFieldData = $fieldRelation->values->where('key',$valueMF->field_data)->first();
 												if($newFieldData)
 													$newFieldData = $newFieldData->value;												
-											}elseif ($valueMF->field_type == 'select' && $valueMF->field_relation != '' && $valueMF->field_relation_pk != '' && $valueMF->field_relation_show != '') {
+											}elseif (($valueMF->field_type == 'select' || $valueMF->field_type == 'select_single') && $valueMF->field_relation != '' && $valueMF->field_relation_pk != '' && $valueMF->field_relation_show != '') {
 												$relationName = $valueMF->field_relation;
 												$relationShow = $valueMF->field_relation_show;
 												$currentFieldData = (($currentItem && $currentItem->$relationName) ? $currentItem->$relationName->$relationShow : (($currentItem) ? $currentItem->$fieldName : ''));
@@ -227,10 +227,13 @@
 																$newFieldData = $newFieldData->value;															
 														?>
 															<br>{{$valueAFSS->mapped_field_label.' : '.$newFieldData}}
-														@elseif($valueAFSS->mapped_field_type == 'select' && $valueAFSS->mapped_field_relation != "" && $valueAFSS->mapped_field_relation_pk != "" && $valueAFSS->mapped_field_relation_show != "")
+														@elseif(($valueAFSS->mapped_field_type == 'select' || $valueAFSS->mapped_field_type == 'select_single') && $valueAFSS->mapped_field_relation != "" && $valueAFSS->mapped_field_relation_pk != "" && $valueAFSS->mapped_field_relation_show != "")
 															<?php
 															$itemModel = $valueAFS->approvable_type;
 															$itemRelation = $valueAFSS->mapped_field_relation;
+															if(strpos($itemRelation, 'self:') !== false){
+                                                                $itemRelation = str_replace('self:','',$itemRelation);
+                                                            }
 															$itemRelationPK = $valueAFSS->mapped_field_relation_pk;
 															$itemRelationShow = $valueAFSS->mapped_field_relation_show;
 															$itemObject = new $itemModel();
@@ -411,18 +414,49 @@
 											$itemRelationPK = $valueAFS->mapped_field_relation_pk;
 											$itemRelationShow = $valueAFS->mapped_field_relation_show;
 											$itemObject = new $itemModel();
+											if(strpos($itemRelation, 'self:') !== false){
+		                                        $itemRelation = str_replace('self:','',$itemRelation);
+		                                        $itemObject = $approvalRequest->approvable;
+		                                        $dropdownCollection = $approvalRequest->approvable->$itemRelation;
+		                                    }else{
+		                                        $dropdownCollection = $itemObject->$itemRelation()->getRelated()::get();
+		                                    }
 											$itemRelationObject = $itemObject->$itemRelation();
 											$itemRelationObjectType = strtolower(namespaceBasePath(get_class($itemRelationObject)));
 											$input_multiple = ((strpos($itemRelationObjectType,'many') !== false) ? 1 : 0);
 											$input_name = $valueAF->id.'_'.$fieldName.($input_multiple ? '[]' : '');
 											?>
 											<select class="form-control approval-form mb-3" name="{{$input_name}}" {{(($input_multiple) ? 'multiple' : '')}}>
-											@foreach($itemRelationObject->getRelated()::get() as $keyAFSR => $valueAFSR)
+											@foreach($dropdownCollection as $keyAFSR => $valueAFSR)
 												<option value="{{$valueAFSR->$itemRelationPK}}" {{(($valueAFSR->$itemRelationPK == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$itemRelationShow}}</option>
 											@endforeach
 											</select>
 										@endif
-									@endif
+									@elseif($valueAFS->mapped_field_type == 'select_single' && $valueAFS->mapped_field_relation != "" && $valueAFS->mapped_field_relation_pk != "" && $valueAFS->mapped_field_relation_show != "")
+		                                @if($valueAF->approvable_type == $approvalRequest->approval->approvable_type)
+		                                    <?php
+		                                    $itemModel = $valueAF->approvable_type;
+		                                    $itemRelation = $valueAFS->mapped_field_relation;                                    
+		                                    $itemRelationPK = $valueAFS->mapped_field_relation_pk;
+		                                    $itemRelationShow = $valueAFS->mapped_field_relation_show;
+		                                    $itemObject = new $itemModel();
+		                                    if(strpos($itemRelation, 'self:') !== false){
+		                                        $itemRelation = str_replace('self:','',$itemRelation);
+		                                        $itemObject = $approvalRequest->approvable;
+		                                        $dropdownCollection = $approvalRequest->approvable->$itemRelation;
+		                                    }else{
+		                                        $itemRelationObject = $itemObject->$itemRelation();
+		                                        $dropdownCollection = $itemRelationObject->getRelated()::get();
+		                                    }                                                                        
+		                                    $input_name = $valueAF->id.'_'.$fieldName;
+		                                    ?>
+		                                    <select class="form-control approval-form mb-3" name="{{$input_name}}">
+		                                    @foreach($dropdownCollection as $keyAFSR => $valueAFSR)
+		                                        <option value="{{$valueAFSR->$itemRelationPK}}" {{(($valueAFSR->$itemRelationPK == $approvalRequest->approvable->$fieldName) ? 'selected' : '')}}>{{$valueAFSR->$itemRelationShow}}</option>
+		                                    @endforeach
+		                                    </select>
+		                                @endif
+		                            @endif
 								@endforeach
 							@else
 								@foreach($valueAF->form_data as $keyAFS => $valueAFS)

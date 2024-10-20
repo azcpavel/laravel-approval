@@ -147,6 +147,7 @@
 																<option value="file" {{($useColumn->field_type??'') == 'file' ? 'selected' : ''}}>File</option>
 																<option value="date" {{($useColumn->field_type??'') == 'date' ? 'selected' : ''}}>Date</option>
 																<option value="select" {{($useColumn->field_type??'') == 'select' ? 'selected' : ''}}>Dropdown</option>
+																<option value="select_single" {{($useColumnFF->mapped_field_type??'') == 'select_single' ? 'selected' : ''}}>Dropdown Single</option>
 															</select>
 														</td>
 														<td><input type="checkbox" name="model_namespace_relation_tbody_check[{{$inputKey}}][]" class="model_namespace_relation_tbody_check" value="{{$keyMR}}" {{$useColumn ? 'checked' : ''}}></td>
