@@ -30,7 +30,7 @@ class UpdateApprovalRequestApproversTable extends Migration
 		Schema::table('ex_approval_request_approvers', function (Blueprint $table) {
 			$table->dropForeign(['next_user_id']);
 			$table->dropColumn('next_user_id');
-			// $table->dropColumn('next_level_user');
+			$table->dropColumn('next_level_user');
 		});
 	}
 }
