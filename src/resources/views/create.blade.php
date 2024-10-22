@@ -57,6 +57,11 @@
 									</div>
 									<span class="d-none invalid-feedback"></span>
 								</div>
+								<div class="form-group">
+									<label for="properties">Properties
+									<input class="form-control" type="text" name="properties" placeholder="Properties" id="properties">
+									<span class="d-none invalid-feedback"></span>
+								</div>
 								<div class="row" id="model_delete_div" style="display:none;">
 									<div class="col-12">
 										<div class="form-group">
