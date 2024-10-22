@@ -65,7 +65,7 @@
 									<span class="d-none invalid-feedback"></span>
 								</div>
 								<div class="form-group">
-									<label for="properties">Properties
+									<label for="properties">Properties</label>
 									<input class="form-control" type="text" name="properties" placeholder="Properties" id="properties" value="{{$approval->properties}}">
 									<span class="d-none invalid-feedback"></span>
 								</div>
