@@ -43,6 +43,14 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
+		<label for="approval_need_attachment">Need Attachement<span class="text-danger position-relative">*</span></label>
+		<select class="form-control" name="approval_need_attachment[]">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</select>
+		<span class="d-none invalid-feedback"></span>
+	</div>
+	<div class="form-group">
 		<label for="approval_approve_reason">Approve Reason Mandatory<span class="text-danger position-relative">*</span></label>
 		<select class="form-control" name="approval_approve_reason[]">
 			<option value="0">No</option>

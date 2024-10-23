@@ -364,12 +364,14 @@
 			  <div class="modal-body">
 				<form method="POST" enctype="multipart/form-data" action="{{route(config('approval-config.route-name-request-prefix').'.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
 					@csrf
-					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
-					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
 					<select name="approval_option" class="form-control mb-3" id="approval-option">
 						<option value="1">Approve</option>
 						<option value="0">Reject</option>
 					</select>
+					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
+					@if($currentLevel->need_attachment)
+					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
+					@endif					
 					@if($nextLevel && $currentLevel->next_level_user)
 					<select name="approval_next_user" class="form-control mb-3" id="approval-next-user">
 						<option value="">Select Next Level User</option>

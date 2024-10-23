@@ -17,6 +17,7 @@ class ApprovalRequestApprover extends Model
 		'user_id',
 		'next_user_id',
 		'next_level_user',
+		'need_attachment',
 		'title',
 		'is_flexible',
 		'is_form_required',

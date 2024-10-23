@@ -226,6 +226,7 @@ class ApprovalController extends Controller
 					'group_notification' => $request->approval_group_notification[$keyL],
 					'next_level_notification' => $request->approval_next_notification[$keyL],
 					'next_level_user' => $request->approval_next_user[$keyL],
+					'need_attachment' => $request->approval_need_attachment[$keyL],
 					'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
 					'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 				]);
@@ -443,6 +444,7 @@ class ApprovalController extends Controller
 						'group_notification' => $request->approval_group_notification[$keyL],
 						'next_level_notification' => $request->approval_next_notification[$keyL],
 						'next_level_user' => $request->approval_next_user[$keyL],
+						'need_attachment' => $request->approval_need_attachment[$keyL],
 						'is_approve_reason_required' => $request->approval_approve_reason[$keyL],
 						'is_reject_reason_required' => $request->approval_reject_reason[$keyL],
 					]);
