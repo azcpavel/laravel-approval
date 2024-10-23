@@ -374,7 +374,7 @@
 					@endif					
 					@if($nextLevel && $currentLevel->next_level_user)
 					<select name="approval_next_user" class="form-control mb-3" id="approval-next-user">
-						<option value="">Select Next Level User</option>
+						<option value="">Select {{$nextLevel->title}} User</option>
 						@foreach($nextLevel->users as $nextUser)
 						<option value="{{$nextUser[config('approval-config.user-primary-key')]}}">{{$nextUser[config('approval-config.user-name')]}}</option>
 						@endforeach

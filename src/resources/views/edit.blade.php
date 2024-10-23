@@ -248,8 +248,8 @@
 										<div class="form-group">
 											<label for="approval_need_attachment">Need Attachment<span class="text-danger position-relative">*</span></label>
 											<select class="form-control" name="approval_need_attachment[]">
-												<option value="0" {{(($valueAL->need_attachment == 0) ? 'selected' : '')}}>No</option>
 												<option value="1" {{(($valueAL->need_attachment == 1) ? 'selected' : '')}}>Yes</option>
+												<option value="0" {{(($valueAL->need_attachment == 0) ? 'selected' : '')}}>No</option>
 											</select>
 											<span class="d-none invalid-feedback"></span>
 										</div>										
