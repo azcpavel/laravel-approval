@@ -523,11 +523,11 @@
 		</div>
 		<script type="text/javascript">
 			function chkApprovalValidate(){
-				if(currentLevel.is_approve_reason_required && $('#approval-option').val() == 1 && $('#approval-reason').val().trim().length == 0){
+				if(parseInt(currentLevel.is_approve_reason_required) == 1 && $('#approval-option').val() == 1 && $('#approval-reason').val().trim().length == 0){
 					alert("Remarks is required!");
 					return false;
 				}
-				if(currentLevel.is_reject_reason_required && $('#approval-option').val() == 0 && $('#approval-reason').val().trim().length == 0){
+				if(parseInt(currentLevel.is_reject_reason_required) == 1 && $('#approval-option').val() == 0 && $('#approval-reason').val().trim().length == 0){
 					alert("Remarks is required!");
 					return false;
 				}				
