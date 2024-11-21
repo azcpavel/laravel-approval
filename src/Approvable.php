@@ -10,6 +10,7 @@ use Exceptio\ApprovalPermission\Models\{
 	ApprovalMapping,
 	ApprovalMappingField,
 	ApprovalRequest,
+	ApprovalRequestApproval,
 	ApprovalRequestApprover,
 	ApprovalRequestApproverForm,
 	ApprovalRequestApproverFormData,
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Notification;
 
 trait Approvable 
 {
-    public function notifyApprovalCreate($approvalItem, $approvalId = null){
+    public function notifyApprovalCreate($approvalItem, $approvalId = null, $resubmitUserId = null, $resubmitRemarks = null){
     	$approvalble = get_class($approvalItem);
     	if($approvalId){
     		$approval = Approval::where('id',$approvalId)->where('on_create',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
@@ -47,6 +48,23 @@ trait Approvable
 						$users = new $userModel();
 						Notification::send($users->whereIn('id',$currentLevel->approval_users->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($old_request, $approvalItem, null, $currentLevel->notifiable_params->channels));
     				}
+
+    				if($resubmitUserId){
+    					ApprovalRequestApproval::create([
+	    					'approval_id' => $approval->id,
+							'approval_request_id' => $old_request->id,
+							'user_id' => $resubmitUserId,
+							'prev_level' => '',
+							'prev_level_title' => '',
+							'next_level' => $currentLevel->level,
+							'next_level_title' => $currentLevel->title,
+							'is_approved' => 0,
+							'is_rejected' => 0,
+							'is_swaped' => 0,
+							'is_resubmitted' => 1,
+							'reason' => $resubmitRemarks,
+	    				]);
+    				}    				
 
     				return $old_request;
     			}else{
@@ -75,7 +93,7 @@ trait Approvable
     	}    	
     }
 
-    public function notifyApprovalUpdate($approvalItem, $approvalMapping, $slug, $approvalId = null){
+    public function notifyApprovalUpdate($approvalItem, $approvalMapping, $slug, $approvalId = null, $resubmitUserId = null, $resubmitRemarks = null){
     	$approvalble = get_class($approvalItem);
     	
     	if($approvalId){
