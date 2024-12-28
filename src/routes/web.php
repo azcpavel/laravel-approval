@@ -12,4 +12,5 @@ Route::group(['prefix' => config('approval-config.route-prefix'),'namespace' => 
     Route::get('approval-request/show/{approvalRequest}','ApprovalRequestController@show')->name(config('approval-config.route-name-request-prefix').'.show');
     Route::post('approval-request/submit/{approvalRequest}','ApprovalRequestController@submit')->name(config('approval-config.route-name-request-prefix').'.submit');
     Route::post('approval-request/swap/{approvalRequest}','ApprovalRequestController@swapLevel')->name(config('approval-config.route-name-request-prefix').'.swap_level');
+    Route::post('approval-request/swap/{approvalRequest}','ApprovalRequestController@commentLevel')->name(config('approval-config.route-name-request-prefix').'.comment_level');
 });

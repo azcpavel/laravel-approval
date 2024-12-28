@@ -1,5 +1,19 @@
 @extends(config('approval-config.view-layout'))
 @section(config('approval-config.view-section'))
+<?php
+function get_approval_type($approval){
+    if($approval->is_approved)
+        return 'Approved';
+    else if($approval->is_swaped)
+        return 'Forwarded';
+    else if($approval->is_resubmitted)
+        return 'Re-Submitted';
+    else if($approval->is_rejected)
+        return 'Rejected';
+    else if($approval->is_commented)
+        return 'Commented';
+}
+?>
 		<div class="flex-center position-ref full-height">            
 			<div class="content">
 				<div class="container">
@@ -71,13 +85,14 @@
 									if($do_swap && !$approvalRequest->approvals->where('is_approved',1)->first()){										
 										$do_swap = false;										
 									}
+									$user_allowed = (in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first());
 									?>
 									State: {{$currentLevelStatus}}<br>
 									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected' && $currentLevelStatus != 'Declined')
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}<br>								
 									Next Level User Selection: {{$currentLevel->next_level_user == 0 ? 'No' : 'Yes'}}
-									@if($currentLevel && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
+									@if($currentLevel && $user_allowed)
 									<script type="text/javascript">
 										var currentLevel = {!!json_encode($currentLevel)!!};
 									</script>
@@ -86,8 +101,11 @@
 									@else
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
 									@endif
-									@if($do_swap && in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first())
+									@if($do_swap && $user_allowed)
 									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Forward Level</button>
+									@endif
+									@if($currentLevel && $user_allowed)
+									<button data-toggle="modal" data-target="#comment-level-modal" type="button" id="comment-level" class="btn btn-sm btn-info">Comment</button>
 									@endif
 								</div>
 							</div>							
@@ -276,7 +294,7 @@
 										<td>{{$valueARL->user[config('approval-config.user-name')]}}</td>
 										<td>{{$valueARL->prev_level_title}}</td>
 										<td>{{$valueARL->next_level_title}}</td>
-										<td>{{(($valueARL->is_swaped) ? 'Forwarded' : (($valueARL->is_approved) ? 'Approved' : 'Rejected'))}}</td>
+										<td>{{get_approval_type($valueARL)}}</td>
 										<td width="150">{{approvalDate($valueARL->created_at)}}</td>
 										<td>{{$valueARL->reason}}</td>
 									</tr>
@@ -512,6 +530,28 @@
 							@endif
 						@endforeach
 					@endif
+					<button type="submit" class="btn btn-primary">Save changes</button>
+				</form>
+			  </div>
+			  <div class="modal-footer justify-content-between">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	              
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div class="modal" tabindex="-1" id="comment-level-modal">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title">Approval Comments</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+	  			<form method="POST" action="{{route(config('approval-config.route-name-request-prefix').'.comment_level',['approvalRequest' => $approvalRequest->id])}}">
+					@csrf					
+					<textarea id="level-comment" name="level_comment" placeholder="Comments" class="form-control mb-3" required></textarea>
 					<button type="submit" class="btn btn-primary">Save changes</button>
 				</form>
 			  </div>

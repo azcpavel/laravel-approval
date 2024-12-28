@@ -598,6 +598,48 @@ class ApprovalRequestController extends Controller
 		return redirect()->back()->with($message);
 	}
 
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Models\ApprovalRequest  $approvalRequest
+	 * @return \Illuminate\Http\Response
+	 */
+	public function commentLevel(Request $request, ApprovalRequest $approvalRequest)
+	{
+		if(!$approvalRequest->approval->status)
+			abort(404);		
+		$currentLevel = $approvalRequest->currentLevel(true);
+		if($currentLevel->level){
+			
+			$message['msg_type'] = 'success';
+			$message['msg_data'] = 'Approval comments submitted for '.$currentLevel->title;
+			
+			$approvalRequestApproval = $approvalRequest->approvals()->create([
+				'approval_id' => $approvalRequest->approval_id,
+				'user_id' => auth()->id(),
+				'prev_level' => $currentLevel->level,
+				'prev_level_title' => $currentLevel->title,
+				'next_level' => $currentLevel->level,
+				'next_level_title' => $currentLevel->title,
+				'is_commented' => 1,
+				'reason' => $request->level_comment,
+			]);
+
+	    	if($currentLevel->group_notification && $currentLevel->notifiable_class){
+				$notifiableClass = $currentLevel->notifiable_class;
+				$userModel = config('approval-config.user-model');
+				$users = new $userModel();
+				Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalRequest->approvable, null, $currentLevel->notifiable_params->channels, $approvalRequestApproval));
+			}
+
+		}else{
+			$message['msg_type'] = 'denger';
+			$message['msg_data'] = 'Approval level not valid!';
+		}
+		return redirect()->back()->with($message);
+	}
+
 	private function doApprovalFinal($currentLevel, $approvalRequest, $approvalRequestApprover, $approvalItem, $request){
 		if(!$this->is_dofinal)
 			$this->is_dofinal = true;
