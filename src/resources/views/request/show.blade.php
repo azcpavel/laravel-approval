@@ -89,7 +89,7 @@ function get_approval_type($approval){
 									?>
 									State: {{$currentLevelStatus}}<br>
 									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected' && $currentLevelStatus != 'Declined')
-									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(',') : ''}}<br>
+									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(', ') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}<br>								
 									Next Level User Selection: {{$currentLevel->next_level_user == 0 ? 'No' : 'Yes'}}
 									@if($currentLevel && $user_allowed)
