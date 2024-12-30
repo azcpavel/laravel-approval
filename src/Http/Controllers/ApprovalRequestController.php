@@ -648,6 +648,7 @@ class ApprovalRequestController extends Controller
 			abort(404);
 		$level = $approvalRequest->approval->levels->where('level',$request->do_swap)->first();
 		$currentLevel = $approvalRequest->currentLevel(true);
+		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
 		
 		$user_selection = null;
 		if($approvalRequest->approval->properties != ''){
@@ -686,7 +687,7 @@ class ApprovalRequestController extends Controller
         	}
         }
 
-		if($level && $approvalRequestSql->first() && $request->do_swap != $currentLevel->level){
+		if($level && ($userApprover !== false || $approvalRequestSql->first()) && $request->do_swap != $currentLevel->level){
 			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval level changed to '.$level->title;
@@ -739,6 +740,7 @@ class ApprovalRequestController extends Controller
 		if(!$approvalRequest->approval->status)
 			abort(404);		
 		$currentLevel = $approvalRequest->currentLevel(true);
+		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
 
 		$user_selection = null;
 		if($approvalRequest->approval->properties != ''){
@@ -777,7 +779,7 @@ class ApprovalRequestController extends Controller
         	}
         }
 
-		if($currentLevel->level && $approvalRequestSql->first()){
+		if($currentLevel->level && ($userApprover !== false || $approvalRequestSql->first())){
 			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval comments submitted for '.$currentLevel->title;
