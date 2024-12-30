@@ -85,7 +85,7 @@ class ApprovalRequest extends Model
      * @Time: 11:08 PM
      */
 
-    public function getDataForDataTable($limit = 20, $offset = 0, $search = '', $where = [], $with = [], $join = [], $order_by = [], $table_col_name = '', $select = null, $whereHas = null, $whereHasType = ['*']){
+    public function getDataForDataTable($limit = 20, $offset = 0, $search = '', $where = [], $with = [], $join = [], $order_by = [], $table_col_name = '', $select = null, $whereHas = null, $whereHasType = ['*'], $user_selection = null){
 
         $totalData = $this::query();
         $filterData = $this::query();
@@ -205,6 +205,49 @@ class ApprovalRequest extends Model
 					}
 				});				
 			});
+        }
+
+        if($user_selection){        	
+        	$user = auth()->user();
+        	foreach($user_selection as $usKey => $usValue){
+        		if($usValue->type == 'model'){
+        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+
+        			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+        		}else if($usValue->type == 'value'){
+        			foreach($usValue->items as $usValueKey => $usValueValue){
+        				$totalData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			           	});
+
+        				$filterData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			            });
+        			}
+        		}
+        	}
         }
 
         if($select != null){

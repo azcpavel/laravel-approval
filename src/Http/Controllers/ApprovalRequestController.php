@@ -78,8 +78,19 @@ class ApprovalRequestController extends Controller
 				}else
 					$where[] = ['approval_state', $request->input('approval_level')];
 			}
+
+			$user_selection = null;
+
+			if($approval->properties != ''){
+				$user_selection = (object)json_decode($approval->properties);
+				if(isset($user_selection->user_selection)){
+					$user_selection = $user_selection->user_selection;
+				}else{
+					$user_selection = null;
+				}
+			}
 			
-			$approvalRequest = $approvalRequest->getDataForDataTable($limit, $offset, $search, $where, $with, $join, $orderBy, $request->all(), null, $approval->list_data_fields, [$approval->approvable_type]);
+			$approvalRequest = $approvalRequest->getDataForDataTable($limit, $offset, $search, $where, $with, $join, $orderBy, $request->all(), null, $approval->list_data_fields, [$approval->approvable_type],$user_selection);
 
 			return response()->json($approvalRequest);
 		}
@@ -118,15 +129,56 @@ class ApprovalRequestController extends Controller
 	{
 		if(!$approvalRequest->approval->status)
 			abort(404);
-		$approvalRequest = ApprovalRequest::where('id',$approvalRequest->id)
+		$user_selection = null;
+		if($approvalRequest->approval->properties != ''){
+			$user_selection = (object)json_decode($approvalRequest->approval->properties);
+			if(isset($user_selection->user_selection)){
+				$user_selection = $user_selection->user_selection;
+			}else{
+				$user_selection = null;
+			}
+		}
+		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id)
 					->with('approval.levels.forms.form_data',
 						'approval.levels.users',
 						'approval.mappings.fields',
 						'approvers.forms.form_data',
 						'mappings.form_data',
 						'approvable',
-						'approvals')->first();
-		return view('laravel-approval::request.show',['approvalRequest' => $approvalRequest]);
+						'approvals');
+
+		if($user_selection){        	
+        	$user = auth()->user();
+        	foreach($user_selection as $usKey => $usValue){
+        		if($usValue->type == 'model'){
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+        		}else if($usValue->type == 'value'){
+        			foreach($usValue->items as $usValueKey => $usValueValue){
+        				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			           	});       				
+        			}
+        		}
+        	}
+        }
+
+		$approvalRequest = $approvalRequestSql->first();
+
+		if(!$approvalRequest)
+			abort(404);
+
+		return view('laravel-approval::request.show',['approvalRequest' => $approvalRequest, 'user_selection' => $user_selection]);
 	}
 
 	/**
@@ -173,9 +225,48 @@ class ApprovalRequestController extends Controller
 	{
 		if(!$approvalRequest->approval->status)
 			abort(404);
+
+		$user_selection = null;
+		if($approvalRequest->approval->properties != ''){
+			$user_selection = (object)json_decode($approvalRequest->approval->properties);
+			if(isset($user_selection->user_selection)){
+				$user_selection = $user_selection->user_selection;
+			}else{
+				$user_selection = null;
+			}
+		}
+		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id);
+
+		if($user_selection){        	
+        	$user = auth()->user();
+        	foreach($user_selection as $usKey => $usValue){
+        		if($usValue->type == 'model'){
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+        		}else if($usValue->type == 'value'){
+        			foreach($usValue->items as $usValueKey => $usValueValue){
+        				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			           	});       				
+        			}
+        		}
+        	}
+        }
+
+
 		$currentLevel = $approvalRequest->currentLevel(true);
 		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
-		if($approvalRequest->completed == 0 && $userApprover !== false && $request->has('approval_option')){
+		if($approvalRequest->completed == 0 && ($userApprover !== false || $approvalRequestSql->first()) && $request->has('approval_option')){
 			try{
 				\DB::beginTransaction();
 
@@ -557,7 +648,45 @@ class ApprovalRequestController extends Controller
 			abort(404);
 		$level = $approvalRequest->approval->levels->where('level',$request->do_swap)->first();
 		$currentLevel = $approvalRequest->currentLevel(true);
-		if($level && $request->do_swap != $currentLevel->level){
+		
+		$user_selection = null;
+		if($approvalRequest->approval->properties != ''){
+			$user_selection = (object)json_decode($approvalRequest->approval->properties);
+			if(isset($user_selection->user_selection)){
+				$user_selection = $user_selection->user_selection;
+			}else{
+				$user_selection = null;
+			}
+		}
+		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id);
+
+		if($user_selection){        	
+        	$user = auth()->user();
+        	foreach($user_selection as $usKey => $usValue){
+        		if($usValue->type == 'model'){
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+        		}else if($usValue->type == 'value'){
+        			foreach($usValue->items as $usValueKey => $usValueValue){
+        				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			           	});       				
+        			}
+        		}
+        	}
+        }
+
+		if($level && $approvalRequestSql->first() && $request->do_swap != $currentLevel->level){
 			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval level changed to '.$level->title;
@@ -610,7 +739,45 @@ class ApprovalRequestController extends Controller
 		if(!$approvalRequest->approval->status)
 			abort(404);		
 		$currentLevel = $approvalRequest->currentLevel(true);
-		if($currentLevel->level){
+
+		$user_selection = null;
+		if($approvalRequest->approval->properties != ''){
+			$user_selection = (object)json_decode($approvalRequest->approval->properties);
+			if(isset($user_selection->user_selection)){
+				$user_selection = $user_selection->user_selection;
+			}else{
+				$user_selection = null;
+			}
+		}
+		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id);
+
+		if($user_selection){        	
+        	$user = auth()->user();
+        	foreach($user_selection as $usKey => $usValue){
+        		if($usValue->type == 'model'){
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
+        		}else if($usValue->type == 'value'){
+        			foreach($usValue->items as $usValueKey => $usValueValue){
+        				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			           	});       				
+        			}
+        		}
+        	}
+        }
+
+		if($currentLevel->level && $approvalRequestSql->first()){
 			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval comments submitted for '.$currentLevel->title;

@@ -21,6 +21,7 @@ class Approval extends Model
 		'view_route_param',
 		'list_data_fields',
 		'slug',
+		'properties',
 		'on_create',
 		'on_update',
 		'on_delete',

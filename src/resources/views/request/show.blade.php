@@ -92,7 +92,7 @@ function get_approval_type($approval){
 									Users: {{($currentLevel != null) ? $currentLevel->users->where('status',1)->pluck('name')->join(', ') : ''}}<br>
 									Submitted: {{$approvalRequest->approvers->where('level',($currentLevel != null) ? $currentLevel->level : null)->count()}}<br>								
 									Next Level User Selection: {{$currentLevel->next_level_user == 0 ? 'No' : 'Yes'}}
-									@if($currentLevel && $user_allowed)
+									@if($currentLevel && ($user_allowed || $user_selection))
 									<script type="text/javascript">
 										var currentLevel = {!!json_encode($currentLevel)!!};
 									</script>
@@ -101,10 +101,10 @@ function get_approval_type($approval){
 									@else
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
 									@endif
-									@if($do_swap && $user_allowed)
+									@if($do_swap && ($user_allowed || $user_selection))
 									 <button data-toggle="modal" data-target="#swap-level-modal" type="button" id="swap-level" class="btn btn-sm btn-warning">Forward Level</button>
 									@endif
-									@if($currentLevel && $user_allowed)
+									@if($currentLevel && ($user_allowed || $user_selection))
 									<button data-toggle="modal" data-target="#comment-level-modal" type="button" id="comment-level" class="btn btn-sm btn-info">Comment</button>
 									@endif
 								</div>
