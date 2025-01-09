@@ -12,6 +12,8 @@ function get_approval_type($approval){
         return 'Rejected';
     else if($approval->is_commented)
         return 'Commented';
+    else if($approval->is_send_back)
+        return 'Send Back';
 }
 ?>
 		<div class="flex-center position-ref full-height">            
@@ -384,6 +386,7 @@ function get_approval_type($approval){
 					@csrf
 					<select name="approval_option" class="form-control mb-3" id="approval-option">
 						<option value="1">Approve</option>
+						<option value="2">Send Back</option>
 						<option value="0">Reject</option>
 					</select>
 					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>

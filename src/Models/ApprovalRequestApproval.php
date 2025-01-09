@@ -23,6 +23,7 @@ class ApprovalRequestApproval extends Model
 		'is_swaped',
 		'is_resubmitted',
 		'is_commented',
+		'is_send_back',
 		'reason'
 	];
 

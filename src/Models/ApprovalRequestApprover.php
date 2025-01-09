@@ -28,6 +28,7 @@ class ApprovalRequestApprover extends Model
 		'is_data_mapped',
 		'is_approved',
 		'is_rejected',
+		'is_send_back',
 		'reason',
 		'reason_file',
 		'status'

@@ -75,6 +75,8 @@ class ApprovalRequestController extends Controller
 					$where[] = ['completed', 1];
 				}else if($approval_level == -2){
 					$where[] = ['completed', 2];
+				}else if($approval_level == -3){
+					$where[] = ['completed', 3];
 				}else
 					$where[] = ['approval_state', $request->input('approval_level')];
 			}
@@ -314,7 +316,8 @@ class ApprovalRequestController extends Controller
 						'status_fields' => $currentLevel->status_fields,
 						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 1,
-						'is_rejected' => 0,                        
+						'is_rejected' => 0,
+						'is_send_back' => 0,
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
 					]);
@@ -337,11 +340,36 @@ class ApprovalRequestController extends Controller
 						'status_fields' => $currentLevel->status_fields,
 						'is_data_mapped' => $currentLevel->is_data_mapped,
 						'is_approved' => 0,
-						'is_rejected' => 1,                        
+						'is_rejected' => 1,
+						'is_send_back' => 0,
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
 					]);
 					$message['msg_data'] = 'Your rejection has been submitted';
+				}else if($request->approval_option == 2){                    
+
+					$approvalRequestApprover = $approvalRequest->approvers()->create([
+						'approval_id' => $currentLevel->approval_id,
+						'user_id' => auth()->id(),
+						'next_user_id' => ($request->approval_next_user) ? $request->approval_next_user : null,
+						'next_level_user' => $currentLevel->next_level_user,
+						'need_attachment' => $currentLevel->need_attachment,
+						'title' => $currentLevel->title,
+						'is_flexible' => $currentLevel->is_flexible,
+						'is_form_required' => $currentLevel->is_form_required,
+						'level' => $currentLevel->level,
+						'action_type' => $currentLevel->action_type,
+						'action_data' => $currentLevel->action_data,
+						'action_frequency' => $currentLevel->action_frequency,
+						'status_fields' => $currentLevel->status_fields,
+						'is_data_mapped' => $currentLevel->is_data_mapped,
+						'is_approved' => 0,
+						'is_rejected' => 0,
+						'is_send_back' => 1,
+						'reason' => $request->approval_reason,
+						'reason_file' => $files,
+					]);
+					$message['msg_data'] = 'Your send back has been submitted';
 				}
 
 				$finalLevel = $approvalRequest->approval->levels->sortByDesc('level')->first();
@@ -357,7 +385,7 @@ class ApprovalRequestController extends Controller
 					}
 				}				
 
-				if($complete){					
+				if($complete){			
 					$approveCount = 0;
 					$rejectCount = 0;
 					foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
@@ -380,20 +408,27 @@ class ApprovalRequestController extends Controller
 								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 							}
 
-							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){								
+							if($request->approval_option == 1 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){								
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
+							}
+
+							if($request->approval_option == 2 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){								
+								foreach($currentLevel->status_fields->send_back as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
 								}
 								$approvalItem->save();
 							}							
 							
-							if($finalLevel->id == $currentLevel->id){
+							if($request->approval_option == 1 && $finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
-							}elseif($nextLevel){
+							}elseif($request->approval_option == 1 && $nextLevel){
 								$approvalRequest->approval_state = $nextLevel->level;
 							}
 							$approvalRequest->save();
-						}else{							
+						}elseif($request->approval_option == 0){							
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject') && $currentLevel->status_fields->reject){							
 								foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
@@ -402,6 +437,16 @@ class ApprovalRequestController extends Controller
 							}
 
 							$approvalRequest->completed = 2;
+							$approvalRequest->save();
+						}elseif($request->approval_option == 2){							
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){							
+								foreach($currentLevel->status_fields->send_back as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
+							}
+
+							$approvalRequest->completed = 3;
 							$approvalRequest->save();
 						}
 					}else{
@@ -413,20 +458,27 @@ class ApprovalRequestController extends Controller
 								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 							}
 
-							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
+							if($request->approval_option == 1 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
 								foreach($currentLevel->status_fields->approve as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
 								}
 								$approvalItem->save();
 							}
 
-							if($finalLevel->id == $currentLevel->id){
+							if($request->approval_option == 2 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){								
+								foreach($currentLevel->status_fields->send_back as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
+							}
+
+							if($request->approval_option == 1 && $finalLevel->id == $currentLevel->id){
 								$approvalRequest->completed = 1;
-							}elseif($nextLevel){
+							}elseif($request->approval_option == 1 && $nextLevel){
 								$approvalRequest->approval_state = $nextLevel->level;
 							}
 							$approvalRequest->save();
-						}else{
+						}elseif($request->approval_option == 0){
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject') && $currentLevel->status_fields->reject){
 								foreach($currentLevel->status_fields->reject as $keyA => $valueA){
 									$approvalItem->$keyA = $valueA;
@@ -435,6 +487,16 @@ class ApprovalRequestController extends Controller
 							}
 
 							$approvalRequest->completed = 2;
+							$approvalRequest->save();
+						}elseif($request->approval_option == 2){							
+							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){							
+								foreach($currentLevel->status_fields->send_back as $keyA => $valueA){
+									$approvalItem->$keyA = $valueA;
+								}
+								$approvalItem->save();
+							}
+
+							$approvalRequest->completed = 3;
 							$approvalRequest->save();
 						}
 					}					
@@ -475,7 +537,7 @@ class ApprovalRequestController extends Controller
 							$rejectCount++;
 					}
 					
-					if($approveCount >= $currentLevel->is_flexible){
+					if($approveCount != 0 && $approveCount >= $currentLevel->is_flexible){
 						//Approve
 						foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
 							$valueASD->update([
@@ -556,7 +618,41 @@ class ApprovalRequestController extends Controller
 							$users = new $userModel();
 							Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
 						}
-					}else{
+					}elseif($request->approval_option == 2){
+						//Send Back
+						foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
+							$valueASD->update([
+								'status' => 1
+							]);						
+						}
+
+						if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'before') && $currentLevel->action_data->before){
+							$actionClassPath = $currentLevel->action_data->before->class;
+							$actionClassMethod = $currentLevel->action_data->before->method;
+							$actionClass = new $actionClassPath();
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+						}
+
+						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){
+							foreach($currentLevel->status_fields->send_back as $keyA => $valueA){
+								$approvalItem->$keyA = $valueA;
+							}
+							$approvalItem->save();
+						}
+
+						$approvalRequest->completed = 3;
+						$approvalRequest->save();
+
+						$approvalRequestApproval = $this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
+
+						if($currentLevel->group_notification && $currentLevel->notifiable_class){
+							$notifiableClass = $currentLevel->notifiable_class;
+							$userModel = config('approval-config.user-model');
+							$users = new $userModel();
+							Notification::send($users->whereIn('id',$currentLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $currentLevel->notifiable_params->channels));
+						}
+					}
+					else{
 						$this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
 
 						if($currentLevel->group_notification && $currentLevel->notifiable_class){
@@ -1014,6 +1110,11 @@ class ApprovalRequestController extends Controller
 				$actionClassMethod = $currentLevel->action_data->reject->method;
 				$actionClass = new $actionClassPath();
 				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+			}elseif($request->approval_option == 2 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'send_back') && $currentLevel->action_data->send_back){
+				$actionClassPath = $currentLevel->action_data->send_back->class;
+				$actionClassMethod = $currentLevel->action_data->send_back->method;
+				$actionClass = new $actionClassPath();
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
 			}
 
 			return redirect()->back()->with($message);
@@ -1033,6 +1134,13 @@ class ApprovalRequestController extends Controller
 				}
 				$routeParams['approver_id'] = $approvalRequestApprover->id;
 				return redirect()->route($currentLevel->action_data->reject->route,$routeParams);
+			}elseif($request->approval_option == 2 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'send_back') && $currentLevel->action_data->send_back){
+				$routeParams = [];
+				foreach($currentLevel->action_data->send_back->param as $keyRP => $valueRP){
+					$routeParams[$keyRP] = $approvalItem->$valueRP;
+				}
+				$routeParams['approver_id'] = $approvalRequestApprover->id;
+				return redirect()->route($currentLevel->action_data->send_back->route,$routeParams);
 			}
 
 			return redirect()->back()->with($message);
@@ -1050,6 +1158,7 @@ class ApprovalRequestController extends Controller
 			'next_level_title' => $approvalRequestApprover->title,
 			'is_approved' => $approvalRequestApprover->is_approved,
 			'is_rejected' => $approvalRequestApprover->is_rejected,
+			'is_send_back' => $approvalRequestApprover->is_send_back,
 			'reason' => $approvalRequestApprover->reason,
 		]);
 
