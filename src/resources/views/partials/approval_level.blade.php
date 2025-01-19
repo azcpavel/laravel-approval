@@ -95,6 +95,10 @@
 			<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method">
 		</div>
 		<div class="input-group action-class mt-2">
+			<input class="form-control" type="text" name="approval_action_class_send_back_path[]" placeholder="Send Back Namespace">
+			<input class="form-control" type="text" name="approval_action_class_send_back_method[]" placeholder="Send Back Method">
+		</div>
+		<div class="input-group action-class mt-2">
 			<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace">
 			<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method">
 		</div>		
@@ -131,6 +135,19 @@
 				    <button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>
 				</div>
 			</div>			
+		</div>
+		<div class="level_status_fields_send_back_div">
+			<div class="input-group level_status_fields_send_back_div_item mb-2">				
+				<div class="input-group-prepend">
+				    <span class="input-group-text">Send Back</span>
+				</div>
+				<input class="form-control" type="text" name="approval_status_fields_send_back_column[]" placeholder="Column Name">
+				<input class="form-control" type="text" name="approval_status_fields_send_back_value[]" placeholder="Column Value">
+				<div class="input-group-append">
+				    <button type="button" class="btn btn-success level_status_fields_send_back_btn_add">+</button>
+				    <button type="button" class="btn btn-danger level_status_fields_send_back_btn_rem">-</button>
+				</div>
+			</div>
 		</div>
 		<div class="level_status_fields_reject_div">
 			<div class="input-group level_status_fields_reject_div_item mb-2">				

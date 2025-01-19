@@ -298,6 +298,10 @@
 												<input class="form-control" type="text" name="approval_action_class_approve_method[]" placeholder="Approve Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'approve') ? $valueAL->action_data->approve->method??'' : '' }}">
 											</div>
 											<div class="input-group action-class mt-2">
+												<input class="form-control" type="text" name="approval_action_class_send_back_path[]" placeholder="Reject Namespace" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'send_back') ? $valueAL->action_data->send_back->class??'' : '' }}">
+												<input class="form-control" type="text" name="approval_action_class_send_back_method[]" placeholder="Reject Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'send_back') ? $valueAL->action_data->send_back->method??'' : '' }}">
+											</div>
+											<div class="input-group action-class mt-2">
 												<input class="form-control" type="text" name="approval_action_class_reject_path[]" placeholder="Reject Namespace" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->class??'' : '' }}">
 												<input class="form-control" type="text" name="approval_action_class_reject_method[]" placeholder="Reject Method" value="{{$valueAL->action_type == 1 && $valueAL->action_data &&property_exists($valueAL->action_data,'reject') ? $valueAL->action_data->reject->method??'' : '' }}">
 											</div>		
@@ -347,6 +351,35 @@
 													<div class="input-group-append">
 													    <button type="button" class="btn btn-success level_status_fields_approve_btn_add">+</button>
 													    <button type="button" class="btn btn-danger level_status_fields_approve_btn_rem">-</button>
+													</div>
+												</div>
+												@endif
+											</div>
+											<div class="level_status_fields_send_back_div">
+												@if($valueAL->status_fields && property_exists($valueAL->status_fields, 'send_back'))
+												@foreach($valueAL->status_fields->send_back as $keyALSF => $valueALSF)
+												<div class="input-group level_status_fields_send_back_div_item mb-2">				
+													<div class="input-group-prepend">
+													    <span class="input-group-text">Approve</span>
+													</div>
+													<input class="form-control" type="text" name="approval_status_fields_send_back_column[]" placeholder="Column Name" value="{{$keyALSF}}">
+													<input class="form-control" type="text" name="approval_status_fields_send_back_value[]" placeholder="Column Value" value="{{$valueALSF}}">
+													<div class="input-group-append">
+													    <button type="button" class="btn btn-success level_status_fields_send_back_btn_add">+</button>
+													    <button type="button" class="btn btn-danger level_status_fields_send_back_btn_rem">-</button>
+													</div>
+												</div>
+												@endforeach
+												@else
+												<div class="input-group level_status_fields_send_back_div_item mb-2">				
+													<div class="input-group-prepend">
+													    <span class="input-group-text">Approve</span>
+													</div>
+													<input class="form-control" type="text" name="approval_status_fields_send_back_column[]" placeholder="Column Name">
+													<input class="form-control" type="text" name="approval_status_fields_send_back_value[]" placeholder="Column Value">
+													<div class="input-group-append">
+													    <button type="button" class="btn btn-success level_status_fields_send_back_btn_add">+</button>
+													    <button type="button" class="btn btn-danger level_status_fields_send_back_btn_rem">-</button>
 													</div>
 												</div>
 												@endif
@@ -693,6 +726,32 @@
 		}
 	});
 
+	$(document).on("click",".level_status_fields_send_back_btn_add",function(){
+		var $item = $(this);
+		$item.closest('.level_status_fields_send_back_div').append(
+			'<div class="input-group level_status_fields_send_back_div_item mb-2">'+
+				'<div class="input-group-prepend">'+
+				    '<span class="input-group-text">Approve</span>'+
+				'</div>'+
+				'<input class="form-control" type="text" name="approval_status_fields_send_back_column[]" placeholder="Column Name">'+
+				'<input class="form-control" type="text" name="approval_status_fields_send_back_value[]" placeholder="Column Value">'+
+				'<div class="input-group-append">'+
+				    '<button type="button" class="btn btn-success level_status_fields_send_back_btn_add">+</button>'+
+				    '<button type="button" class="btn btn-danger level_status_fields_send_back_btn_rem">-</button>'+
+				'</div>'+
+			'</div>'
+		);
+		updateFormIndex();
+	});
+
+	$(document).on("click",".level_status_fields_send_back_btn_rem",function(){
+		var $item = $(this);
+		if($item.closest('.level_status_fields_send_back_div').children().length > 1){
+			$item.closest('.level_status_fields_send_back_div_item').remove();
+			updateFormIndex();
+		}
+	});
+
 	$(document).on("click",".level_status_fields_reject_btn_add",function(){
 		var $item = $(this);
 		$item.closest('.level_status_fields_reject_div').append(
@@ -810,6 +869,9 @@
 			$item.find(':input[name^=approval_status_fields_approve_column]').attr('name','approval_status_fields_approve_column['+(indForm)+'][]');
 			$item.find(':input[name^=approval_status_fields_approve_value]').attr('name','approval_status_fields_approve_value['+(indForm)+'][]');
 			
+			$item.find(':input[name^=approval_status_fields_send_back_column]').attr('name','approval_status_fields_send_back_column['+(indForm)+'][]');
+			$item.find(':input[name^=approval_status_fields_send_back_value]').attr('name','approval_status_fields_send_back_value['+(indForm)+'][]');
+
 			$item.find(':input[name^=approval_status_fields_reject_column]').attr('name','approval_status_fields_reject_column['+(indForm)+'][]');
 			$item.find(':input[name^=approval_status_fields_reject_value]').attr('name','approval_status_fields_reject_value['+(indForm)+'][]');
 

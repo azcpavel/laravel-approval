@@ -332,6 +332,32 @@
 		}
 	});
 
+	$(document).on("click",".level_status_fields_send_back_btn_add",function(){
+		var $item = $(this);
+		$item.closest('.level_status_fields_send_back_div').append(
+			'<div class="input-group level_status_fields_send_back_div_item mb-2">'+
+				'<div class="input-group-prepend">'+
+				    '<span class="input-group-text">Reject</span>'+
+				'</div>'+
+				'<input class="form-control" type="text" name="approval_status_fields_send_back_column[]" placeholder="Column Name">'+
+				'<input class="form-control" type="text" name="approval_status_fields_send_back_value[]" placeholder="Column Value">'+
+				'<div class="input-group-append">'+
+				    '<button type="button" class="btn btn-success level_status_fields_send_back_btn_add">+</button>'+
+				    '<button type="button" class="btn btn-danger level_status_fields_send_back_btn_rem">-</button>'+
+				'</div>'+
+			'</div>'
+		);
+		updateFormIndex();
+	});
+
+	$(document).on("click",".level_status_fields_send_back_btn_rem",function(){
+		var $item = $(this);
+		if($item.closest('.level_status_fields_send_back_div').children().length > 1){
+			$item.closest('.level_status_fields_send_back_div_item').remove();
+			updateFormIndex();
+		}
+	});
+
 	$(document).on("click",".level_status_fields_reject_btn_add",function(){
 		var $item = $(this);
 		$item.closest('.level_status_fields_reject_div').append(
@@ -449,6 +475,9 @@
 			$item.find(':input[name^=approval_status_fields_approve_column]').attr('name','approval_status_fields_approve_column['+(indForm)+'][]');
 			$item.find(':input[name^=approval_status_fields_approve_value]').attr('name','approval_status_fields_approve_value['+(indForm)+'][]');
 			
+			$item.find(':input[name^=approval_status_fields_send_back_column]').attr('name','approval_status_fields_send_back_column['+(indForm)+'][]');
+			$item.find(':input[name^=approval_status_fields_send_back_value]').attr('name','approval_status_fields_send_back_value['+(indForm)+'][]');
+
 			$item.find(':input[name^=approval_status_fields_reject_column]').attr('name','approval_status_fields_reject_column['+(indForm)+'][]');
 			$item.find(':input[name^=approval_status_fields_reject_value]').attr('name','approval_status_fields_reject_value['+(indForm)+'][]');
 

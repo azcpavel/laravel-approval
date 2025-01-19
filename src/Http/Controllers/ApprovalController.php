@@ -175,6 +175,13 @@ class ApprovalController extends Controller
 						];
 					}
 
+					if($request->approval_action_class_approve_path[$keyL] != ''){
+						$action_data['send_back'] = [
+							'class' => $request->approval_action_class_send_back_path[$keyL],
+							'method' => $request->approval_action_class_send_back_method[$keyL]
+						];
+					}
+
 					if($request->approval_action_class_reject_path[$keyL] != ''){
 						$action_data['reject'] = [
 							'class' => $request->approval_action_class_reject_path[$keyL],
@@ -202,6 +209,12 @@ class ApprovalController extends Controller
 				if($request->approval_status_fields_approve_column && $request->approval_status_fields_approve_column[$keyL]){
 					foreach($request->approval_status_fields_approve_column[$keyL] as $keySF => $valueSF){
 						$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
+					}
+				}
+
+				if($request->approval_status_fields_approve_column && $request->approval_status_fields_send_back_column[$keyL]){
+					foreach($request->approval_status_fields_send_back_column[$keyL] as $keySF => $valueSF){
+						$status_fields['send_back'][$request->approval_status_fields_send_back_column[$keyL][$keySF]] = $request->approval_status_fields_send_back_value[$keyL][$keySF];
 					}
 				}
 
@@ -391,6 +404,13 @@ class ApprovalController extends Controller
 							];
 						}
 
+						if($request->approval_action_class_approve_path[$keyL] != ''){
+							$action_data['send_back'] = [
+								'class' => $request->approval_action_class_send_back_path[$keyL],
+								'method' => $request->approval_action_class_send_back_method[$keyL]
+							];
+						}
+
 						if($request->approval_action_class_reject_path[$keyL] != ''){
 							$action_data['reject'] = [
 								'class' => $request->approval_action_class_reject_path[$keyL],
@@ -419,6 +439,13 @@ class ApprovalController extends Controller
 						foreach($request->approval_status_fields_approve_column[$keyL] as $keySF => $valueSF){
 							if($request->approval_status_fields_approve_value[$keyL][$keySF] != '')
 								$status_fields['approve'][$request->approval_status_fields_approve_column[$keyL][$keySF]] = $request->approval_status_fields_approve_value[$keyL][$keySF];
+						}
+					}
+
+					if($request->approval_status_fields_send_back_column[$keyL]){
+						foreach($request->approval_status_fields_send_back_column[$keyL] as $keySF => $valueSF){
+							if($request->approval_status_fields_send_back_value[$keyL][$keySF] != '')
+								$status_fields['send_back'][$request->approval_status_fields_send_back_column[$keyL][$keySF]] = $request->approval_status_fields_send_back_value[$keyL][$keySF];
 						}
 					}
 
