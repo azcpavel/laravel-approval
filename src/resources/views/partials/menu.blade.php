@@ -25,10 +25,31 @@ $isMenuActive = strpos($currentRouteName,config('approval-config.route-name-pref
 		@foreach($approvals as $keyA => $valueA)
 			<?php
 			$isChildActive = strpos($currentRouteName,config('approval-config.route-name-request-prefix').".index") !== false && request()->route('approval')->id == $valueA->id;
+			$properties = $valueA->properties;
+			if($properties){
+				$properties = json_decode($valueA->properties);
+				if(isset($properties->route)){
+				$isChildActive = strpos($currentRouteName,$properties->route->name) !== false;
+			?>
+			<{{$menuChildEl}} class="{{$menuChildClass.' '.($isChildActive ? $menuLinkActiveClass : '')}}">
+			<a href="{{route($properties->route->name,[$properties->route->param => $valueA->id])}}" class="{{$menuLinkClass.' '.( $isChildActive ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.$valueA->title.$menuLinkTitlePostfix!!}</a>
+			</{{$menuChildEl}}>
+			<?php
+				}else{
+				?>
+				<{{$menuChildEl}} class="{{$menuChildClass.' '.($isChildActive ? $menuLinkActiveClass : '')}}">
+				<a href="{{route(config('approval-config.route-name-request-prefix').'.index',['approval' => $valueA->id])}}" class="{{$menuLinkClass.' '.( $isChildActive ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.$valueA->title.$menuLinkTitlePostfix!!}</a>
+				</{{$menuChildEl}}>
+				<?php
+				}
+			}else{
 			?>
 			<{{$menuChildEl}} class="{{$menuChildClass.' '.($isChildActive ? $menuLinkActiveClass : '')}}">
 			<a href="{{route(config('approval-config.route-name-request-prefix').'.index',['approval' => $valueA->id])}}" class="{{$menuLinkClass.' '.( $isChildActive ? $menuLinkActiveClass : '')}}">{!!$menuLinkTitlePrefix.$valueA->title.$menuLinkTitlePostfix!!}</a>
 			</{{$menuChildEl}}>
+			<?php
+			}
+			?>
 		@endforeach
 
 	</{{$menuParentEl}}>
