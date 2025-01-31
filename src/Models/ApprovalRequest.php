@@ -149,7 +149,14 @@ class ApprovalRequest extends Model
         }
 
         if(count($join) > 0){
-            foreach ($join as list($nameJ, $withJ, $asJ)) {
+            foreach ($join as $joinItem) {
+            	$whereJ = null;
+            	$nameJ = $joinItem[0];
+            	$withJ = $joinItem[1];
+            	$asJ = $joinItem[2];
+            	if(isset($joinItem[3]))
+            		$whereJ = $joinItem[3];
+
 				$name_array = explode(" ", $nameJ);
 				$name_as = end($name_array);
 				if($name_as =='rev'){
@@ -157,7 +164,12 @@ class ApprovalRequest extends Model
 					->selectRaw($asJ);
 					$filterData->leftJoin($name_array[0], $withJ, '=', $this->getTable().'.id');
 					$totalCount->leftJoin($name_array[0], $withJ, '=', $this->getTable().'.id');
-				}else if($name_as =='inner'){
+				}else if($name_as =='rev_column'){
+                    $totalData->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1])
+                    ->selectRaw($asJ);
+                    $filterData->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1]);
+                    $totalCount->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1]);
+                }else if($name_as =='inner'){
                     $totalData->join($name_array[0], $withJ, '=', $name_array[0].'.id')
                     ->selectRaw($asJ);
                     $filterData->join($name_array[0], $withJ, '=', $name_array[0].'.id');
@@ -169,6 +181,14 @@ class ApprovalRequest extends Model
 					$filterData->leftJoin($nameJ, $withJ, '=', $name_as.'.id');
 					$totalCount->leftJoin($nameJ, $withJ, '=', $name_as.'.id');
 				}
+
+				if($whereJ && count($whereJ)>0){
+                    foreach($whereJ as $keyWhereJ => $valueWhereJ){
+                        $totalData->where([$valueWhereJ]);                        
+                        $filterData->where([$valueWhereJ]);
+                        $totalCount->where([$valueWhereJ]);
+                    }
+                }
 			}
 
             if($select == null){
@@ -226,6 +246,14 @@ class ApprovalRequest extends Model
 							}
 	        			}									
 					});
+
+					$totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+						foreach($usValue->items as $usValueKey => $usValueValue){
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+							}
+	        			}									
+					});
         		}else if($usValue->type == 'value'){
         			foreach($usValue->items as $usValueKey => $usValueValue){
         				$totalData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
@@ -238,6 +266,15 @@ class ApprovalRequest extends Model
 			           	});
 
         				$filterData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
+			               $query->select(\DB::raw(1))
+			                     ->from(config('approval-config.user-table'))
+			                     ->where('id',$user->id);
+			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					$query->where($usValueValueKey,$usValueValueValue);
+							}
+			            });
+
+			            $totalCount->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
 			               $query->select(\DB::raw(1))
 			                     ->from(config('approval-config.user-table'))
 			                     ->where('id',$user->id);

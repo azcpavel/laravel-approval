@@ -14,7 +14,7 @@ class UpdateApprovalsTable extends Migration
 	public function up()
 	{
 		Schema::table('ex_approvals', function (Blueprint $table) {
-			$table->string('properties')->nullable()->after('list_data_fields');
+			$table->text('properties')->nullable()->after('list_data_fields');
 		});
 	}
 
