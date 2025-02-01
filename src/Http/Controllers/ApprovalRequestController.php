@@ -237,6 +237,8 @@ class ApprovalRequestController extends Controller
 				$user_selection = null;
 			}
 		}
+
+		$currentLevel = $approvalRequest->currentLevel(true);
 		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id);
 
 		if($user_selection){        	
@@ -261,12 +263,20 @@ class ApprovalRequestController extends Controller
 							}
 			           	});       				
         			}
+
+        			$approvalRequestSql->whereExists(function ($query) use($user, $currentLevel, $usValue){
+		               $level_column = $usValue->level_column;
+		               $query->select(\DB::raw(1))
+		                     ->from(config('approval-config.user-table'))
+		                     ->where('id',$user->id)
+		                     ->whereNotNull($level_column)
+		                     ->where($level_column,$currentLevel->level);
+		                
+		           	});
         		}
         	}
         }
 
-
-		$currentLevel = $approvalRequest->currentLevel(true);
 		$userApprover = (($currentLevel) ? in_array(auth()->id(),$currentLevel->approval_users->pluck('user_id')->all()) : false);
 		if($approvalRequest->completed == 0 && ($userApprover !== false || $approvalRequestSql->first()) && $request->has('approval_option')){
 			try{
@@ -727,6 +737,7 @@ class ApprovalRequestController extends Controller
 		}
 		else{
 			$message['msg_type'] = 'danger';
+			$message['msg_data'] = 'Application state is not valid!';
 			return redirect()->back()->with($message);
 		}
 	}
@@ -779,6 +790,16 @@ class ApprovalRequestController extends Controller
 							}
 			           	});       				
         			}
+
+        			$approvalRequestSql->whereExists(function ($query) use($user, $currentLevel, $usValue){
+		               $level_column = $usValue->level_column;
+		               $query->select(\DB::raw(1))
+		                     ->from(config('approval-config.user-table'))
+		                     ->where('id',$user->id)
+		                     ->whereNotNull($level_column)
+		                     ->where($level_column,$currentLevel->level);
+		                
+		           	});
         		}
         	}
         }
@@ -818,7 +839,7 @@ class ApprovalRequestController extends Controller
 			$approvalRequest->approval_state = $level->level;
 			$approvalRequest->save();
 		}else{
-			$message['msg_type'] = 'denger';
+			$message['msg_type'] = 'danger';
 			$message['msg_data'] = 'Approval level not valid!';
 		}
 		return redirect()->back()->with($message);
@@ -871,6 +892,16 @@ class ApprovalRequestController extends Controller
 							}
 			           	});       				
         			}
+
+        			$approvalRequestSql->whereExists(function ($query) use($user, $currentLevel, $usValue){
+		               $level_column = $usValue->level_column;
+		               $query->select(\DB::raw(1))
+		                     ->from(config('approval-config.user-table'))
+		                     ->where('id',$user->id)
+		                     ->whereNotNull($level_column)
+		                     ->where($level_column,$currentLevel->level);
+		                
+		           	});
         		}
         	}
         }
@@ -899,7 +930,7 @@ class ApprovalRequestController extends Controller
 			}
 
 		}else{
-			$message['msg_type'] = 'denger';
+			$message['msg_type'] = 'danger';
 			$message['msg_data'] = 'Approval level not valid!';
 		}
 		return redirect()->back()->with($message);
