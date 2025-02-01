@@ -88,6 +88,9 @@ function get_approval_type($approval){
 										$do_swap = false;										
 									}
 									$user_allowed = (in_array(auth()->id(), $currentLevel->approval_users->where('status',1)->pluck('user_id')->all()) !== false && !$approvalRequest->approvers->where('user_id',auth()->id())->where('level',$currentLevel->level)->where('status',0)->first());
+									$approval_properties = $approvalRequest->approval->properties;
+		                            if($approval_properties)
+		                                $approval_properties = json_decode($approval_properties);
 									?>
 									State: {{$currentLevelStatus}}<br>
 									@if($currentLevelStatus != 'Pending' && $currentLevelStatus != 'Completed' && $currentLevelStatus != 'Rejected' && $currentLevelStatus != 'Declined')
@@ -112,6 +115,9 @@ function get_approval_type($approval){
 								</div>
 							</div>							
 						</div>
+						@if(isset($approval_properties->partial))
+		                @include($approval_properties->partial->view,[$approval_properties->partial->param => $approvalRequest])
+		                @endif
 						@if($approvalRequest->approval->on_update)
 							@foreach($approvalRequest->mappings as $keyM => $valueM)
 							<?php
