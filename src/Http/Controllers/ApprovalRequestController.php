@@ -415,7 +415,7 @@ class ApprovalRequestController extends Controller
 								$actionClassPath = $currentLevel->action_data->before->class;
 								$actionClassMethod = $currentLevel->action_data->before->method;
 								$actionClass = new $actionClassPath();
-								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 							}
 
 							if($request->approval_option == 1 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){								
@@ -465,7 +465,7 @@ class ApprovalRequestController extends Controller
 								$actionClassPath = $currentLevel->action_data->before->class;
 								$actionClassMethod = $currentLevel->action_data->before->method;
 								$actionClass = new $actionClassPath();
-								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+								$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 							}
 
 							if($request->approval_option == 1 && $currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
@@ -559,7 +559,7 @@ class ApprovalRequestController extends Controller
 							$actionClassPath = $currentLevel->action_data->before->class;
 							$actionClassMethod = $currentLevel->action_data->before->method;
 							$actionClass = new $actionClassPath();
-							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 						}
 
 						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'approve') && $currentLevel->status_fields->approve){
@@ -607,7 +607,7 @@ class ApprovalRequestController extends Controller
 							$actionClassPath = $currentLevel->action_data->before->class;
 							$actionClassMethod = $currentLevel->action_data->before->method;
 							$actionClass = new $actionClassPath();
-							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 						}
 
 						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'reject') && $currentLevel->status_fields->reject){
@@ -640,7 +640,7 @@ class ApprovalRequestController extends Controller
 							$actionClassPath = $currentLevel->action_data->before->class;
 							$actionClassMethod = $currentLevel->action_data->before->method;
 							$actionClass = new $actionClassPath();
-							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+							$actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 						}
 
 						if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){
@@ -1135,17 +1135,17 @@ class ApprovalRequestController extends Controller
 				$actionClassPath = $currentLevel->action_data->approve->class;
 				$actionClassMethod = $currentLevel->action_data->approve->method;
 				$actionClass = new $actionClassPath();
-				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 			}elseif($request->approval_option == 0 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'reject') && $currentLevel->action_data->reject){
 				$actionClassPath = $currentLevel->action_data->reject->class;
 				$actionClassMethod = $currentLevel->action_data->reject->method;
 				$actionClass = new $actionClassPath();
-				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 			}elseif($request->approval_option == 2 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'send_back') && $currentLevel->action_data->send_back){
 				$actionClassPath = $currentLevel->action_data->send_back->class;
 				$actionClassMethod = $currentLevel->action_data->send_back->method;
 				$actionClass = new $actionClassPath();
-				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover);
+				return $actionClass->$actionClassMethod($approvalItem, $approvalRequestApprover,$request->all());
 			}
 
 			return redirect()->back()->with($message);
