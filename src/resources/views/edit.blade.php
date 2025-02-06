@@ -217,6 +217,11 @@
 											<span class="d-none invalid-feedback"></span>
 										</div>
 										<div class="form-group">
+											<label for="approval_properties">Properties</label>
+											<input class="form-control" type="string" name="approval_properties[]" placeholder="Properties" value="{{$valueAL->properties}}">
+											<span class="d-none invalid-feedback"></span>
+										</div>
+										<div class="form-group">
 											<label for="approval_flex">Flexible<span class="text-danger position-relative">*</span></label>
 											<input class="form-control" type="number" min="0" max="100" name="approval_flex[]" placeholder="Flexible" value="{{$valueAL->is_flexible}}" required>
 											<span class="d-none invalid-feedback"></span>

@@ -14,8 +14,8 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
-		<label for="approval_level">Properties</label>
-		<input class="form-control" type="string" name="approval_properties[]" placeholder="Level" required>
+		<label for="approval_properties">Properties</label>
+		<input class="form-control" type="string" name="approval_properties[]" placeholder="Properties">
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
