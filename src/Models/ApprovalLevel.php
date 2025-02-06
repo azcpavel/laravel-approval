@@ -17,6 +17,7 @@ class ApprovalLevel extends Model
 		'is_flexible',
 		'is_form_required',
 		'level',
+		'properties',
 		'action_type',
 		'action_data',
 		'action_frequency',

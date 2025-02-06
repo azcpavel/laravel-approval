@@ -14,6 +14,11 @@
 		<span class="d-none invalid-feedback"></span>
 	</div>
 	<div class="form-group">
+		<label for="approval_level">Properties</label>
+		<input class="form-control" type="string" name="approval_properties[]" placeholder="Level" required>
+		<span class="d-none invalid-feedback"></span>
+	</div>
+	<div class="form-group">
 		<label for="approval_flex">Flexible<span class="text-danger position-relative">*</span></label>
 		<input class="form-control" type="number" min="0" max="100" name="approval_flex[]" value="0" placeholder="Flexible" required>
 		<span class="d-none invalid-feedback"></span>

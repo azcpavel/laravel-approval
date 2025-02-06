@@ -398,7 +398,13 @@ function get_approval_type($approval){
 					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
 					@if($currentLevel->need_attachment)
 					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
-					@endif					
+					@endif
+					@php
+					$approval_level_properties = (object)json_decode($currentLevel->properties);					
+					@endphp
+					@if($approval_level_properties && isset($approval_level_properties->partial_form))
+						@include($approval_level_properties->partial_form->view,[$approval_level_properties->partial_form->param => $approvalRequest])
+					@endif				
 					@if($nextLevel && $currentLevel->next_level_user)
 					<select name="approval_next_user" class="form-control mb-3" id="approval-next-user">
 						<option value="">Select {{$nextLevel->title}} User</option>
