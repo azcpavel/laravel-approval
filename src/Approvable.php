@@ -203,4 +203,31 @@ trait Approvable
     		return false;
     	}    	
     }
+
+    public function addApprovalData($approvalRequest, $approval_state, $approvel_action, $user_id, $approval_next_user = null, $approval_reason = null, $files = null){
+    	$currentLevel = ApprovalLevel::where('approval_id',$approvalRequest->approval_id)->where('level',$approval_state)->first();
+    	$approvalRequestApprover = $approvalRequest->approvers()->create([
+			'approval_id' => $currentLevel->approval_id,
+			'user_id' => $user_id,
+			'next_user_id' => $approval_next_user,
+			'next_level_user' => $currentLevel->next_level_user,
+			'need_attachment' => $currentLevel->need_attachment,
+			'title' => $currentLevel->title,
+			'is_flexible' => $currentLevel->is_flexible,
+			'is_form_required' => $currentLevel->is_form_required,
+			'level' => $currentLevel->level,
+			'action_type' => $currentLevel->action_type,
+			'action_data' => $currentLevel->action_data,
+			'action_frequency' => $currentLevel->action_frequency,
+			'status_fields' => $currentLevel->status_fields,
+			'is_data_mapped' => $currentLevel->is_data_mapped,
+			'is_approved' => (($approvel_action === 1) ? 1 : 0),
+			'is_rejected' => (($approvel_action === 0) ? 1 : 0),
+			'is_send_back' => (($approvel_action === 2) ? 1 : 0),
+			'reason' => $approval_reason,
+			'reason_file' => $files,
+		]);
+
+		return $approvalRequestApprover;
+    }
 }
