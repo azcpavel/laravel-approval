@@ -228,6 +228,11 @@ class ApprovalRequestController extends Controller
 		if(!$approvalRequest->approval->status)
 			abort(404);
 
+		$request->validate([
+			'approval_file' => 'bail|nullable|array',
+			'approval_file.*' => config('approval-config.file_rules'),
+		]);
+
 		$user_selection = null;
 		if($approvalRequest->approval->properties != ''){
 			$user_selection = (object)json_decode($approvalRequest->approval->properties);
