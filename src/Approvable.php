@@ -230,4 +230,25 @@ trait Approvable
 
 		return $approvalRequestApprover;
     }
+
+    public function addApprovalLogData($approvalRequest, $approval_action, $user_id, $approval_reason = null){
+    	$currentLevel = $approvalRequest->currentLevel(true);
+    	$approvalRequestApproval = ApprovalRequestApproval::create([
+			'approval_id' => $approvalRequest->approval_id,
+			'approval_request_id' => $approvalRequest->id,
+			'user_id' => $user_id,
+			'prev_level' => '',
+			'prev_level_title' => '',
+			'next_level' => $currentLevel->level,
+			'next_level_title' => $currentLevel->title,
+			'is_approved' => (($approval_action === 1) ? 1 : 0),
+			'is_rejected' => (($approval_action === 0) ? 1 : 0),
+			'is_send_back' => (($approval_action === 2) ? 1 : 0),
+			'is_swaped' => (($approval_action === 3) ? 1 : 0),
+			'is_resubmitted' => (($approval_action === 4) ? 1 : 0),
+			'reason' => $approval_reason,
+		]);;
+
+		return $approvalRequestApproval;
+    }
 }
