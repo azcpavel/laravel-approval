@@ -8,6 +8,7 @@ use Exceptio\ApprovalPermission\Models\{
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 
 class ApprovalRequestController extends Controller
 {
@@ -228,10 +229,16 @@ class ApprovalRequestController extends Controller
 		if(!$approvalRequest->approval->status)
 			abort(404);
 
-		$request->validate([
-			'approval_file' => 'bail|nullable|array',
+		$validator = Validator::make($request->all(), [
+            'approval_file' => 'bail|nullable|array',
 			'approval_file.*' => config('approval-config.file_rules'),
-		]);
+        ]);
+
+		if($validator->fails()){
+            $message['msg_type'] = 'danger';
+			$message['msg_data'] = 'File type is not valid!';
+			return redirect()->back()->with($message);
+        }
 
 		$user_selection = null;
 		if($approvalRequest->approval->properties != ''){
