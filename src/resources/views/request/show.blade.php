@@ -56,7 +56,21 @@ function get_approval_type($approval){
 									?>
 									@endforeach
 									{{approvalDate($approvalRequest->created_at, true)}}<br>
-									<a target="_blank" href="{{route($approvalRequest->approval->view_route_name,[array_keys($approvalRequest->approval->view_route_param)[0]=>$approvalRequest->approvable[array_values($approvalRequest->approval->view_route_param)[0]]])}}">View Details</a>
+									@php
+		                            $route_params = array_values($approvalRequest->approval->view_route_param)[0];
+		                            $param_value = null;
+		                            if(strpos($route_params,'.') !== false){
+		                                $params = explode('.',$route_params);
+		                                foreach($params as $keyParam => $param){
+		                                    if($keyParam == 0)
+		                                        $param_value = $approvalRequest->approvable->$param;
+		                                    else
+		                                        $param_value = $param_value->$param;
+		                                }
+		                            }else
+		                                $param_value = $approvalRequest->approvable[$route_params];
+		                            @endphp
+									<a target="_blank" href="{{route($approvalRequest->approval->view_route_name,[array_keys($approvalRequest->approval->view_route_param)[0]=>$param_value])}}">View Details</a>
 								</div>
 							</div>							
 						</div>
