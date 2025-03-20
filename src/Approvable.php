@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Notification;
 
 trait Approvable 
 {
-    public function notifyApprovalCreate($approvalItem, $approvalId = null, $resubmitUserId = null, $resubmitRemarks = null){
+    public function notifyApprovalCreate($approvalItem, $approvalId = null, $resubmitUserId = null, $resubmitRemarks = null, $created_by = null){
     	$approvalble = get_class($approvalItem);
     	if($approvalId){
     		$approval = Approval::where('id',$approvalId)->where('on_create',1)->where('status',1)->with('levels.forms.form_data','levels.users','mappings.fields')->first();
@@ -71,7 +71,7 @@ trait Approvable
     				$approvalRequest = $approval->requests()->create([
 			    		'approvable_type' => $approvalble,
 			    		'approvable_id' => $approvalItem->id,
-						'user_id' => auth()->user()->id,
+						'user_id' => ($created_by) ? $created_by: auth()->user()->id,
 			    	]);
 
 			    	$firstLevel = $approval->levels->sortBy('level')->first();
