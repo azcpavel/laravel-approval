@@ -157,7 +157,8 @@ class ApprovalRequestController extends Controller
         			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$user->$usValueValueValue);
+	        					if($user->$usValueValueValue)
+	        						$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
