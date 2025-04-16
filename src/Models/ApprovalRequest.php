@@ -234,6 +234,7 @@ class ApprovalRequest extends Model
         			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
@@ -242,6 +243,7 @@ class ApprovalRequest extends Model
         			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+	        					if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
@@ -250,6 +252,7 @@ class ApprovalRequest extends Model
 					$totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+								if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
