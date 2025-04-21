@@ -174,6 +174,10 @@ class ApprovalRequest extends Model
                     ->selectRaw($asJ);
                     $filterData->join($name_array[0], $withJ, '=', $name_array[0].'.id');
                     $totalCount->join($name_array[0], $withJ, '=', $name_array[0].'.id');
+                }else if($name_as =='function'){
+                    $totalData->join($name_array[0], $withJ)->selectRaw($asJ);
+                    $filterData->join($name_array[0], $withJ);
+                    $totalCount->join($name_array[0], $withJ);
                 }
 				else{
 					$totalData->leftJoin($nameJ, $withJ, '=', $name_as.'.id')
@@ -229,34 +233,91 @@ class ApprovalRequest extends Model
 
         if($user_selection){        	
         	$user = auth()->user();
+        	$totalData->whereExists(function ($query) use($user){
+                $query->select(\DB::raw(1))
+                      ->from('ex_approval_level_users')
+                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
+                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
+                      ->where('ex_approval_level_users.user_id',$user->id);
+            });
+            $filterData->whereExists(function ($query) use($user){
+                $query->select(\DB::raw(1))
+                      ->from('ex_approval_level_users')
+                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
+                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
+                      ->where('ex_approval_level_users.user_id',$user->id);
+            });
+            $totalCount->whereExists(function ($query) use($user){
+                $query->select(\DB::raw(1))
+                      ->from('ex_approval_level_users')
+                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
+                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
+                      ->where('ex_approval_level_users.user_id',$user->id);
+            });
         	foreach($user_selection as $usKey => $usValue){
         		if($usValue->type == 'model'){
-        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
 
-        			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+        			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
 
-					$totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'and', function($query) use($user, $usValue) {
+					$totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-								if($user->$usValueValueValue)
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
+        		}if($usValue->type == 'model_collection'){
+        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
+                        foreach($usValue->items as $usValueKey => $usValueValue){
+                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+                                $user_relation = $usValueValueValue->relation;
+                                if(!$user->$user_relation || count($user->$user_relation) == 0)
+                                    $query->where($usValueValueKey,-9999);
+                                else
+                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
+                                
+                            }
+                        }                                   
+                    });
+
+                    $filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
+                        foreach($usValue->items as $usValueKey => $usValueValue){
+                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+                                $user_relation = $usValueValueValue->relation;
+                                if(!$user->$user_relation || count($user->$user_relation) == 0)
+                                    $query->where($usValueValueKey,-9999);
+                                else
+                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
+                                
+                            }
+                        }                                   
+                    });
+
+                    $totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
+                        foreach($usValue->items as $usValueKey => $usValueValue){
+                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+                                $user_relation = $usValueValueValue->relation;
+                                if(!$user->$user_relation || count($user->$user_relation) == 0)
+                                    $query->where($usValueValueKey,-9999);
+                                else
+                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
+                                
+                            }
+                        }                                   
+                    });
         		}else if($usValue->type == 'value'){
         			foreach($usValue->items as $usValueKey => $usValueValue){
         				$totalData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
@@ -291,7 +352,7 @@ class ApprovalRequest extends Model
         }
 
         if($select != null){
-        	$query->selectRaw($select);
+        	$totalData->selectRaw($select);
         	$filterData->selectRaw($select);
         }
 
@@ -302,7 +363,7 @@ class ApprovalRequest extends Model
 		} else {
 			$totalData->orderBy($this->getTable() . '.id', 'DESC');
         }
-        // dd($totalData->toSql());
+        
         return [
             'data' => $totalData->get(),
             'draw'      => request()->input('draw'), //prevent Cross Site Scripting (XSS) attacks. https://datatables.net/manual/server-side

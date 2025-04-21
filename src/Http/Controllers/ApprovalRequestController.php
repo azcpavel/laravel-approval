@@ -149,20 +149,38 @@ class ApprovalRequestController extends Controller
 						'mappings.form_data',
 						'approvable',
 						'approvals');
-
 		if($user_selection){        	
         	$user = auth()->user();
+        	$approvalRequestSql->whereExists(function ($query) use($user){
+                $query->select(\DB::raw(1))
+                      ->from('ex_approval_level_users')
+                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
+                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
+                      ->where('ex_approval_level_users.user_id',$user->id);
+            });
         	foreach($user_selection as $usKey => $usValue){
         		if($usValue->type == 'model'){
-        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'and', function($query) use($user, $usValue) {
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
-							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					if($user->$usValueValueValue)
-	        						$query->where($usValueValueKey,$user->$usValueValueValue);
+							foreach($usValueValue as $usValueValueKey => $usValueValueValue){	        					
+	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
-        		}else if($usValue->type == 'value'){
+        		}if($usValue->type == 'model_collection'){
+                    $approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
+                        foreach($usValue->items as $usValueKey => $usValueValue){
+                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
+                                $user_relation = $usValueValueValue->relation;
+                                if(!$user->$user_relation || count($user->$user_relation) == 0)
+                                    $query->where($usValueValueKey,-9999);
+                                else
+                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
+                                
+                            }
+                        }                                   
+                    });
+                }else if($usValue->type == 'value'){
         			foreach($usValue->items as $usValueKey => $usValueValue){
         				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
 			               $query->select(\DB::raw(1))
@@ -176,9 +194,8 @@ class ApprovalRequestController extends Controller
         		}
         	}
         }
-
+        // dd($approvalRequestSql->toSql(),$approvalRequestSql->getBindings());
 		$approvalRequest = $approvalRequestSql->first();
-
 		if(!$approvalRequest)
 			abort(404);
 
