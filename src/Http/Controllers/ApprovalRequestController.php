@@ -195,7 +195,7 @@ class ApprovalRequestController extends Controller
         	}
         }
         // dd($approvalRequestSql->toSql(),$approvalRequestSql->getBindings());
-		$approvalRequest = $approvalRequestSql->first();
+		$approvalRequest = $approvalRequestSql->where('id',$approvalRequest->id)->first();
 		if(!$approvalRequest)
 			abort(404);
 
