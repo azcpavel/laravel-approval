@@ -775,6 +775,8 @@ class ApprovalRequestController extends Controller
 			}catch(\Exception $e){
 				if(env('APP_DEBUG'))
 					dd($e);
+				else
+					$this->logError($e);
 				\DB::rollback();
 				$message['msg_type'] = 'danger';
 				$message['msg_data'] = 'Something went wrong, please try again';
@@ -1244,5 +1246,10 @@ class ApprovalRequestController extends Controller
 		]);
 
 		return $approvalRequestApproval;
+	}
+
+	private function logError($e){
+
+	    \Log::info(json_encode(['message'=>$e->getMessage(),'file'=>$e->getFile(),'line'=>$e->getLine()]));
 	}	
 }
