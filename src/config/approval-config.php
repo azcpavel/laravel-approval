@@ -36,5 +36,6 @@
         'notification-dir' => 'Notifications',
         'upload-dir' => 'uploads',
         'file_rules' => 'bail|nullable|mimes:png,jpg,jpeg,pdf,xls,xlsx,doc|max:3000',
-        'dev-mode' => env('APPROVALPERMISSION_DEV',false)
+        'dev-mode' => env('APPROVALPERMISSION_DEV',false),
+        'db_like_operator' => 'like'        
     ];
