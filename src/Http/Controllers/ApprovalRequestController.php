@@ -645,7 +645,7 @@ class ApprovalRequestController extends Controller
 								Notification::send($users->whereIn('id',$nextLevel->approval_users->where('user_id','!=',auth()->id())->where('status',1)->pluck('user_id')->all())->get(),new $notifiableClass($approvalRequest, $approvalItem, $approvalRequestApprover, $nextLevel->notifiable_params->channels, $approvalRequestApproval));
 							}						
 						}
-					}elseif($rejectCount > ($currentLevel->approval_users->count() - $currentLevel->is_flexible)){
+					}elseif($rejectCount != 0 && $rejectCount >= $currentLevel->is_flexible){
 						//Reject
 						foreach($approvalRequest->approvers->where('level',$currentLevel->level)->where('status',0)->all() as $keyASD => $valueASD){
 							$valueASD->update([
