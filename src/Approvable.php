@@ -33,11 +33,11 @@ trait Approvable
     	
     	try{
     		if($approval){
-    			$old_request = $approval->requests->where('approvable_id',$approvalItem->id)->whereBetween('completed',[0,2])->first();    			
+    			$old_request = $approval->requests->where('approvable_id',$approvalItem->id)->whereBetween('completed',[0,2,3])->first();    			
     			if($old_request && $old_request->completed == 0)
     				return -2;
 
-    			if($old_request && $old_request->completed == 2){
+    			if($old_request && ($old_request->completed == 2 || $old_request->completed == 3)){
     				$old_request->completed = 0;
     				$old_request->save();
 
