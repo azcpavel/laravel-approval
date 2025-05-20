@@ -151,12 +151,13 @@ class ApprovalRequestController extends Controller
 						'approvals');
 		if($user_selection){        	
         	$user = auth()->user();
-        	$approvalRequestSql->whereExists(function ($query) use($user){
+        	$approvalRequestSql->whereExists(function ($query) use($user,$approvalRequest){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
                       ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
                       ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
-                      ->where('ex_approval_level_users.user_id',$user->id);
+                      ->where('ex_approval_level_users.user_id',$user->id)
+                      ->where('ex_approval_requests.approvable_type',$approvalRequest->approval->approvable_type);
             });
         	foreach($user_selection as $usKey => $usValue){
         		if($usValue->type == 'model'){
