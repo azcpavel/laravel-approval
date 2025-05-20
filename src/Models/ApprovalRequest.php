@@ -93,53 +93,6 @@ class ApprovalRequest extends Model
         $filterData = $this::query();
 		$totalCount = $this::query();
 
-        if(count($where) > 0){
-            foreach ($where as $keyW => $valueW) {
-				if(strpos($keyW, ' IN') !== false){
-                    $keyW = str_replace(' IN', '', $keyW);
-                    $totalData->whereIn($keyW, $valueW);
-                    $filterData->whereIn($keyW, $valueW);
-                    $totalCount->whereIn($keyW, $valueW);
-                }else if(strpos($keyW, ' NOTIN') !== false){
-                    $keyW = str_replace(' NOTIN', '', $keyW);
-                    $totalData->whereNotIn($keyW, $valueW);
-                    $filterData->whereNotIn($keyW, $valueW);
-                    $totalCount->whereNotIn($keyW, $valueW);
-                }else if(is_array($valueW)){
-                    $totalData->where([$valueW]);
-                    $filterData->where([$valueW]);
-                    $totalCount->where([$valueW]);
-                }else if(strpos($keyW, ' and') === false){
-                    if(strpos($keyW, ' NOTEQ') !== false){
-                        $keyW = str_replace(' NOTEQ', '', $keyW);
-                        $totalData->orWhere($keyW, '!=', $valueW);
-                        $filterData->orWhere($keyW, '!=',  $valueW);
-                        $totalCount->orWhere($keyW, '!=', $valueW);
-                    }
-                    else{
-                        $totalData->orWhere($keyW, $valueW);
-                        $filterData->orWhere($keyW, $valueW);
-                        $totalCount->orWhere($keyW, $valueW);
-                    }
-                }
-                else{
-                    $keyW = str_replace(' and', '', $keyW);
-                    if(strpos($keyW, ' NOTEQ') !== false){
-                        $keyW = str_replace(' NOTEQ', '', $keyW);
-                        $totalData->where($keyW, '!=', $valueW);
-                        $filterData->where($keyW, '!=',  $valueW);
-                        $totalCount->where($keyW, '!=', $valueW);
-                    }
-                    else{
-                        $totalData->where($keyW, $valueW);
-                        $filterData->where($keyW, $valueW);
-                        $totalCount->where($keyW, $valueW);
-                    }
-                }
-			}
-        }
-
-
         if($limit > 0){
             $totalData->limit($limit)->offset($offset);
         }
@@ -235,26 +188,32 @@ class ApprovalRequest extends Model
 
         if($user_selection){        	
         	$user = auth()->user();
-        	$totalData->whereExists(function ($query) use($user){
+        	$totalData->whereExists(function ($query) use($user, $whereHasType){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
                       ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
                       ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
                       ->where('ex_approval_level_users.user_id',$user->id);
+                if(count($whereHasType)>0)
+                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
             });
-            $filterData->whereExists(function ($query) use($user){
+            $filterData->whereExists(function ($query) use($user, $whereHasType){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
                       ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
                       ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
                       ->where('ex_approval_level_users.user_id',$user->id);
+                if(count($whereHasType)>0)
+                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
             });
-            $totalCount->whereExists(function ($query) use($user){
+            $totalCount->whereExists(function ($query) use($user, $whereHasType){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
                       ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
                       ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
                       ->where('ex_approval_level_users.user_id',$user->id);
+                if(count($whereHasType)>0)
+                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
             });
         	foreach($user_selection as $usKey => $usValue){
         		if($usValue->type == 'model'){
@@ -351,6 +310,52 @@ class ApprovalRequest extends Model
         			}
         		}
         	}
+        }
+
+        if(count($where) > 0){
+            foreach ($where as $keyW => $valueW) {
+				if(strpos($keyW, ' IN') !== false){
+                    $keyW = str_replace(' IN', '', $keyW);
+                    $totalData->whereIn($keyW, $valueW);
+                    $filterData->whereIn($keyW, $valueW);
+                    $totalCount->whereIn($keyW, $valueW);
+                }else if(strpos($keyW, ' NOTIN') !== false){
+                    $keyW = str_replace(' NOTIN', '', $keyW);
+                    $totalData->whereNotIn($keyW, $valueW);
+                    $filterData->whereNotIn($keyW, $valueW);
+                    $totalCount->whereNotIn($keyW, $valueW);
+                }else if(is_array($valueW)){
+                    $totalData->where([$valueW]);
+                    $filterData->where([$valueW]);
+                    $totalCount->where([$valueW]);
+                }else if(strpos($keyW, ' and') === false){
+                    if(strpos($keyW, ' NOTEQ') !== false){
+                        $keyW = str_replace(' NOTEQ', '', $keyW);
+                        $totalData->orWhere($keyW, '!=', $valueW);
+                        $filterData->orWhere($keyW, '!=',  $valueW);
+                        $totalCount->orWhere($keyW, '!=', $valueW);
+                    }
+                    else{
+                        $totalData->orWhere($keyW, $valueW);
+                        $filterData->orWhere($keyW, $valueW);
+                        $totalCount->orWhere($keyW, $valueW);
+                    }
+                }
+                else{
+                    $keyW = str_replace(' and', '', $keyW);
+                    if(strpos($keyW, ' NOTEQ') !== false){
+                        $keyW = str_replace(' NOTEQ', '', $keyW);
+                        $totalData->where($keyW, '!=', $valueW);
+                        $filterData->where($keyW, '!=',  $valueW);
+                        $totalCount->where($keyW, '!=', $valueW);
+                    }
+                    else{
+                        $totalData->where($keyW, $valueW);
+                        $filterData->where($keyW, $valueW);
+                        $totalCount->where($keyW, $valueW);
+                    }
+                }
+			}
         }
 
         if($select != null){
