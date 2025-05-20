@@ -273,7 +273,7 @@ class ApprovalRequestController extends Controller
 
 		if($user_selection){        	
         	$user = auth()->user();
-        	$approvalRequestSql->whereExists(function ($query) use($user){
+        	$approvalRequestSql->whereExists(function ($query) use($user,$approvalRequest){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
                       ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
