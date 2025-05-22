@@ -497,8 +497,11 @@ class ApprovalRequestController extends Controller
 								}
 								$approvalItem->save();
 							}
-
-							$approvalRequest->completed = 2;
+							if($currentLevel->move_on_reject == 0){
+								$approvalRequest->completed = 2;
+							}else{
+								$approvalRequest->approval_state = $nextLevel->level;
+							}
 							$approvalRequest->save();
 						}elseif($request->approval_option == 2){							
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){							
@@ -548,7 +551,12 @@ class ApprovalRequestController extends Controller
 								$approvalItem->save();
 							}
 
-							$approvalRequest->completed = 2;
+							if($currentLevel->move_on_reject == 0){
+								$approvalRequest->completed = 2;
+							}else{
+								$approvalRequest->approval_state = $nextLevel->level;
+							}
+							
 							$approvalRequest->save();
 						}elseif($request->approval_option == 2){							
 							if($currentLevel->status_fields && property_exists($currentLevel->status_fields, 'send_back') && $currentLevel->status_fields->send_back){							
@@ -669,7 +677,11 @@ class ApprovalRequestController extends Controller
 							$approvalItem->save();
 						}
 
-						$approvalRequest->completed = 2;
+						if($currentLevel->move_on_reject == 0){
+							$approvalRequest->completed = 2;
+						}else{
+							$approvalRequest->approval_state = $nextLevel->level;
+						}
 						$approvalRequest->save();
 
 						$approvalRequestApproval = $this->doApprovalLog($approvalRequest, $approvalRequestApprover, $prevLevel);
@@ -743,7 +755,11 @@ class ApprovalRequestController extends Controller
 						$approvalItem->save();
 					}
 
-					$approvalRequest->completed = 2;
+					if($currentLevel->move_on_reject == 0){
+						$approvalRequest->completed = 2;
+					}else{
+						$approvalRequest->approval_state = $nextLevel->level;
+					}
 					$approvalRequest->save();
 
 					if($currentLevel->group_notification && $currentLevel->notifiable_class){
