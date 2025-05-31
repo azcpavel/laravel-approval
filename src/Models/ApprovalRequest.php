@@ -133,8 +133,11 @@ class ApprovalRequest extends Model
                     $totalData->join($name_array[0], $withJ)->selectRaw($asJ);
                     $filterData->join($name_array[0], $withJ);
                     $totalCount->join($name_array[0], $withJ);
-                }
-				else{
+                }elseif($name_as =='function_left'){
+                    $totalData->leftJoin($name_array[0], $withJ)->selectRaw($asJ);
+                    $filterData->leftJoin($name_array[0], $withJ);
+                    $totalCount->leftJoin($name_array[0], $withJ);
+                }else{
 					$totalData->leftJoin($nameJ, $withJ, '=', $name_as.'.id')
 					->selectRaw($asJ);
 					$filterData->leftJoin($nameJ, $withJ, '=', $name_as.'.id');
