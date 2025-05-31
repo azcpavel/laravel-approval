@@ -163,9 +163,17 @@ class ApprovalRequest extends Model
 						if(strpos($valueS, ":") === false)					
 							$querySub->orWhere($valueS, config('approval-config.db_like_operator'), "%$search%");
 						else{
-							$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
-						        $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
-						    });							
+							$relation = explode(':',$valueS)[0];
+							if(get_class($querySub->getModel()->$relation()) == 'Illuminate\Database\Eloquent\Relations\MorphTo'){
+								// TODO: Fix Morph
+								// $querySub->hasMorph(explode(':',$valueS)[0], ['*'], function ($querySubSub) use ($search,$valueS) {
+							    //     $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
+							    // });
+							}else{
+								$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
+							        $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
+							    });	
+							}							
 						}					
 					}
 				});				
@@ -177,9 +185,17 @@ class ApprovalRequest extends Model
 						if(strpos($valueS, ":") === false)				
 							$querySub->orWhere($valueS, config('approval-config.db_like_operator'), "%$search%");
 						else{
-							$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
-						        $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
-						    });							
+							$relation = explode(':',$valueS)[0];
+							if(get_class($querySub->getModel()->$relation()) == 'Illuminate\Database\Eloquent\Relations\MorphTo'){
+								// TODO: Fix Morph
+								// $querySub->hasMorph(explode(':',$valueS)[0], ['*'], function ($querySubSub) use ($search,$valueS) {
+							    //     $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
+							    // });
+							}else{
+								$querySub->orWhereHas(explode(':',$valueS)[0], function ($querySubSub) use ($search,$valueS) {
+							        $querySubSub->where(explode(':',$valueS)[1], config('approval-config.db_like_operator'), "%$search%");
+							    });	
+							}							
 						}				
 					}
 				});				
