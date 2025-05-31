@@ -119,17 +119,17 @@ class ApprovalRequest extends Model
 					->selectRaw($asJ);
 					$filterData->leftJoin($name_array[0], $withJ, '=', $this->getTable().'.id');
 					$totalCount->leftJoin($name_array[0], $withJ, '=', $this->getTable().'.id');
-				}else if($name_as =='rev_column'){
+				}elseif($name_as =='rev_column'){
                     $totalData->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1])
                     ->selectRaw($asJ);
                     $filterData->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1]);
                     $totalCount->leftJoin($name_array[0], $withJ, '=', $name_array[0].'.'.$name_array[1]);
-                }else if($name_as =='inner'){
+                }elseif($name_as =='inner'){
                     $totalData->join($name_array[0], $withJ, '=', $name_array[0].'.id')
                     ->selectRaw($asJ);
                     $filterData->join($name_array[0], $withJ, '=', $name_array[0].'.id');
                     $totalCount->join($name_array[0], $withJ, '=', $name_array[0].'.id');
-                }else if($name_as =='function'){
+                }elseif($name_as =='function'){
                     $totalData->join($name_array[0], $withJ)->selectRaw($asJ);
                     $filterData->join($name_array[0], $withJ);
                     $totalCount->join($name_array[0], $withJ);
@@ -188,21 +188,27 @@ class ApprovalRequest extends Model
 
         if(count($where) > 0){
             foreach ($where as $keyW => $valueW) {
-				if(strpos($keyW, ' IN') !== false){
+				if(strpos($keyW, ' EXISTS') !== false){
+                    $keyW = str_replace(' EXISTS', '', $keyW);                    
+                    $totalData->whereExists($valueW);
+                    $filterData->whereExists($valueW);
+                    $totalCount->whereExists($valueW);
+                }
+				elseif(strpos($keyW, ' IN') !== false){
                     $keyW = str_replace(' IN', '', $keyW);
                     $totalData->whereIn($keyW, $valueW);
                     $filterData->whereIn($keyW, $valueW);
                     $totalCount->whereIn($keyW, $valueW);
-                }else if(strpos($keyW, ' NOTIN') !== false){
+                }elseif(strpos($keyW, ' NOTIN') !== false){
                     $keyW = str_replace(' NOTIN', '', $keyW);
                     $totalData->whereNotIn($keyW, $valueW);
                     $filterData->whereNotIn($keyW, $valueW);
                     $totalCount->whereNotIn($keyW, $valueW);
-                }else if(is_array($valueW)){
+                }elseif(is_array($valueW)){
                     $totalData->where([$valueW]);
                     $filterData->where([$valueW]);
                     $totalCount->where([$valueW]);
-                }else if(strpos($keyW, ' and') === false){
+                }elseif(strpos($keyW, ' and') === false){
                     if(strpos($keyW, ' NOTEQ') !== false){
                         $keyW = str_replace(' NOTEQ', '', $keyW);
                         $totalData->orWhere($keyW, '!=', $valueW);
@@ -359,21 +365,27 @@ class ApprovalRequest extends Model
 
         	if(count($where) > 0){
 	            foreach ($where as $keyW => $valueW) {
-					if(strpos($keyW, ' IN') !== false){
+					if(strpos($keyW, ' EXISTS') !== false){
+	                    $keyW = str_replace(' EXISTS', '', $keyW);                    
+	                    $totalData->whereExists($valueW);
+	                    $filterData->whereExists($valueW);
+	                    $totalCount->whereExists($valueW);
+	                }
+					elseif(strpos($keyW, ' IN') !== false){
 	                    $keyW = str_replace(' IN', '', $keyW);
 	                    $totalData->whereIn($keyW, $valueW);
 	                    $filterData->whereIn($keyW, $valueW);
 	                    $totalCount->whereIn($keyW, $valueW);
-	                }else if(strpos($keyW, ' NOTIN') !== false){
+	                }elseif(strpos($keyW, ' NOTIN') !== false){
 	                    $keyW = str_replace(' NOTIN', '', $keyW);
 	                    $totalData->whereNotIn($keyW, $valueW);
 	                    $filterData->whereNotIn($keyW, $valueW);
 	                    $totalCount->whereNotIn($keyW, $valueW);
-	                }else if(is_array($valueW)){
+	                }elseif(is_array($valueW)){
 	                    $totalData->where([$valueW]);
 	                    $filterData->where([$valueW]);
 	                    $totalCount->where([$valueW]);
-	                }else if(strpos($keyW, ' and') === false){
+	                }elseif(strpos($keyW, ' and') === false){
 	                    if(strpos($keyW, ' NOTEQ') !== false){
 	                        $keyW = str_replace(' NOTEQ', '', $keyW);
 	                        $totalData->orWhere($keyW, '!=', $valueW);
