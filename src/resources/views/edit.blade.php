@@ -673,7 +673,7 @@
 			$.each(response,function(indKey, val){
 				$htmlWrap.find('#model_namespace_relation_tbody').append(
 					'<tr>'+
-						'<td>'+val.Field+'</td>'+
+						'<td>'+val.column_name+'</td>'+
 						'<td><input type="text" name="model_namespace_relation_tbody_label['+inputKey+'][]" class="form-control model_namespace_relation_tbody_label" placeholder="Label">'+
 						'<input type="hidden" name="model_namespace_relation_tbody_name['+inputKey+'][]" class="form-control model_namespace_relation_tbody_name" value="'+val.Field+'" required>'+
 						'<input type="text" name="model_namespace_relation_tbody_relation['+inputKey+'][]" class="mt-2 form-control model_namespace_relation_tbody_relation mt-2" placeholder="Relation">'+
@@ -826,7 +826,7 @@
 			$.each(response,function(indKey, val){
 				$htmlWrap.find('.approval_form_tbody').append(
 					'<tr>'+
-						'<td>'+val.Field+'</td>'+
+						'<td>'+val.column_name+'</td>'+
 						'<td><input type="text" name="approval_form_tbody_label['+approvalLevel+']['+inputKey+'][]" class="form-control approval_form_tbody_label" placeholder="Label">'+
 						'<input type="text" name="approval_form_tbody_relation['+approvalLevel+']['+inputKey+'][]" class="mt-2 form-control approval_form_tbody_relation" placeholder="Relation">'+
 						'<div class="input-group">'+						

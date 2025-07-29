@@ -576,7 +576,8 @@ class ApprovalController extends Controller
 
 	public function modelColumn(Request $request){
 		$model = new $request->model_namespace();
-		return \DB::select('SHOW COLUMNS FROM '.$model->getTable());        
+		return \DB::select("SELECT *
+		FROM information_schema.columns WHERE table_name = '".$model->getTable()."'");
 	}
 
 	public function approvelLevelForm(Request $request){
