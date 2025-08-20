@@ -369,6 +369,9 @@ function get_approval_type($approval){
 							@csrf
 							<?php
 							$maxLevelApproved = $approvalRequest->approvals->where('is_approved',1)->sortByDesc('next_level')->first();
+							if($currentLevel->move_on_reject){
+		                        $maxLevelApproved = $approvalRequest->approvals->sortByDesc('next_level')->first();                        
+		                    }
 							?>
 							@if($maxLevelApproved)
 							<?php
