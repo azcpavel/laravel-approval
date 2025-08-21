@@ -892,6 +892,13 @@ class ApprovalRequestController extends Controller
 				'reason' => $request->swap_reason,
 			]);
 
+			if($currentLevel->action_type == 1 && $currentLevel->action_data && property_exists($currentLevel->action_data, 'swap') && $currentLevel->action_data->swap){
+				$actionClassPath = $currentLevel->action_data->swap->class;
+				$actionClassMethod = $currentLevel->action_data->swap->method;
+				$actionClass = new $actionClassPath();
+				$actionClass->$actionClassMethod($approvalRequest->approvable, $approvalRequestApproval ,$request->all());
+			}
+
 	    	if($currentLevel->group_notification && $currentLevel->notifiable_class){
 				$notifiableClass = $currentLevel->notifiable_class;
 				$userModel = config('approval-config.user-model');
