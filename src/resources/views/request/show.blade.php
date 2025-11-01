@@ -407,21 +407,16 @@ function get_approval_type($approval){
 			  <div class="modal-body">
 				<form method="POST" enctype="multipart/form-data" action="{{route(config('approval-config.route-name-request-prefix').'.submit',['approvalRequest' => $approvalRequest->id])}}" onsubmit="return chkApprovalValidate()">
 					@csrf
-					<select name="approval_option" class="form-control mb-3" id="approval-option">
-						<option value="1">Approve</option>
-						<option value="2">Send Back</option>
-						<option value="0">Reject</option>
-					</select>
+					@php
+					$approval_level_properties = (object)json_decode($currentLevel->properties);					
+					@endphp					
 					<textarea id="approval-reason" name="approval_reason" placeholder="Reason" class="form-control mb-3"></textarea>
 					@if($currentLevel->need_attachment)
 					<input type="file" multiple name="approval_file[]" class="form-control mb-3">		        
 					@endif
-					@php
-					$approval_level_properties = (object)json_decode($currentLevel->properties);					
-					@endphp
 					@if($approval_level_properties && isset($approval_level_properties->partial_form))
 						@include($approval_level_properties->partial_form->view,[$approval_level_properties->partial_form->param => $approvalRequest])
-					@endif				
+					@endif									
 					@if($nextLevel && $currentLevel->next_level_user)
 					<select name="approval_next_user" class="form-control mb-3" id="approval-next-user">
 						<option value="">Select {{$nextLevel->title}} User</option>
@@ -562,6 +557,15 @@ function get_approval_type($approval){
 							@endif
 						@endforeach
 					@endif
+					@if($approval_level_properties && isset($approval_level_properties->hide_action))
+                    <input type="hidden" id="approval-option" name="approval_option" value="1">
+                    @else
+                    <select name="approval_option" class="w-full form-input mb-3 border px-4 py-3 rounded-[8px]" id="approval-option">
+                        <option value="1">Approve</option>
+                        <option value="2">Send Back</option>
+                        <option value="0">Reject</option>
+                    </select>
+                    @endif
 					<button type="submit" class="btn btn-primary">Save changes</button>
 				</form>
 			  </div>
