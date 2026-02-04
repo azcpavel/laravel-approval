@@ -149,8 +149,9 @@ class ApprovalRequestController extends Controller
 						'mappings.form_data',
 						'approvable',
 						'approvals');
+		$currentLevel = $approvalRequest->currentLevel(true);
+		$user = auth()->user();
 		if($user_selection){        	
-        	$user = auth()->user();
         	$approvalRequestSql->whereExists(function ($query) use($user,$approvalRequest){
                 $query->select(\DB::raw(1))
                       ->from('ex_approval_level_users')
@@ -194,7 +195,20 @@ class ApprovalRequestController extends Controller
         			}
         		}
         	}
+
+        	if($currentLevel->properties){
+        		$properties = (object)json_decode($currentLevel->properties);
+        		$level_column = $user_selection->level_column;
+        		if(isset($properties->show_level_user_only) && $user->$level_column != $approvalRequest->approval_state)
+        			abort(403);
+        	}
         }
+        
+        if($currentLevel->properties){
+    		$properties = (object)json_decode($currentLevel->properties);
+    		if(isset($properties->show_level_user_only) && !in_array($user->id, $currentLevel->users->pluck('id')->toArray()))
+    			abort(403);
+    	}
         // dd($approvalRequestSql->toSql(),$approvalRequestSql->getBindings());
 		$approvalRequest = $approvalRequestSql->where('id',$approvalRequest->id)->first();
 		if(!$approvalRequest)
