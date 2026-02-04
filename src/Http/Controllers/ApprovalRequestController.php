@@ -193,18 +193,18 @@ class ApprovalRequestController extends Controller
 							}
 			           	});       				
         			}
-        		}
-        	}
 
-        	if($currentLevel->properties){
-        		$properties = (object)json_decode($currentLevel->properties);
-        		$level_column = $user_selection->level_column;
-        		if(isset($properties->show_level_user_only) && $user->$level_column != $approvalRequest->approval_state)
-        			abort(403);
+        			if($currentLevel->properties){
+		        		$properties = (object)json_decode($currentLevel->properties);
+		        		$level_column = $usValue->level_column;
+		        		if(isset($properties->show_level_user_only) && $user->$level_column != $approvalRequest->approval_state)
+		        			abort(403);
+		        	}
+        		}
         	}
         }
         
-        if($currentLevel->properties){
+        if(!$user_selection && $currentLevel->properties){
     		$properties = (object)json_decode($currentLevel->properties);
     		if(isset($properties->show_level_user_only) && !in_array($user->id, $currentLevel->users->pluck('id')->toArray()))
     			abort(403);
