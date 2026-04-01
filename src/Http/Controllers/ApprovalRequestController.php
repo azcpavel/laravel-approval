@@ -68,18 +68,12 @@ class ApprovalRequestController extends Controller
 			$with[] = 'approvable:id'.(count($fields) > 0 ? ','.implode(',', $fields) : '');
 			$with = array_merge($with, $relations);
 
+			if($request->input('approval_state') != ''){
+				$where[] = ['completed', $request->input('approval_state')];
+			}
+
 			if($request->input('approval_level') != ''){
-				$approval_level = $request->input('approval_level');
-				if($approval_level == 0){
-					$where[] = ['completed', 0];
-				}else if($approval_level == -1){
-					$where[] = ['completed', 1];
-				}else if($approval_level == -2){
-					$where[] = ['completed', 2];
-				}else if($approval_level == -3){
-					$where[] = ['completed', 3];
-				}else
-					$where[] = ['approval_state', $request->input('approval_level')];
+				$where[] = ['approval_state', $request->input('approval_level')];
 			}
 
 			$user_selection = null;

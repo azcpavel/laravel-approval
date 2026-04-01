@@ -35,7 +35,7 @@
 			approvalRequestDataTable = $('#approval-request-table').DataTable({
 			dom: '<"row"<"col-12 col-sm-6"Bl<"#tools.float-right">><"col-12 col-sm-6"f>><"row"<"col-12 col-sm-12"t><"col-12 col-sm-6"i><"col-12 col-sm-6"p>>',
 			initComplete: function(){                    
-                $('#tools').html('<select id="approval_level" class="form-control input-sm"><option value="">All Levels</option><option value="0">Pending</option><option value="-1">Completed</option><option value="-3">Send Back</option><option value="-2">Rejected</option>@php
+                $('#tools').html('<select id="approval_state" class="form-control input-sm"><option value="">All State</option><option value="0">Pending</option><option value="1">Completed</option><option value="3">Send Back</option><option value="2">Rejected</option></select> <select id="approval_level" class="form-control input-sm"><option value="">All Levels</option>@php
                                 foreach($approval->levels as $level){
                                     echo '<option value="'.$level->level.'">'.$level->title.'</option>';
                                 }
@@ -119,6 +119,7 @@
 			ajax: {
 				url: "{{route(config('approval-config.route-name-request-prefix').'.index',['approval' => $approval->id])}}",
 				data: function(query){
+                    query.approval_state = $('#approval_state').val();                        
                     query.approval_level = $('#approval_level').val();                        
                 }
 			},
@@ -141,7 +142,7 @@
 			});
 		});
 
-		$(document).on('change', '#approval_level', function() {
+		$(document).on('change', '#approval_state, #approval_level', function() {
             approvalRequestDataTable.ajax.reload();
         });
 
