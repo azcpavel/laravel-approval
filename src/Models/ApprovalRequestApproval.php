@@ -24,7 +24,8 @@ class ApprovalRequestApproval extends Model
 		'is_resubmitted',
 		'is_commented',
 		'is_send_back',
-		'reason'
+		'reason',
+		'custom_action'
 	];
 
 	public function approval(){

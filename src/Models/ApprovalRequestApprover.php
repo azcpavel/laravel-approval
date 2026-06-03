@@ -31,7 +31,8 @@ class ApprovalRequestApprover extends Model
 		'is_send_back',
 		'reason',
 		'reason_file',
-		'status'
+		'status',
+		'custom_action'
 	];
 
 	protected $casts = [

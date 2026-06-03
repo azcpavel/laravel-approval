@@ -115,7 +115,7 @@ function get_approval_type($approval){
 									<script type="text/javascript">
 										var currentLevel = {!!json_encode($currentLevel)!!};
 									</script>
-									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">Submit Approval</button>
+									<br><button data-toggle="modal" data-target="#approval-modal" type="button" id="submit-approval" class="btn btn-sm btn-success">@if(property_exists($approval_properties,'action_button_name')){{$approval_properties->action_button_name}} @else Submit Approval @endif</button>
 									@endif
 									@else
 									Time: {{approvalDate($approvalRequest->updated_at,true)}}
@@ -235,7 +235,7 @@ function get_approval_type($approval){
 									<tr>
 										<td width="40">{{$keyALS+1}}</td>
 										<td>{{$valueALS->user[config('approval-config.user-name')]}}</td>
-										<td>{{($valueALS->is_approved) ? 'Approved' : 'Rejected'}}</td>
+										<td>{{(($valueALS->custom_action) ? ucwords(str_replace('_',' ',$valueALS->custom_action)) : (($valueALS->is_approved) ? 'Approved' : 'Rejected'))}}</td>
 										@if($valueAL->where('next_level_user',1)->first())
 										<td>{{($valueALS->next_user) ? $valueALS->next_user[config('approval-config.user-name')] : ''}}</td>
 										@endif
@@ -617,7 +617,11 @@ function get_approval_type($approval){
 	@endif
 	<script type="text/javascript">
 		$(document).on("click","#submit-approval",function(){
+			@if(property_exists($approval_properties,'action_button_name'))
+			$('#approval-modal .modal-title').html("{{$approval_properties->action_button_name}} For: "+currentLevel.title);
+			@else
 			$('#approval-modal .modal-title').html("Approval For: "+currentLevel.title);
+			@endif
 		});
 
 		$(document).on("change","#approval-option",function(){

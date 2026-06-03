@@ -279,7 +279,7 @@ class ApprovalRequestController extends Controller
 
 		$currentLevel = $approvalRequest->currentLevel(true);
 		$approvalRequestSql = ApprovalRequest::where('id',$approvalRequest->id);
-
+		$currentLevelProperties = (object) json_decode($currentLevel->properties);
 		if($user_selection){        	
         	$user = auth()->user();
         	$approvalRequestSql->whereExists(function ($query) use($user,$approvalRequest){
@@ -390,6 +390,7 @@ class ApprovalRequestController extends Controller
 						'is_send_back' => 0,
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
+						'custom_action' => (property_exists($currentLevelProperties,'custom_action_request_name') ? $request->input($currentLevelProperties->custom_action_request_name) : null)
 					]);
 					$message['msg_data'] = 'Your approval has been submitted';
 				}else if($request->approval_option == 0){                    
@@ -414,6 +415,7 @@ class ApprovalRequestController extends Controller
 						'is_send_back' => 0,
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
+						'custom_action' => (property_exists($currentLevelProperties,'custom_action_request_name') ? $request->input($currentLevelProperties->custom_action_request_name) : null)
 					]);
 					$message['msg_data'] = 'Your rejection has been submitted';
 				}else if($request->approval_option == 2){                    
@@ -438,6 +440,7 @@ class ApprovalRequestController extends Controller
 						'is_send_back' => 1,
 						'reason' => $request->approval_reason,
 						'reason_file' => $files,
+						'custom_action' => (property_exists($currentLevelProperties,'custom_action_request_name') ? $request->input($currentLevelProperties->custom_action_request_name) : null)
 					]);
 					$message['msg_data'] = 'Your send back has been submitted';
 				}
@@ -1276,6 +1279,7 @@ class ApprovalRequestController extends Controller
 			'is_rejected' => $approvalRequestApprover->is_rejected,
 			'is_send_back' => $approvalRequestApprover->is_send_back,
 			'reason' => $approvalRequestApprover->reason,
+			'custom_action' => $approvalRequestApprover->custom_action,
 		]);
 
 		return $approvalRequestApproval;
