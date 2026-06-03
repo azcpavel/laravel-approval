@@ -291,16 +291,22 @@ class ApprovalRequestController extends Controller
                       ->where('ex_approval_requests.approvable_type',$approvalRequest->approval->approvable_type);
             });
         	foreach($user_selection as $usKey => $usValue){
+        		$submit_where_clause = "or";
+        		if(property_exists($usValue,"submit_where_clause")){
+        			$submit_where_clause = $usValue->submit_where_clause;
+        		}
+
         		if($usValue->type == 'model'){
-        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
+        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, $submit_where_clause, function($query) use($user, $usValue) {
 						foreach($usValue->items as $usValueKey => $usValueValue){
 							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
 	        					$query->where($usValueValueKey,$user->$usValueValueValue);
 							}
 	        			}									
 					});
-        		}if($usValue->type == 'model_collection'){
-                    $approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
+        		}
+        		else if($usValue->type == 'model_collection'){
+                    $approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, $submit_where_clause, function($query) use($user, $usValue) {
                         foreach($usValue->items as $usValueKey => $usValueValue){
                             foreach($usValueValue as $usValueValueKey => $usValueValueValue){
                                 $user_relation = $usValueValueValue->relation;
