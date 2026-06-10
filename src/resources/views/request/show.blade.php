@@ -380,6 +380,11 @@ function get_approval_type($approval){
 							<textarea id="swap-reason" name="swap_reason" placeholder="Remarks" class="form-control mb-3" required></textarea>
 							<select class="form-control mb-3" name="do_swap" required>
 								@foreach($maxLevelList as $keyALSI => $valueALSI)
+								@php
+								$valueALSI_properties = (object)json_decode($valueALSI->properties);
+								if($valueALSI_properties && isset($valueALSI_properties->hide_on_swap))
+									continue;					
+								@endphp	
 								<option value="{{$valueALSI->level}}">{{$valueALSI->title}}</option>
 								@endforeach
 							</select>
