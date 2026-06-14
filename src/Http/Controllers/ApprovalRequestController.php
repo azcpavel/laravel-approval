@@ -289,6 +289,7 @@ class ApprovalRequestController extends Controller
 	                      ->join('ex_approval_levels', 'ex_approval_levels.id', '=', 'ex_approval_level_users.approval_level_id')
 	                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
 	                      ->where('ex_approval_level_users.user_id', $user->id)
+	                      ->where('ex_approval_levels.level', $approvalRequest->approval_state)
 	                      ->where('ex_approval_requests.approvable_type', $approvalRequest->approval->approvable_type);
 	              });
 
