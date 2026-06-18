@@ -145,58 +145,71 @@ class ApprovalRequestController extends Controller
 						'approvals');
 		$currentLevel = $approvalRequest->currentLevel(true);
 		$user = auth()->user();
-		if($user_selection){        	
-        	$approvalRequestSql->whereExists(function ($query) use($user,$approvalRequest){
-                $query->select(\DB::raw(1))
-                      ->from('ex_approval_level_users')
-                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
-                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
-                      ->where('ex_approval_level_users.user_id',$user->id)
-                      ->where('ex_approval_requests.approvable_type',$approvalRequest->approval->approvable_type);
-            });
-        	foreach($user_selection as $usKey => $usValue){
-        		if($usValue->type == 'model'){
-        			$approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
-						foreach($usValue->items as $usValueKey => $usValueValue){
-							foreach($usValueValue as $usValueValueKey => $usValueValueValue){	        					
-	        					$query->where($usValueValueKey,$user->$usValueValueValue);
-							}
-	        			}									
-					});
-        		}if($usValue->type == 'model_collection'){
-                    $approvalRequestSql->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, 'or', function($query) use($user, $usValue) {
-                        foreach($usValue->items as $usValueKey => $usValueValue){
-                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-                                $user_relation = $usValueValueValue->relation;
-                                if(!$user->$user_relation || count($user->$user_relation) == 0)
-                                    $query->where($usValueValueKey,-9999);
-                                else
-                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
-                                
-                            }
-                        }                                   
-                    });
-                }else if($usValue->type == 'value'){
-        			foreach($usValue->items as $usValueKey => $usValueValue){
-        				$approvalRequestSql->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
-			               $query->select(\DB::raw(1))
-			                     ->from(config('approval-config.user-table'))
-			                     ->where('id',$user->id);
-			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$usValueValueValue);
-							}
-			           	});       				
-        			}
+		if($user_selection){
+	          $approvalRequestSql->where(function ($group) use ($user, $approvalRequest, $user_selection, $currentLevel) {
+	              $group->whereExists(function ($query) use ($user, $approvalRequest) {
+	                  $query->select(\DB::raw(1))
+	                      ->from('ex_approval_level_users')
+	                      ->join('ex_approval_levels', 'ex_approval_levels.id', '=', 'ex_approval_level_users.approval_level_id')
+	                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
+	                      ->where('ex_approval_level_users.user_id', $user->id)
+	                      ->where('ex_approval_requests.approvable_type', $approvalRequest->approval->approvable_type);
+	              });
 
-        			if($currentLevel->properties){
-		        		$properties = (object)json_decode($currentLevel->properties);
-		        		$level_column = $usValue->level_column;
-		        		if(isset($properties->show_level_user_only) && $user->$level_column != $approvalRequest->approval_state)
-		        			abort(403);
-		        	}
-        		}
-        	}
-        }
+	              $group->orWhere(function ($subQuery) use ($user_selection, $user, $approvalRequest, $currentLevel) {
+	                  foreach ($user_selection as $usKey => $usValue) {
+	                      $submit_where_clause = "or";
+	                      if (property_exists($usValue, "submit_where_clause")) {
+	                          $submit_where_clause = $usValue->submit_where_clause;
+	                      }
+
+	                      if ($usValue->type == 'model') {
+	                          $subQuery->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, $submit_where_clause, function ($query) use ($user, $usValue) {
+	                              foreach ($usValue->items as $usValueKey => $usValueValue) {
+	                                  foreach ($usValueValue as $usValueValueKey => $usValueValueValue) {
+	                                      $query->where($usValueValueKey, $user->$usValueValueValue);
+	                                  }
+	                              }
+	                          });
+	                      } else if ($usValue->type == 'model_collection') {
+	                          $subQuery->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, $submit_where_clause, function ($query) use ($user, $usValue) {
+	                              foreach ($usValue->items as $usValueKey => $usValueValue) {
+	                                  foreach ($usValueValue as $usValueValueKey => $usValueValueValue) {
+	                                      $user_relation = $usValueValueValue->relation;
+	                                      if (!$user->$user_relation || count($user->$user_relation) == 0)
+	                                          $query->where($usValueValueKey, -9999);
+	                                      else
+	                                          $query->whereIn($usValueValueKey, $user->$user_relation->pluck($usValueValueValue->property)->toArray());
+
+	                                  }
+	                              }
+	                          });
+	                      } else if ($usValue->type == 'value') {
+	                          foreach ($usValue->items as $usValueKey => $usValueValue) {
+	                              $subQuery->whereExists(function ($query) use ($usValueKey, $usValueValue, $user) {
+	                                  $query->select(\DB::raw(1))
+	                                      ->from(config('approval-config.user-table'))
+	                                      ->where('id', $user->id);
+	                                  foreach ($usValueValue as $usValueValueKey => $usValueValueValue) {
+	                                      $query->where($usValueValueKey, $usValueValueValue);
+	                                  }
+	                              });
+	                          }
+
+	                          $subQuery->whereExists(function ($query) use ($user, $currentLevel, $usValue) {
+	                              $level_column = $usValue->level_column;
+	                              $query->select(\DB::raw(1))
+	                                  ->from(config('approval-config.user-table'))
+	                                  ->where('id', $user->id)
+	                                  ->whereNotNull($level_column)
+	                                  ->where($level_column, $currentLevel->level);
+
+	                          });
+	                      }
+	                  }
+	              });
+	          });
+	      }
         
         if(!$user_selection && $currentLevel->properties){
     		$properties = (object)json_decode($currentLevel->properties);
