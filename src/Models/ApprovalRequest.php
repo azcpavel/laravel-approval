@@ -3,6 +3,7 @@
 namespace Exceptio\ApprovalPermission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 use Exceptio\ApprovalPermission\Models\Approval;
 use Exceptio\ApprovalPermission\Models\ApprovalRequestApproval;
@@ -257,183 +258,134 @@ class ApprovalRequest extends Model
 			}
         }
 
-        if($user_selection){        	
-        	$user = auth()->user();
-        	$totalData->whereExists(function ($query) use($user, $whereHasType){
-                $query->select(\DB::raw(1))
-                      ->from('ex_approval_level_users')
-                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
-                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
-                      ->where('ex_approval_level_users.user_id',$user->id);
-                if(count($whereHasType)>0)
-                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
-            });
-            $filterData->whereExists(function ($query) use($user, $whereHasType){
-                $query->select(\DB::raw(1))
-                      ->from('ex_approval_level_users')
-                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
-                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
-                      ->where('ex_approval_level_users.user_id',$user->id);
-                if(count($whereHasType)>0)
-                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
-            });
-            $totalCount->whereExists(function ($query) use($user, $whereHasType){
-                $query->select(\DB::raw(1))
-                      ->from('ex_approval_level_users')
-                      ->join('ex_approval_levels','ex_approval_levels.id','=','ex_approval_level_users.approval_level_id')
-                      ->whereColumn('ex_approval_levels.approval_id', 'ex_approval_requests.approval_id')
-                      ->where('ex_approval_level_users.user_id',$user->id);
-                if(count($whereHasType)>0)
-                      $query->where('ex_approval_requests.approvable_type',$whereHasType[0]);
-            });
-        	foreach($user_selection as $usKey => $usValue){
-        		if($usValue->type == 'model'){
-        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-						foreach($usValue->items as $usValueKey => $usValueValue){
-							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$user->$usValueValueValue);
-							}
-	        			}									
-					});
+        $user = auth()->user();
+		$applyUserSelection = function ($builder) use ($user, $user_selection, $whereHasType) {
 
-        			$filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-						foreach($usValue->items as $usValueKey => $usValueValue){
-							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$user->$usValueValueValue);
-							}
-	        			}									
-					});
+		    $builder->where(function ($group) use ($user, $user_selection, $whereHasType) {
 
-					$totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-						foreach($usValue->items as $usValueKey => $usValueValue){
-							foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$user->$usValueValueValue);
-							}
-	        			}									
-					});
-        		}if($usValue->type == 'model_collection'){
-        			$totalData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-                        foreach($usValue->items as $usValueKey => $usValueValue){
-                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-                                $user_relation = $usValueValueValue->relation;
-                                if(!$user->$user_relation || count($user->$user_relation) == 0)
-                                    $query->where($usValueValueKey,-9999);
-                                else
-                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
-                                
-                            }
-                        }                                   
-                    });
+		        // Assigned approver
+		        $group->whereExists(function ($query) use ($user, $whereHasType) {
+		            $query->select(DB::raw(1))
+		                ->from('ex_approval_level_users')
+		                ->join(
+		                    'ex_approval_levels',
+		                    'ex_approval_levels.id',
+		                    '=',
+		                    'ex_approval_level_users.approval_level_id'
+		                )
+		                ->whereColumn(
+		                    'ex_approval_levels.approval_id',
+		                    'ex_approval_requests.approval_id'
+		                )
+		                ->where('ex_approval_level_users.user_id', $user->id);
 
-                    $filterData->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-                        foreach($usValue->items as $usValueKey => $usValueValue){
-                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-                                $user_relation = $usValueValueValue->relation;
-                                if(!$user->$user_relation || count($user->$user_relation) == 0)
-                                    $query->where($usValueValueKey,-9999);
-                                else
-                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
-                                
-                            }
-                        }                                   
-                    });
+		            if (!empty($whereHasType)) {
+		                $query->where(
+		                    'ex_approval_requests.approvable_type',
+		                    $whereHasType[0]
+		                );
+		            }
+		        });
 
-                    $totalCount->hasMorph('approvable', $whereHasType, '>=', 1, 'or', function($query) use($user, $usValue) {
-                        foreach($usValue->items as $usValueKey => $usValueValue){
-                            foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-                                $user_relation = $usValueValueValue->relation;
-                                if(!$user->$user_relation || count($user->$user_relation) == 0)
-                                    $query->where($usValueValueKey,-9999);
-                                else
-                                    $query->whereIn($usValueValueKey,$user->$user_relation->pluck($usValueValueValue->property)->toArray());
-                                
-                            }
-                        }                                   
-                    });
-        		}else if($usValue->type == 'value'){
-        			foreach($usValue->items as $usValueKey => $usValueValue){
-        				$totalData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
-			               $query->select(\DB::raw(1))
-			                     ->from(config('approval-config.user-table'))
-			                     ->where('id',$user->id);
-			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$usValueValueValue);
-							}
-			           	});
+		        // Dynamic user selection
+		        $group->orWhere(function ($subQuery) use (
+		            $user,
+		            $user_selection,
+		            $whereHasType
+		        ) {
 
-        				$filterData->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
-			               $query->select(\DB::raw(1))
-			                     ->from(config('approval-config.user-table'))
-			                     ->where('id',$user->id);
-			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$usValueValueValue);
-							}
-			            });
+		            foreach ($user_selection as $usValue) {
 
-			            $totalCount->whereExists(function ($query) use($usValueKey, $usValueValue, $user){
-			               $query->select(\DB::raw(1))
-			                     ->from(config('approval-config.user-table'))
-			                     ->where('id',$user->id);
-			                foreach($usValueValue as $usValueValueKey => $usValueValueValue){
-	        					$query->where($usValueValueKey,$usValueValueValue);
-							}
-			            });
-        			}
-        		}
-        	}
+		                $submitWhereClause = property_exists(
+		                    $usValue,
+		                    'submit_where_clause'
+		                )
+		                    ? $usValue->submit_where_clause
+		                    : 'or';
 
-        	if(count($where) > 0){
-	            foreach ($where as $keyW => $valueW) {
-					if(strpos($keyW, ' EXISTS') !== false){
-	                    $keyW = str_replace(' EXISTS', '', $keyW);                    
-	                    $totalData->whereExists($valueW);
-	                    $filterData->whereExists($valueW);
-	                    $totalCount->whereExists($valueW);
-	                }
-					elseif(strpos($keyW, ' IN') !== false){
-	                    $keyW = str_replace(' IN', '', $keyW);
-	                    $totalData->whereIn($keyW, $valueW);
-	                    $filterData->whereIn($keyW, $valueW);
-	                    $totalCount->whereIn($keyW, $valueW);
-	                }elseif(strpos($keyW, ' NOTIN') !== false){
-	                    $keyW = str_replace(' NOTIN', '', $keyW);
-	                    $totalData->whereNotIn($keyW, $valueW);
-	                    $filterData->whereNotIn($keyW, $valueW);
-	                    $totalCount->whereNotIn($keyW, $valueW);
-	                }elseif(is_array($valueW)){
-	                    $totalData->where([$valueW]);
-	                    $filterData->where([$valueW]);
-	                    $totalCount->where([$valueW]);
-	                }elseif(strpos($keyW, ' and') === false){
-	                    if(strpos($keyW, ' NOTEQ') !== false){
-	                        $keyW = str_replace(' NOTEQ', '', $keyW);
-	                        $totalData->orWhere($keyW, '!=', $valueW);
-	                        $filterData->orWhere($keyW, '!=',  $valueW);
-	                        $totalCount->orWhere($keyW, '!=', $valueW);
-	                    }
-	                    else{
-	                        $totalData->orWhere($keyW, $valueW);
-	                        $filterData->orWhere($keyW, $valueW);
-	                        $totalCount->orWhere($keyW, $valueW);
-	                    }
-	                }
-	                else{
-	                    $keyW = str_replace(' and', '', $keyW);
-	                    if(strpos($keyW, ' NOTEQ') !== false){
-	                        $keyW = str_replace(' NOTEQ', '', $keyW);
-	                        $totalData->where($keyW, '!=', $valueW);
-	                        $filterData->where($keyW, '!=',  $valueW);
-	                        $totalCount->where($keyW, '!=', $valueW);
-	                    }
-	                    else{
-	                        $totalData->where($keyW, $valueW);
-	                        $filterData->where($keyW, $valueW);
-	                        $totalCount->where($keyW, $valueW);
-	                    }
-	                }
-				}
-	        }
-        }
+		                if ($usValue->type == 'model') {
+
+		                    $subQuery->hasMorph(
+		                        'approvable',
+		                        $whereHasType,
+		                        '>=',
+		                        1,
+		                        $submitWhereClause,
+		                        function ($query) use ($user, $usValue) {
+
+		                            foreach ($usValue->items as $item) {
+		                                foreach ($item as $column => $userField) {
+		                                    $query->where(
+		                                        $column,
+		                                        $user->$userField
+		                                    );
+		                                }
+		                            }
+		                        }
+		                    );
+
+		                } elseif ($usValue->type == 'model_collection') {
+
+		                    $subQuery->hasMorph(
+		                        'approvable',
+		                        $whereHasType,
+		                        '>=',
+		                        1,
+		                        $submitWhereClause,
+		                        function ($query) use ($user, $usValue) {
+
+		                            foreach ($usValue->items as $item) {
+		                                foreach ($item as $column => $config) {
+
+		                                    $relation = $config->relation;
+
+		                                    if (
+		                                        !$user->$relation ||
+		                                        $user->$relation->isEmpty()
+		                                    ) {
+		                                        $query->where($column, -9999);
+		                                    } else {
+		                                        $query->whereIn(
+		                                            $column,
+		                                            $user->$relation
+		                                                ->pluck($config->property)
+		                                                ->toArray()
+		                                        );
+		                                    }
+		                                }
+		                            }
+		                        }
+		                    );
+
+		                } elseif ($usValue->type == 'value') {
+
+		                    foreach ($usValue->items as $item) {
+
+		                        $subQuery->whereExists(function ($query) use (
+		                            $user,
+		                            $item
+		                        ) {
+
+		                            $query->select(DB::raw(1))
+		                                ->from(config('approval-config.user-table'))
+		                                ->where('id', $user->id);
+
+		                            foreach ($item as $column => $value) {
+		                                $query->where($column, $value);
+		                            }
+		                        });
+		                    }
+		                }
+		            }
+		        });
+		    });
+		};
+
+		if ($user_selection) {
+		    $applyUserSelection($totalData);
+		    $applyUserSelection($filterData);
+		    $applyUserSelection($totalCount);
+		}
 
         if($select != null){
         	$totalData->selectRaw($select);
