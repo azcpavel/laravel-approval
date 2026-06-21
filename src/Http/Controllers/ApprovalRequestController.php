@@ -912,7 +912,7 @@ class ApprovalRequestController extends Controller
         	}
         }
 
-		if($level && ($userApprover !== false || $approvalRequestSql->first()) && $request->do_swap != $currentLevel->level){
+		if($approvalRequest->completed == 0 && $level && ($userApprover !== false || $approvalRequestSql->first()) && $request->do_swap != $currentLevel->level){
 			
 			$message['msg_type'] = 'success';
 			$message['msg_data'] = 'Approval level changed to '.$level->title;
