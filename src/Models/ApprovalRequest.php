@@ -336,9 +336,10 @@ class ApprovalRequest extends Model
 
 		                            foreach ($usValue->items as $item) {
 		                                foreach ($item as $column => $config) {
-
+		                                    if(property_exists($config, 'skip_on_list')){
+		                                    	continue;
+		                                    }
 		                                    $relation = $config->relation;
-
 		                                    if (
 		                                        !$user->$relation ||
 		                                        $user->$relation->isEmpty()

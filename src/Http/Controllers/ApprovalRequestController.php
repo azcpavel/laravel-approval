@@ -175,6 +175,9 @@ class ApprovalRequestController extends Controller
 	                          $subQuery->hasMorph('approvable', [$approvalRequest->approval->approvable_type], '>=', 1, $submit_where_clause, function ($query) use ($user, $usValue) {
 	                              foreach ($usValue->items as $usValueKey => $usValueValue) {
 	                                  foreach ($usValueValue as $usValueValueKey => $usValueValueValue) {
+	                                  	  if(property_exists($usValueValueValue, 'skip_on_view')){
+		                                    continue;
+		                                  }
 	                                      $user_relation = $usValueValueValue->relation;
 	                                      if (!$user->$user_relation || count($user->$user_relation) == 0)
 	                                          $query->where($usValueValueKey, -9999);
