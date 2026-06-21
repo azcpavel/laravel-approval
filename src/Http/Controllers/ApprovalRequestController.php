@@ -198,16 +198,17 @@ class ApprovalRequestController extends Controller
 	                                  }
 	                              });
 	                          }
-
-	                          $subQuery->whereExists(function ($query) use ($user, $currentLevel, $usValue) {
-	                              $level_column = $usValue->level_column;
-	                              $query->select(\DB::raw(1))
-	                                  ->from(config('approval-config.user-table'))
-	                                  ->where('id', $user->id)
-	                                  ->whereNotNull($level_column)
-	                                  ->where($level_column, $currentLevel->level);
-
-	                          });
+	                          
+	                          if(property_exists($usValue,'strict_level_view')){
+		                          	$subQuery->whereExists(function ($query) use ($user, $currentLevel, $usValue) {
+		                              $level_column = $usValue->level_column;
+		                              $query->select(\DB::raw(1))
+		                                  ->from(config('approval-config.user-table'))
+		                                  ->where('id', $user->id)
+		                                  ->whereNotNull($level_column)
+		                                  ->where($level_column, $currentLevel->level);
+		                          	});
+	                          }
 	                      }
 	                  }
 	              });
